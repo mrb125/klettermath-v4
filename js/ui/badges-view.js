@@ -1,4 +1,5 @@
 import { getState, exportJSON } from '../state/store.js';
+import { TASKS_LIBRARY } from '../data/tasks-library.js';
 
 const FLASHCARDS = [
   {
@@ -160,6 +161,86 @@ export function renderBadges() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   });
+
+  renderTaskLibrarySection(container);
+}
+
+const CONCEPT_MAP = {
+  koordinaten:'📍 Koordinaten', ortsvektor:'🎯 Ortsvektor', verbindungsvektor:'↗ Verbindungsvektor',
+  betrag:'📏 Betrag', geradengleichung:'📐 Gerade', spurpunkt:'✕ Spurpunkt',
+  schnittgerade:'⚡ Schnitt', abstand:'↔ Abstand', skalarprodukt:'· Skalarprodukt',
+  winkel:'∠ Winkel', kreuzprodukt:'✕ Kreuzprodukt',
+};
+
+let _taskFilter = 'alle';
+
+function renderTaskLibrarySection(container) {
+  const section = document.createElement('details');
+  section.id = 'task-library-section';
+  section.style.cssText = 'margin-top:24px;border:1px solid rgba(139,115,85,.25);border-radius:12px;overflow:hidden';
+
+  section.innerHTML = `
+    <summary style="padding:14px 16px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--rope);list-style:none;display:flex;align-items:center;gap:10px;background:rgba(232,160,48,.06)">
+      <span>📚</span> Aufgaben-Bibliothek
+      <span style="font-family:'Nunito',sans-serif;font-size:.72rem;color:var(--text2);font-weight:400;letter-spacing:.5px;margin-left:4px">${TASKS_LIBRARY.length} Aufgaben · 18 Länder</span>
+      <span style="margin-left:auto;font-size:.75rem;color:var(--text2)">▼</span>
+    </summary>
+    <div style="padding:14px 16px">
+      <div style="font-size:.75rem;color:var(--text2);margin-bottom:12px">Internationale Vektorrechnung-Aufgaben für Q1 GK NRW — mit KletterMath-Adaptierungshinweis</div>
+      <div id="task-filter-bar" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px"></div>
+      <div id="task-cards-list"></div>
+    </div>`;
+
+  container.appendChild(section);
+  renderTaskFilters();
+  renderTaskCards();
+}
+
+function renderTaskFilters() {
+  const bar = document.getElementById('task-filter-bar');
+  if (!bar) return;
+  const concepts = ['alle', ...new Set(TASKS_LIBRARY.map(t => t.concept))];
+  bar.innerHTML = concepts.map(c => {
+    const label = c === 'alle' ? 'Alle' : (CONCEPT_MAP[c] || c);
+    const active = _taskFilter === c;
+    return `<button class="tl-filter-btn" data-f="${c}" style="
+      padding:4px 10px;border-radius:99px;border:1px solid ${active ? 'var(--rope)' : 'rgba(139,115,85,.25)'};
+      background:${active ? 'rgba(232,160,48,.2)' : 'transparent'};
+      color:${active ? 'var(--rope)' : 'var(--text2)'};
+      cursor:pointer;font-size:.72rem;font-family:var(--font);font-weight:700">${label}</button>`;
+  }).join('');
+  bar.querySelectorAll('.tl-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => { _taskFilter = btn.dataset.f; renderTaskFilters(); renderTaskCards(); });
+  });
+}
+
+function renderTaskCards() {
+  const list = document.getElementById('task-cards-list');
+  if (!list) return;
+  const tasks = _taskFilter === 'alle' ? TASKS_LIBRARY : TASKS_LIBRARY.filter(t => t.concept === _taskFilter);
+  if (!tasks.length) { list.innerHTML = '<div style="color:var(--text2);font-size:.85rem">Keine Aufgaben für diesen Filter.</div>'; return; }
+
+  list.innerHTML = tasks.map(t => {
+    const diffColor = t.diff === 'leicht' ? 'var(--ok)' : t.diff === 'mittel' ? 'var(--rope)' : 'var(--err)';
+    const diffLabel = t.diff === 'leicht' ? '● Leicht' : t.diff === 'mittel' ? '●● Mittel' : '●●● Schwer';
+    const conceptLabel = CONCEPT_MAP[t.concept] || t.concept;
+    return `<div style="background:rgba(255,255,255,.04);border:1px solid rgba(139,115,85,.18);border-radius:10px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
+        <span style="font-size:1.3rem;flex-shrink:0">${t.flag}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:.9rem;line-height:1.3">${t.title}</div>
+          <div style="font-size:.72rem;color:var(--text2);margin-top:2px">${t.country} · ${t.context}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+        <span style="font-size:.7rem;padding:2px 8px;border-radius:99px;background:rgba(100,149,237,.15);color:#6495ed;border:1px solid rgba(100,149,237,.25);font-weight:700">${conceptLabel}</span>
+        <span style="font-size:.7rem;padding:2px 8px;border-radius:99px;color:${diffColor};border:1px solid ${diffColor}30;background:${diffColor}18;font-weight:700">${diffLabel}</span>
+      </div>
+      <div style="font-size:.82rem;color:var(--text2);line-height:1.5;margin-bottom:8px">${t.desc}</div>
+      <div style="font-size:.78rem;background:rgba(232,160,48,.06);border:1px solid rgba(232,160,48,.15);border-radius:6px;padding:7px 10px;line-height:1.4;margin-bottom:8px">🧗 ${t.km}</div>
+      <a href="${t.source}" target="_blank" rel="noopener" style="font-size:.73rem;color:var(--rope);opacity:.8;text-decoration:none">🔗 ${t.label}</a>
+    </div>`;
+  }).join('');
 }
 
 export function checkBadges() {
