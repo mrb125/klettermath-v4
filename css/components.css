@@ -229,3 +229,69 @@
   font-size: .7rem;
   opacity: 0.6;
 }
+
+/* ── Kletterpark-Tour Button ── */
+.tour-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, rgba(107,203,119,0.12), rgba(200,131,58,0.12));
+  border: 1px solid rgba(107,203,119,0.35);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s, border-color 0.2s;
+}
+.tour-btn:hover {
+  background: linear-gradient(135deg, rgba(107,203,119,0.2), rgba(200,131,58,0.2));
+  border-color: #6bcb77;
+}
+.tour-btn__icon { font-size: 1.5rem; }
+.tour-btn__text { flex: 1; }
+.tour-btn__title { font-size: .9rem; font-weight: 800; color: #6bcb77; }
+.tour-btn__sub   { font-size: .75rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.tour-btn__arrow { font-size: 1.4rem; color: rgba(255,255,255,0.3); }
+
+/* ── Tour Mode Items ── */
+.tour-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.tour-item__num {
+  font-size: .72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--rope);
+  margin-bottom: 6px;
+}
+.tour-item__prompt { margin-bottom: 10px; }
+
+/* ── Tour Summary ── */
+.tour-summary {
+  margin-top: 16px;
+  padding: 16px;
+  background: rgba(107,203,119,0.08);
+  border: 1px solid rgba(107,203,119,0.3);
+  border-radius: 12px;
+}
+.tour-summary__title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #6bcb77;
+  margin-bottom: 12px;
+}
+.tour-summary__breakdown { display: flex; flex-direction: column; gap: 6px; }
+.tour-summary__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: .83rem;
+}
+.tour-ok  { color: #81c784; font-weight: 700; }
+.tour-err { color: #ff8a80; font-weight: 700; }

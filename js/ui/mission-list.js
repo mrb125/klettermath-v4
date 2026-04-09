@@ -3,6 +3,7 @@ import { isAvailable } from '../state/progress.js';
 import { MISSIONS } from '../data/missions.js';
 import { renderMath } from './math-render.js';
 import { fetchCustomMissions } from '../api/sync.js';
+import { startTour } from './tour-mode.js';
 
 let activeMissionId = null;
 let onSelectMission = null;
@@ -40,6 +41,20 @@ export async function renderMissionList() {
 
   html += buildMasteryOverview();
 
+  const doneMissions = MISSIONS.filter(m => isDone(m.id));
+  if (doneMissions.length >= 3) {
+    html += `
+      <button class="tour-btn" id="btn-tour">
+        <span class="tour-btn__icon">🏕️</span>
+        <div class="tour-btn__text">
+          <div class="tour-btn__title">Kletterpark-Tour</div>
+          <div class="tour-btn__sub">${Math.min(doneMissions.length, 5)} gemischte Aufgaben · kein Thema-Hinweis</div>
+        </div>
+        <span class="tour-btn__arrow">›</span>
+      </button>
+    `;
+  }
+
   MISSIONS.forEach(m => {
     const done  = isDone(m.id);
     const avail = isAvailable(m.id);
@@ -62,6 +77,8 @@ export async function renderMissionList() {
   });
 
   pane.innerHTML = html;
+
+  document.getElementById('btn-tour')?.addEventListener('click', () => startTour());
 
   pane.querySelectorAll('.review-chip').forEach(btn => {
     btn.addEventListener('click', () => {
