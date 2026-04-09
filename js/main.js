@@ -5,7 +5,7 @@ import { PLATS } from './data/platforms.js';
 import { getStoredCode, storeCode, validateCode, syncProgress } from './api/sync.js';
 
 // ── Boot ──
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const state = loadState();
   initToast();
 
