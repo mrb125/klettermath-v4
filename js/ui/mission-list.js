@@ -18,6 +18,8 @@ export async function renderMissionList() {
 
   let html = '<div class="mission-list-header">Missionen</div>';
 
+  html += buildMasteryOverview();
+
   MISSIONS.forEach(m => {
     const done  = isDone(m.id);
     const avail = isAvailable(m.id);
@@ -82,6 +84,66 @@ export async function renderMissionList() {
       import('./mission-view.js').then(mod => mod.renderMission(id));
     });
   });
+}
+
+function buildMasteryOverview() {
+  // Group missions by concept
+  const groups = {};
+  MISSIONS.forEach(m => {
+    const c = m.concept;
+    if (!groups[c]) groups[c] = { total: 0, done: 0, icon: getConceptIcon(c) };
+    groups[c].total++;
+    if (isDone(m.id)) groups[c].done++;
+  });
+
+  const entries = Object.entries(groups);
+  const totalDone = entries.reduce((s, [, g]) => s + g.done, 0);
+  const totalAll  = entries.reduce((s, [, g]) => s + g.total, 0);
+  const overallPct = Math.round((totalDone / totalAll) * 100);
+
+  let html = `
+    <details class="mastery-overview" ${totalDone > 0 ? 'open' : ''}>
+      <summary class="mastery-overview__summary">
+        <span>📊 Fortschritt</span>
+        <span class="mastery-overview__total">${totalDone}/${totalAll} Missionen · ${overallPct}%</span>
+      </summary>
+      <div class="mastery-bars">
+  `;
+
+  entries.forEach(([concept, g]) => {
+    const pct = g.total > 0 ? Math.round((g.done / g.total) * 100) : 0;
+    const label = pct === 100 ? '✓' : `${g.done}/${g.total}`;
+    html += `
+      <div class="mastery-bar-row">
+        <span class="mastery-bar-label">${g.icon} ${concept}</span>
+        <div class="mastery-bar-track">
+          <div class="mastery-bar-fill ${pct === 100 ? 'mastery-bar-fill--done' : ''}" style="width:${pct}%"></div>
+        </div>
+        <span class="mastery-bar-count">${label}</span>
+      </div>
+    `;
+  });
+
+  html += `</div></details>`;
+  return html;
+}
+
+function getConceptIcon(concept) {
+  const MAP = {
+    'Ortsvektor': '📍',
+    'Verbindungsvektor & Betrag': '📏',
+    'Parameterdarstellung': '🚡',
+    'Skalarprodukt': '⚡',
+    'Punktprobe': '🔍',
+    'Winkel zwischen Vektoren': '📐',
+    'Lagebeziehung': '🔀',
+    'Lotfußpunkt': '📐',
+    'Ebene': '🪟',
+    'Abstand Punkt-Ebene': '📏',
+    'Schnitt Gerade–Ebene': '✂️',
+    'Spiegelung an Ebene': '🪞',
+  };
+  return MAP[concept] || '🎯';
 }
 
 export function backToList() {
