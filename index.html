@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>KletterMath — Vektoren im Kletterwald</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/mission.css">
+<script type="module" src="js/main.js"></script>
+</head>
+<body>
+
+<!-- ════ Welcome ════ -->
+<div id="s-welcome" class="screen">
+  <div class="wlc-title">KletterMath</div>
+  <div class="wlc-sub">Vektoren im Kletterwald</div>
+  <div class="wlc-desc">
+    Entdecke Vektorrechnung an echten Kletterpark-Aufgaben.
+    Plattform = Punkt, Seil = Gerade — rechne dich durch den Park!
+  </div>
+  <button id="btn-enter" class="btn-start">PARK BETRETEN</button>
+  <button id="btn-continue" class="wlc-continue hidden">WEITER KLETTERN</button>
+</div>
+
+<!-- ════ Park ════ -->
+<div id="s-park" class="screen">
+  <div class="top-bar">
+    <div class="top-logo" data-nav="welcome">KletterMath</div>
+    <div class="top-progress">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <span id="progress-label">0/10</span>
+    </div>
+    <div class="top-xp" id="top-xp">0 XP</div>
+  </div>
+  <div class="park-body">
+    <div class="canvas-pane">
+      <canvas id="park-canvas"></canvas>
+      <div class="canvas-legend">
+        <span style="color:var(--rope)">●</span> Plattform
+        &nbsp;<span style="color:var(--gold)">—</span> Seil
+        &nbsp;Maus: drehen · Scroll: zoom
+      </div>
+    </div>
+    <div class="mission-pane">
+      <div class="mission-pane-scroll" id="mission-pane">
+        <!-- Mission list or active mission rendered here -->
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <button class="nav-btn active" data-nav="park"><span class="icon">🌲</span>Park</button>
+    <button class="nav-btn" data-nav="badges"><span class="icon">🏆</span>Badges</button>
+  </div>
+</div>
+
+<!-- ════ Badges ════ -->
+<div id="s-badges" class="screen">
+  <div class="top-bar">
+    <div class="top-logo" data-nav="park">KletterMath</div>
+    <div style="flex:1"></div>
+    <div class="top-xp" id="badges-xp">0 XP</div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:20px" id="badges-content">
+    <!-- Badges rendered here -->
+  </div>
+  <div class="bottom-nav">
+    <button class="nav-btn" data-nav="park"><span class="icon">🌲</span>Park</button>
+    <button class="nav-btn active" data-nav="badges"><span class="icon">🏆</span>Badges</button>
+  </div>
+</div>
+
+</body>
+</html>

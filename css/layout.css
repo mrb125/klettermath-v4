@@ -1,0 +1,192 @@
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.screen.active { display: flex }
+
+/* ── Welcome ── */
+#s-welcome {
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 50% 30%, #2e2416 0%, #1a1614 70%);
+  text-align: center;
+  padding: 24px;
+}
+.wlc-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 10vw, 88px);
+  letter-spacing: 5px;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--rope) 0%, var(--accent) 50%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 40px rgba(232,160,48,.25));
+}
+.wlc-sub {
+  color: var(--rope);
+  font-size: 1rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 4px 0 6px;
+}
+.wlc-desc {
+  color: var(--text2);
+  font-size: .9rem;
+  max-width: 440px;
+  margin: 0 auto 28px;
+  line-height: 1.7;
+}
+.btn-start {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 3px;
+  padding: 14px 48px;
+  background: linear-gradient(135deg, var(--accent), var(--rope));
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s;
+  box-shadow: 0 4px 24px rgba(255,107,53,.3);
+}
+.btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(255,107,53,.45);
+}
+.wlc-continue {
+  margin-top: 12px;
+  background: transparent;
+  border: 1px solid var(--stone);
+  color: var(--text2);
+  padding: 10px 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  transition: all .2s;
+}
+.wlc-continue:hover { border-color: var(--rope); color: var(--rope) }
+
+/* ── Top Bar ── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 16px;
+  background: var(--bg2);
+  border-bottom: 1px solid rgba(139,115,85,.18);
+  flex-shrink: 0;
+  z-index: 50;
+}
+.top-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.35rem;
+  background: linear-gradient(135deg, var(--rope), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 2px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.top-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  font-size: .8rem;
+  color: var(--text2);
+}
+.progress-track {
+  flex: 1;
+  max-width: 160px;
+  height: 5px;
+  background: var(--bg4);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rope), var(--accent));
+  border-radius: 99px;
+  transition: width .5s ease;
+}
+.top-xp {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+/* ── Park Screen ── */
+#s-park { flex-direction: column }
+.park-body { display: flex; flex: 1; overflow: hidden }
+.canvas-pane {
+  flex: 0 0 55%;
+  position: relative;
+  background: var(--bg2);
+  border-right: 1px solid rgba(139,115,85,.15);
+}
+#park-canvas { width: 100%; height: 100%; display: block; cursor: grab }
+#park-canvas:active { cursor: grabbing }
+.canvas-legend {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  font-size: .75rem;
+  color: var(--text3);
+  pointer-events: none;
+}
+.mission-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+.mission-pane-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+/* ── Bottom Nav ── */
+.bottom-nav {
+  display: flex;
+  background: var(--bg2);
+  border-top: 1px solid rgba(139,115,85,.18);
+  flex-shrink: 0;
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: .7rem;
+  cursor: pointer;
+  transition: color .2s;
+}
+.nav-btn .icon { font-size: 1.2rem }
+.nav-btn.active { color: var(--rope) }
+.nav-btn:hover { color: var(--text) }
+
+/* ── Badges Screen ── */
+#s-badges {
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* ── Responsive ── */
+@media (max-width: 720px) {
+  .park-body { flex-direction: column }
+  .canvas-pane { flex: 0 0 35%; border-right: none; border-bottom: 1px solid rgba(139,115,85,.15) }
+  .mission-pane { flex: 1 }
+}

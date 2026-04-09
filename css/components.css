@@ -1,0 +1,69 @@
+/* ── Buttons ── */
+.btn {
+  font-family: 'Nunito', sans-serif;
+  font-size: .85rem;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: var(--r);
+  border: 1px solid rgba(139,115,85,.3);
+  background: var(--bg3);
+  color: var(--text);
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn:hover { background: var(--bg4); border-color: var(--stone) }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--rope));
+  border: none;
+  color: #fff;
+  font-weight: 700;
+}
+.btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px) }
+.btn-sm {
+  padding: 5px 11px;
+  font-size: .78rem;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid rgba(139,115,85,.15);
+  border-radius: var(--r2);
+  padding: 16px;
+  transition: all .2s;
+}
+.card:hover { border-color: rgba(139,115,85,.3) }
+
+/* ── Chips ── */
+.chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .5px;
+}
+.chip-basis { background: rgba(107,203,119,.15); color: var(--ok) }
+.chip-standard { background: rgba(232,160,48,.15); color: var(--rope) }
+.chip-vertiefung { background: rgba(239,68,68,.15); color: var(--err) }
+
+/* ── Inputs ── */
+.input-field {
+  background: var(--bg3);
+  border: 1px solid rgba(139,115,85,.3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .9rem;
+  outline: none;
+  transition: border-color .2s;
+  width: 80px;
+  text-align: center;
+}
+.input-field:focus { border-color: var(--rope) }
+.input-field.correct { border-color: var(--ok); box-shadow: var(--glow-ok) }
+.input-field.wrong { border-color: var(--err); box-shadow: var(--glow-err) }
+
+/* ── Hidden utility ── */
+.hidden { display: none !important }

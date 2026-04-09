@@ -1,0 +1,23 @@
+:root {
+  --bg: #1a1614;
+  --bg2: #22201c;
+  --bg3: #2e2820;
+  --bg4: #3a3228;
+  --stone: #8b7355;
+  --stone2: #a08060;
+  --rope: #e8a030;
+  --accent: #ff6b35;
+  --gold: #ffd166;
+  --ok: #6bcb77;
+  --err: #ef4444;
+  --blue: #5b9bd5;
+  --text: #f5f0e8;
+  --text2: #b0a090;
+  --text3: #9a8a78;
+  --r: 10px;
+  --r2: 14px;
+  --shadow: 0 4px 24px rgba(0,0,0,.35);
+  --glow-rope: 0 0 20px rgba(232,160,48,.25);
+  --glow-ok: 0 0 12px rgba(107,203,119,.3);
+  --glow-err: 0 0 12px rgba(239,68,68,.3);
+}
