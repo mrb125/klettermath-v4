@@ -613,19 +613,19 @@ export const MISSIONS = [
         },
         tolerance: 0.1,
         hints: [
-          () => 'Der Spiegelpunkt T\\' liegt auf der anderen Seite von F: T\\' = 2·F − T',
+          () => 'Der Spiegelpunkt T\u2032 liegt auf der anderen Seite von F: T\u2032 = 2\u00B7F \u2212 T',
           () => { const n = connV(0,1).cross(connV(0,2)); const t = -n.dot(pV(4).sub(pV(0)))/n.dot(n); const f = pV(4).add(n.scale(t)); return `\\(T' = 2 \\cdot \\begin{pmatrix}${f.x.toFixed(2)}\\\\${f.y.toFixed(2)}\\\\${f.z.toFixed(2)}\\end{pmatrix} - \\begin{pmatrix}${pV(4).x}\\\\${pV(4).y}\\\\${pV(4).z}\\end{pmatrix}\\)` },
           () => { const n = connV(0,1).cross(connV(0,2)); const t = -n.dot(pV(4).sub(pV(0)))/n.dot(n); const f = pV(4).add(n.scale(t)); const tp = f.scale(2).sub(pV(4)); return `$$T' \\approx \\begin{pmatrix}${tp.x.toFixed(2)}\\\\${tp.y.toFixed(2)}\\\\${tp.z.toFixed(2)}\\end{pmatrix}$$` }
         ],
         diagnostics: [
-          { pattern: (ans) => { const n = connV(0,1).cross(connV(0,2)); const t = -n.dot(pV(4).sub(pV(0)))/n.dot(n); const f = pV(4).add(n.scale(t)); const wrong = pV(4).sub(f.sub(pV(4))); return Math.abs(ans[0]-wrong.x)<0.1 && Math.abs(ans[1]-wrong.y)<0.1 }, msg: 'Fast! Prüfe die Formel: T\\' = 2·F − T, nicht F − (T − F).' }
+          { pattern: (ans) => { const n = connV(0,1).cross(connV(0,2)); const t = -n.dot(pV(4).sub(pV(0)))/n.dot(n); const f = pV(4).add(n.scale(t)); const wrong = pV(4).sub(f.sub(pV(4))); return Math.abs(ans[0]-wrong.x)<0.1 && Math.abs(ans[1]-wrong.y)<0.1 }, msg: 'Fast! Pr\u00FCfe die Formel: T\u2032 = 2\u00B7F \u2212 T, nicht F \u2212 (T \u2212 F).' }
         ]
       }
     ],
     insight: {
       title: 'Spiegelung an einer Ebene',
-      formula: '$$T' = 2F - T, \\quad F = T + t \\cdot \\vec{n}, \\quad t = \\frac{-\\vec{n}\\cdot(T-A)}{|\\vec{n}|^2}$$',
-      body: 'Der Spiegelpunkt liegt symmetrisch zum Lotfußpunkt F: F ist der Mittelpunkt von T und T\'.'
+      formula: '$$T\u2032 = 2F - T, \\quad F = T + t \\cdot \\vec{n}, \\quad t = \\frac{-\\vec{n}\\cdot(T-A)}{|\\vec{n}|^2}$$',
+      body: 'Der Spiegelpunkt liegt symmetrisch zum Lotfu\u00DFpunkt F: F ist der Mittelpunkt von T und T\u2032.'
     }
   }
 ];
