@@ -320,25 +320,34 @@ function handleHint(idx) {
   const step = currentMission.steps[idx];
   if (!step.hints || !step.hints.length) return;
   const ms = getMissionStep(currentMission.id, idx);
-  const tier = Math.min(ms.hintTier, step.hints.length - 1);
-
-  // Adaptive: if student has ≥3 prior errors on this concept, skip straight to strategy hint
-  const state = getState();
-  const priorErrors = state.analytics?.errorPatterns?.[currentMission.concept] || 0;
-  const startTier = (ms.hintTier === 0 && ms.attempts === 0 && priorErrors >= 3) ? 1 : 0;
-  const nextTier = Math.min(tier + (ms.hintTier === 0 && ms.attempts === 0 ? startTier : 1), step.hints.length - 1);
-
-  useHint(currentMission.id, idx, nextTier);
-
-  // Show adaptive notice once (first hint request, high prior errors)
-  if (ms.hintTier === 0 && priorErrors >= 3 && nextTier >= 1) {
-    showToast('💡 Adaptiver Modus: Du bekommst direkt eine ausführlichere Hilfe.', 'ok', 3500);
-  }
 
   const hintEl = document.getElementById(`hint-${idx}`);
   if (!hintEl) return;
 
   const totalTiers = step.hints.length;
+
+  // Determine which tier to reveal next.
+  // ms.hintTier stays 0 after showing tier 0 (useHint uses Math.max),
+  // so we use DOM presence to distinguish "first click" from "already showing".
+  const hintEl = document.getElementById(`hint-${idx}`);
+  const hintsAlreadyShown = hintEl && hintEl.querySelector('.hint-tier-label');
+  let nextTier;
+  if (!hintsAlreadyShown) {
+    // First reveal — adaptive: skip to tier 1 if many prior errors
+    const state = getState();
+    const priorErrors = state.analytics?.errorPatterns?.[currentMission.concept] || 0;
+    if (priorErrors >= 3) {
+      nextTier = Math.min(1, totalTiers - 1);
+      showToast('💡 Adaptiver Modus: Du bekommst direkt eine ausführlichere Hilfe.', 'ok', 3500);
+    } else {
+      nextTier = 0;
+    }
+  } else {
+    nextTier = Math.min(ms.hintTier + 1, totalTiers - 1);
+  }
+
+  useHint(currentMission.id, idx, nextTier);
+
   const TIER_META = [
     { label: '💡 Hinweis',       cls: 'hint-box hint-tier-1' },
     { label: '🔍 Strategie',     cls: 'hint-box hint-tier-2' },
