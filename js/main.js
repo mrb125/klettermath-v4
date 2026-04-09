@@ -118,6 +118,24 @@ async function onParkShow() {
     const { initScene } = await import('./scene/scene-manager.js');
     initScene(document.getElementById('park-canvas'));
   }
+  // Camera preset buttons (inject once)
+  if (!document.getElementById('cam-presets')) {
+    const bar = document.createElement('div');
+    bar.id = 'cam-presets';
+    bar.className = 'cam-presets';
+    bar.innerHTML = `
+      <button class="cam-btn" data-preset="top" title="Draufsicht">⬆</button>
+      <button class="cam-btn" data-preset="front" title="Vorne">👁</button>
+      <button class="cam-btn" data-preset="side" title="Seite">↔</button>
+      <button class="cam-btn" data-preset="default" title="Standard">⌂</button>
+    `;
+    document.querySelector('.canvas-pane')?.appendChild(bar);
+    bar.addEventListener('click', e => {
+      const btn = e.target.closest('.cam-btn');
+      if (!btn) return;
+      import('./scene/scene-manager.js').then(m => m.setCameraPreset(btn.dataset.preset));
+    });
+  }
   // Load mission list
   const { renderMissionList } = await import('./ui/mission-list.js');
   renderMissionList();

@@ -220,6 +220,20 @@ export function clearHighlights() {
   ropeMeshes.forEach(m => { m.visible = false; });
 }
 
+export function setCameraPreset(name) {
+  if (!camera || !controls) return;
+  const presets = {
+    top:     { pos: [3.5, 22, 0.01], target: [3.5, 0, 0] },
+    front:   { pos: [3.5, 4, 20],    target: [3.5, 4, 0] },
+    side:    { pos: [22, 4, 2],      target: [3.5, 4, 2] },
+    default: { pos: [12, 9, 14],     target: [3.5, 2.5, 2] },
+  };
+  const p = presets[name] || presets.default;
+  camera.position.set(...p.pos);
+  controls.target.set(...p.target);
+  controls.update();
+}
+
 export function dispose() {
   if (animId) cancelAnimationFrame(animId);
   if (renderer) renderer.dispose();
