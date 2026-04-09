@@ -1,6 +1,7 @@
 import { MISSIONS } from '../data/missions.js';
 import { PLATS } from '../data/platforms.js';
 import { checkAnswer, runDiagnostics } from '../math/checks.js';
+import { classifyError } from '../math/error-classifier.js';
 import { getState, completeMission, completeCustomMission, addAttempt, useHint, getMissionStep, addErrorPattern, awardBadge } from '../state/store.js';
 import { isExamMode } from '../state/exam-mode.js';
 import { renderMath } from './math-render.js';
@@ -277,10 +278,18 @@ function doCheck(idx, step, userAnswer) {
     missionIsGold = false;
     // Check diagnostics (suppressed in exam mode)
     const diagMsg = isExamMode() ? null : runDiagnostics(step.type, userAnswer, step.diagnostics);
-    const msg = diagMsg || 'Leider falsch. Versuch es nochmal!';
-    showFeedback(idx, msg, false);
+    const classified = (!isExamMode() && !diagMsg)
+      ? classifyError(step.type, userAnswer, correct, currentMission.concept)
+      : null;
+    const msg = diagMsg || classified || 'Leider falsch — versuch es nochmal! 💪';
+    showFeedback(idx, msg, false, !!classified);
     markInputsWrong(step, idx);
     addErrorPattern(currentMission.concept);
+    if (classified) {
+      // Extract error type tag for analytics
+      const typeMatch = classified.match(/strong>(.*?)</);
+      if (typeMatch) addErrorPattern(currentMission.concept + ':' + typeMatch[1].replace(/[^a-zA-ZäöüÄÖÜß]/g, '_'));
+    }
     // Generation Effect: Erklärung nach ≥2 Fehlversuchen automatisch einblenden
     const msNow = getMissionStep(currentMission.id, idx);
     if (msNow.attempts >= 2) {
@@ -303,10 +312,10 @@ function doCheck(idx, step, userAnswer) {
   }
 }
 
-function showFeedback(idx, msg, correct) {
+function showFeedback(idx, msg, correct, isClassified = false) {
   const el = document.getElementById(`feedback-${idx}`);
   if (!el) return;
-  el.className = `step-feedback ${correct ? 'correct' : 'wrong'}`;
+  el.className = `step-feedback ${correct ? 'correct' : 'wrong'}${isClassified ? ' classified' : ''}`;
   el.innerHTML = msg;
   renderMath(el);
 }
