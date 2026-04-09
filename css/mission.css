@@ -360,3 +360,28 @@
   color: var(--text2);
   line-height: 1.7;
 }
+
+/* ── Inline Glossar ── */
+.gl-term {
+  border-bottom: 1px dotted var(--rope);
+  cursor: help;
+  color: inherit;
+}
+.gl-term:hover, .gl-term:focus {
+  border-bottom-color: var(--gold);
+  color: var(--gold);
+}
+.gl-popup {
+  display: inline-block;
+  background: var(--bg3);
+  border: 1px solid rgba(232,160,48,.3);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: .78rem;
+  color: var(--text2);
+  margin-left: 4px;
+  vertical-align: middle;
+  animation: fadeIn .15s ease;
+  max-width: 260px;
+  line-height: 1.4;
+}

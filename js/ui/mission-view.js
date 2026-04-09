@@ -8,7 +8,7 @@ import { showToast } from './toast.js';
 import { backToList } from './mission-list.js';
 import { updateTopBar } from '../main.js';
 import { checkBadges } from './badges-view.js';
-import { renderTheoryButton, refreshGlossar } from './theory-panel.js';
+import { renderTheoryButton, refreshGlossar, applyInlineGlossar } from './theory-panel.js';
 
 let currentMission = null;
 let currentStepIdx = 0;
@@ -95,6 +95,7 @@ function renderMissionUI() {
 
   pane.innerHTML = html;
   renderMath(pane);
+  applyInlineGlossar(pane);
 
   bindStepEvents();
 
