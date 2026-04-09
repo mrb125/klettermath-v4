@@ -136,6 +136,24 @@ async function onParkShow() {
       import('./scene/scene-manager.js').then(m => m.setCameraPreset(btn.dataset.preset));
     });
   }
+  // Map overlay toggle (inject once)
+  if (!document.getElementById('map-toggle-btn')) {
+    const btn = document.createElement('button');
+    btn.id = 'map-toggle-btn';
+    btn.className = 'cam-btn map-toggle-btn';
+    btn.title = 'Park-Karte';
+    btn.innerHTML = '🗺️';
+    btn.style.marginTop = '8px';
+    document.getElementById('cam-presets')?.appendChild(btn);
+
+    btn.addEventListener('click', () => {
+      const overlay = document.getElementById('map-overlay');
+      if (!overlay) return;
+      const isShown = overlay.style.display !== 'none';
+      overlay.style.display = isShown ? 'none' : 'flex';
+      btn.classList.toggle('active', !isShown);
+    });
+  }
   // Load mission list
   const { renderMissionList } = await import('./ui/mission-list.js');
   renderMissionList();

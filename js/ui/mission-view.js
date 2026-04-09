@@ -49,6 +49,9 @@ export function renderMission(missionId, customMission = null) {
     }
   }
 
+  // Reset to standard camera view on mission start
+  import('../scene/scene-manager.js').then(m => m.setCameraPreset('default')).catch(() => {});
+
   // Highlight platforms in scene
   highlightPlatforms(mission.platforms);
 

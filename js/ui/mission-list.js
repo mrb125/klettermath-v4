@@ -17,6 +17,9 @@ export async function renderMissionList() {
   // If a mission is active, don't overwrite
   if (activeMissionId !== null) return;
 
+  // Zoom to isometric map view when showing mission list
+  import('../scene/scene-manager.js').then(m => m.setCameraPreset('map')).catch(() => {});
+
   const dueReviews = getDueReviews();
   // Only show concepts that have at least one done mission
   const doneConcepts = new Set(MISSIONS.filter(m => isDone(m.id)).map(m => m.concept));

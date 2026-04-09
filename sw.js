@@ -7,6 +7,7 @@ const STATIC = [
   './',
   './index.html',
   './assets/welcome-bg.jpg',
+  './assets/park-map.png',
   './css/variables.css',
   './css/base.css',
   './css/layout.css',

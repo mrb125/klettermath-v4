@@ -228,6 +228,7 @@ export function clearHighlights() {
 export function setCameraPreset(name) {
   if (!camera || !controls) return;
   const presets = {
+    map:     { pos: [3.5, 18, 3],    target: [3.5, 0, 2] },
     top:     { pos: [3.5, 22, 0.01], target: [3.5, 0, 0] },
     front:   { pos: [3.5, 4, 20],    target: [3.5, 4, 0] },
     side:    { pos: [22, 4, 2],      target: [3.5, 4, 2] },
