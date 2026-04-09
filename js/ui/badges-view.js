@@ -72,6 +72,19 @@ const BADGE_DEFS = [
   { id: 'spiegel_held',     name: 'Spiegelheld',       icon: '🪞', desc: 'Spiegelung an Ebene gemeistert' },
 ];
 
+const BADGE_META = {
+  'erste_schritte':  { icon: '📍', label: 'Pfadfinder',            story: 'Du weißt, wo jede Plattform im Raum liegt — kein Kletterpark ist mehr ein Rätsel.' },
+  'vektor_meister':  { icon: '🪢', label: 'Seiltechniker',         story: 'Du berechnest Seillängen exakt. Kein Seil zu kurz, keins zu lang.' },
+  'kletter_profi':   { icon: '🏆', label: 'Kletterpark-Champion',  story: 'Du hast alle Missionen gemeistert. Der Kletterpark gehört dir — rechnerisch gesehen.' },
+  'streak_3':        { icon: '🔥', label: '3-Tage-Streak',         story: 'Drei Tage am Stück trainiert — Ausdauer ist auch beim Klettern die halbe Miete.' },
+  'streak_7':        { icon: '💥', label: 'Wochenstreak',          story: 'Eine ganze Woche dran geblieben. Profis klettern jeden Tag.' },
+  'streak_14':       { icon: '⚡', label: 'Zweiwochenstreak',      story: '14 Tage ohne Pause. Deine Vektorkenntnisse sind jetzt Muskelgedächtnis.' },
+  'first_try':       { icon: '🎯', label: 'Routenprüfer',          story: 'Erster Versuch, direkt richtig — du planst deine Routen ohne Fehler.' },
+  'gold_meister':    { icon: '🏅', label: 'Goldmeister',           story: '5 Missionen fehlerfrei gemeistert. Jeder Seilpfad sitzt auf Anhieb.' },
+  'ebenen_explorer': { icon: '🏔️', label: 'Netz-Architekt',       story: 'Sicherheitsnetze liegen genau da, wo du sie hinrechnest. Keine Abweichungen.' },
+  'spiegel_held':    { icon: '🪞', label: 'Spiegelmeister',        story: 'Symmetrie im Raum beherrschst du. Deine Routen sind perfekt gespiegelt.' },
+};
+
 export function renderBadges() {
   const state = getState();
   const container = document.getElementById('badges-content');
@@ -101,11 +114,18 @@ export function renderBadges() {
 
   BADGE_DEFS.forEach(b => {
     const has = state.progress.badges.includes(b.id);
+    const meta = BADGE_META[b.id];
+    const icon = meta ? meta.icon : b.icon;
+    const label = meta ? meta.label : b.name;
+    const story = meta ? meta.story : null;
     html += `
-      <div class="card" style="text-align:center;${has ? '' : 'opacity:.3;filter:grayscale(1)'}">
-        <div style="font-size:2rem;margin-bottom:6px">${b.icon}</div>
-        <div style="font-weight:700;font-size:.85rem">${b.name}</div>
-        <div style="font-size:.72rem;color:var(--text2);margin-top:4px">${b.desc}</div>
+      <div class="card" style="text-align:center;${has ? '' : 'opacity:.3;filter:grayscale(1)'}" title="${b.desc}">
+        <div style="font-size:2rem;margin-bottom:6px">${icon}</div>
+        <div style="font-weight:700;font-size:.85rem">${label}</div>
+        ${has && story
+          ? `<div style="font-size:.72rem;color:var(--text2);margin-top:6px;font-style:italic;line-height:1.4">${story}</div>`
+          : `<div style="font-size:.72rem;color:var(--text3);margin-top:4px">🔒 Noch nicht verdient</div>`
+        }
       </div>`;
   });
 

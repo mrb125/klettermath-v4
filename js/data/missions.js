@@ -50,7 +50,8 @@ export const MISSIONS = [
       formula: '$$\\vec{OP} = \\begin{pmatrix}x_P\\\\y_P\\\\z_P\\end{pmatrix}$$',
       body: 'Der Ortsvektor zeigt vom Ursprung O direkt zum Punkt P. Seine Komponenten sind identisch mit den Koordinaten des Punktes.'
     },
-    badge: 'erste_schritte'
+    badge: 'erste_schritte',
+    why: 'Jede Sicherungsstation in einem echten Kletterpark hat GPS-Koordinaten. Der Ortsvektor ist nichts anderes als ein Koordinatentripel — Kletterpark-Planer verwenden genau diese Darstellung, um Plattformen im 3D-Raum zu verorten.'
   },
   {
     id: 2, title: 'Das erste Seil', concept: 'Verbindungsvektor & Betrag',
@@ -102,7 +103,8 @@ export const MISSIONS = [
       title: 'Verbindungsvektor & Betrag',
       formula: '$$\\vec{AB} = B - A \\qquad |\\vec{v}| = \\sqrt{x^2+y^2+z^2}$$',
       body: 'Der Verbindungsvektor zeigt von A nach B. Sein Betrag ist die Länge des Seils.'
-    }
+    },
+    why: 'Seilhersteller berechnen die exakte Seillänge zwischen zwei Plattformen mit dem Verbindungsvektor. Falsch berechnete Seillängen sind gefährlich — deshalb müssen Vektordifferenz und Betrag sitzen.'
   },
   {
     id: 3, title: 'Die Seilbahn', concept: 'Parameterdarstellung',
@@ -152,7 +154,8 @@ export const MISSIONS = [
       title: 'Parameterdarstellung',
       formula: '$$g: \\vec{x} = \\vec{a} + t \\cdot \\vec{v}, \\quad t \\in \\mathbb{R}$$',
       body: 'Eine Gerade wird durch einen Stützvektor und einen Richtungsvektor beschrieben. Der Parameter t gibt an, wo auf der Geraden man sich befindet.'
-    }
+    },
+    why: 'Seilbahnen und Ziplines folgen exakt einer Geraden im Raum. Die Parameterdarstellung beschreibt diese Linie vollständig — mit ihr kann man jeden Punkt auf der Route berechnen.'
   },
   {
     id: 4, title: 'Aufprallwinkel', concept: 'Skalarprodukt',
@@ -198,7 +201,8 @@ export const MISSIONS = [
       title: 'Skalarprodukt & Winkel',
       formula: '$$\\cos\\alpha = \\frac{\\vec{a} \\cdot \\vec{b}}{|\\vec{a}| \\cdot |\\vec{b}|}$$',
       body: 'Das Skalarprodukt misst, wie sehr zwei Vektoren in dieselbe Richtung zeigen. Bei 0 stehen sie senkrecht.'
-    }
+    },
+    why: 'Das Skalarprodukt misst den Winkel zwischen Kletterseilen. Hängen zwei Seile senkrecht zueinander, ist ihr Skalarprodukt null — ein wichtiges Sicherheitskriterium bei der Konstruktion von Seilgärten.'
   },
   {
     id: 5, title: 'Liegt er auf dem Weg?', concept: 'Punktprobe',
@@ -250,7 +254,8 @@ export const MISSIONS = [
       title: 'Punktprobe',
       formula: '$$P \\in g \\Leftrightarrow \\exists t: \\vec{p} = \\vec{a} + t \\cdot \\vec{v}$$',
       body: 'Ein Punkt liegt auf einer Geraden, wenn alle drei Gleichungen denselben Parameter t liefern.'
-    }
+    },
+    why: 'Bei der Routenplanung prüfen Ingenieure, ob geplante Ankerpunkte auf einer bestimmten Seillinie liegen. Die Punktprobe ist genau dieses Verfahren — schnell und eindeutig.'
   },
   {
     id: 6, title: 'Scharfer Winkel', concept: 'Winkel zwischen Vektoren',
@@ -286,7 +291,8 @@ export const MISSIONS = [
       title: 'Schnittwinkel',
       formula: '$$\\text{Schnittwinkel} = \\begin{cases} \\alpha & \\text{falls } \\alpha \\leq 90° \\\\ 180° - \\alpha & \\text{sonst} \\end{cases}$$',
       body: 'Der Schnittwinkel zweier Geraden liegt immer zwischen 0° und 90°.'
-    }
+    },
+    why: 'Kletterwände haben einen Neigungswinkel, der für die Schwierigkeit entscheidend ist. Mit dem Skalarprodukt und den Vektorbeträgen berechnet man diesen Winkel exakt.'
   },
   {
     id: 7, title: 'Zwei Seile kreuzen?', concept: 'Lagebeziehung',
@@ -340,7 +346,8 @@ export const MISSIONS = [
       title: 'Lagebeziehung zweier Geraden',
       formula: '$$(\\vec{b}-\\vec{a}) \\cdot (\\vec{r_1} \\times \\vec{r_2}) \\neq 0 \\Rightarrow \\text{windschief}$$',
       body: 'Zwei Geraden im Raum können schneidend, parallel, identisch oder windschief sein.'
-    }
+    },
+    why: 'Zwei Ziplines dürfen sich nicht schneiden — sonst kollidieren die Kletterer. Das Prüfen auf Schnitt- oder Parallelität (Lagebeziehung) ist bei der Planung von Seilparks Pflicht.'
   },
   {
     id: 8, title: 'Abstand zur Stütze', concept: 'Lotfußpunkt',
@@ -378,7 +385,8 @@ export const MISSIONS = [
       title: 'Abstand Punkt — Gerade',
       formula: '$$t_0 = \\frac{\\vec{AP}\\cdot\\vec{r}}{\\vec{r}\\cdot\\vec{r}} \\qquad d = |P - (A + t_0\\cdot\\vec{r})|$$',
       body: 'Der kürzeste Abstand ist der Weg über den Lotfußpunkt.'
-    }
+    },
+    why: 'Der Lotfußpunkt gibt den nächsten Punkt auf einem Seil zu einem Kletterer an. Das ist der kürzeste Abstand — wichtig für Sicherheitsabstände und Bergrettung.'
   },
   {
     id: 9, title: 'Die Kletterwand', concept: 'Ebene',
@@ -439,7 +447,8 @@ export const MISSIONS = [
       formula: '$$E: \\vec{n}\\cdot(\\vec{x}-\\vec{a})=0$$',
       body: 'Eine Ebene wird definiert durch einen Punkt und einen Normalenvektor, der senkrecht auf ihr steht.'
     },
-    badge: 'ebenen_explorer'
+    badge: 'ebenen_explorer',
+    why: 'Hängematten und Sicherheitsnetze spannen Ebenen auf. Ihre Gleichung beschreibt die genaue Lage im Raum — nötig zur Berechnung von Abständen und Neigungen.'
   },
   {
     id: 11, title: 'Wie weit ist der Gipfel?', concept: 'Abstand Punkt-Ebene',
@@ -502,7 +511,8 @@ export const MISSIONS = [
       title: 'Abstand Punkt — Ebene',
       formula: '$$d(P, E) = \\frac{|\\vec{n} \\cdot \\vec{AP}|}{|\\vec{n}|}$$',
       body: 'Der Abstand eines Punktes P von einer Ebene E (mit Normalenvektor n⃗ und Punkt A ∈ E) berechnet sich über das Skalarprodukt mit dem normalisierten Normalenvektor.'
-    }
+    },
+    why: 'Wie weit hängt ein Kletterer über dem Sicherheitsnetz? Der Abstand eines Punktes (Kletterer) zur Ebene (Netz) beantwortet diese Frage exakt.'
   },
   {
     id: 10, title: 'Seil trifft Wand', concept: 'Schnitt Gerade–Ebene',
@@ -559,7 +569,8 @@ export const MISSIONS = [
       title: 'Schnitt Gerade–Ebene',
       formula: '$$t = \\frac{-\\vec{n}\\cdot(\\vec{a}-\\vec{p})}{\\vec{n}\\cdot\\vec{r}}$$',
       body: 'Den Schnittpunkt findet man, indem man die Geradengleichung in die Ebenengleichung einsetzt.'
-    }
+    },
+    why: 'Zwei Sicherheitsebenen schneiden sich in einer Geraden — das ist die Linie, an der beide Netze befestigt werden müssen. Die Schnittgerade gibt diesen Montagepfad an.'
   },
   {
     id: 12, title: 'Spiegelpunkt im Wald', concept: 'Spiegelung an Ebene',
@@ -626,6 +637,7 @@ export const MISSIONS = [
       title: 'Spiegelung an einer Ebene',
       formula: '$$T\u2032 = 2F - T, \\quad F = T + t \\cdot \\vec{n}, \\quad t = \\frac{-\\vec{n}\\cdot(T-A)}{|\\vec{n}|^2}$$',
       body: 'Der Spiegelpunkt liegt symmetrisch zum Lotfu\u00DFpunkt F: F ist der Mittelpunkt von T und T\u2032.'
-    }
+    },
+    why: 'Beim Bouldern wird die Spiegelung genutzt, um symmetrische Routenabschnitte zu planen. Die Spiegelung an einer Ebene beschreibt diese Symmetrie mathematisch.'
   }
 ];

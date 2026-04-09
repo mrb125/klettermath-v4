@@ -57,6 +57,14 @@ function renderMissionUI() {
     <div class="mission-story">${m.story()}</div>
     <div class="mission-task">${m.task()}</div>`;
 
+  if (m.why) {
+    html += `
+    <details class="why-box">
+      <summary>🧗 Wozu brauche ich das in der Praxis?</summary>
+      <div class="why-body">${m.why}</div>
+    </details>`;
+  }
+
   // Tischaufgabe
   if (m.tischaufgabe) {
     html += `
