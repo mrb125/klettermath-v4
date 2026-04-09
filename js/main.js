@@ -234,11 +234,130 @@ async function onParkShow() {
   // Init glossar sidebar
   const { initGlossar } = await import('./ui/theory-panel.js');
   initGlossar();
+
+  // Tab switching: Karte ↔ Liste
+  document.querySelectorAll('.pane-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      document.querySelectorAll('.pane-tab').forEach(b => b.classList.toggle('active', b === btn));
+      document.getElementById('map-pane').style.display = tab === 'map' ? 'flex' : 'none';
+      document.getElementById('mission-pane').style.display = tab === 'list' ? 'block' : 'none';
+    });
+  });
+
+  // Render the interactive map
+  renderMapPane();
+
+  // km-back-to-map: switch back to map tab after mission complete
+  if (!window._kmMapListenerAdded) {
+    window._kmMapListenerAdded = true;
+    document.addEventListener('km-back-to-map', () => {
+      document.getElementById('map-pane').style.display = 'flex';
+      document.getElementById('mission-pane').style.display = 'none';
+      document.querySelectorAll('.pane-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'map'));
+      const svg = document.getElementById('map-pane-svg');
+      if (svg) delete svg.dataset.rendered;
+      renderMapPane();
+    });
+  }
 }
 
 async function onBadgesShow() {
   const { renderBadges } = await import('./ui/badges-view.js');
   renderBadges();
+}
+
+// ── Interactive Map Pane ──
+export function renderMapPane() {
+  const svg = document.getElementById('map-pane-svg');
+  if (!svg || svg.dataset.rendered) return;
+  svg.dataset.rendered = '1';
+
+  const PLATS_DATA = [
+    { id: 0, lbl: 'S', x: 0,  y: 0,  color: '#94a3b8', name: 'Start' },
+    { id: 1, lbl: 'A', x: 4,  y: 1,  color: '#e8a030', name: 'Adlerhorst' },
+    { id: 2, lbl: 'B', x: 8,  y: 3,  color: '#ff6b35', name: 'Brücke' },
+    { id: 3, lbl: 'G', x: -3, y: 6,  color: '#6bcb77', name: 'Gipfel' },
+    { id: 4, lbl: 'T', x: 6,  y: -4, color: '#5b9bd5', name: 'Trapez' },
+    { id: 5, lbl: 'H', x: -5, y: 8,  color: '#a78bfa', name: 'Hängenest' },
+    { id: 6, lbl: 'K', x: 5,  y: 9,  color: '#f472b6', name: 'Kletternetz' },
+    { id: 7, lbl: 'E', x: 10, y: -2, color: '#ffd166', name: 'Endstation' },
+  ];
+  const ROPES_DATA = [[0,1],[0,3],[1,2],[1,3],[2,4],[2,7],[3,4],[3,5],[4,6],[5,6],[6,7]];
+
+  // Map math coords to SVG viewport (400×400), pad 40
+  const PAD = 40, W = 400, H = 400;
+  const xMin = -6, xMax = 11, yMin = -5, yMax = 10;
+  const sx = (W - 2 * PAD) / (xMax - xMin);
+  const sy = (H - 2 * PAD) / (yMax - yMin);
+  function toSVG(mx, my) {
+    return [PAD + (mx - xMin) * sx, H - PAD - (my - yMin) * sy];
+  }
+
+  let html = '';
+
+  // Rope lines
+  ROPES_DATA.forEach(([a, b]) => {
+    const [x1, y1] = toSVG(PLATS_DATA[a].x, PLATS_DATA[a].y);
+    const [x2, y2] = toSVG(PLATS_DATA[b].x, PLATS_DATA[b].y);
+    html += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="rgba(200,150,60,0.8)" stroke-width="2.5" stroke-linecap="round"/>`;
+  });
+
+  // Platform markers (clickable)
+  PLATS_DATA.forEach((p) => {
+    const [cx, cy] = toSVG(p.x, p.y);
+    html += `
+      <g class="map-plat" data-plat-id="${p.id}" style="cursor:pointer" role="button" tabindex="0" aria-label="${p.name}">
+        <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="14" fill="${p.color}" opacity="0.25" class="map-plat__pulse"/>
+        <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="9" fill="${p.color}" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
+        <text x="${cx.toFixed(1)}" y="${(cy + 3.5).toFixed(1)}" text-anchor="middle" font-size="8" font-weight="bold" fill="#111" pointer-events="none">${p.lbl}</text>
+        <text x="${cx.toFixed(1)}" y="${(cy + 20).toFixed(1)}" text-anchor="middle" font-size="7" fill="rgba(255,255,255,0.85)" font-weight="600" pointer-events="none">${p.name}</text>
+      </g>`;
+  });
+
+  svg.innerHTML = html;
+
+  // Update completion status
+  import('./state/store.js').then(({ isDone }) => {
+    PLATS_DATA.forEach((p) => {
+      const g = svg.querySelector(`[data-plat-id="${p.id}"]`);
+      if (!g) return;
+      const done = isDone(p.id + 1); // mission IDs start at 1
+      if (done) {
+        const circles = g.querySelectorAll('circle');
+        circles[1]?.setAttribute('stroke', '#4caf50');
+        circles[1]?.setAttribute('stroke-width', '2.5');
+        const [cx, cy] = toSVG(p.x, p.y);
+        const check = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        check.setAttribute('x', (cx - 8).toFixed(1));
+        check.setAttribute('y', (cy - 8).toFixed(1));
+        check.setAttribute('font-size', '9');
+        check.setAttribute('fill', '#4caf50');
+        check.setAttribute('pointer-events', 'none');
+        check.textContent = '✓';
+        g.appendChild(check);
+      }
+    });
+  });
+
+  // Click handlers — open mission
+  svg.querySelectorAll('.map-plat').forEach(g => {
+    const platId = parseInt(g.dataset.platId);
+    const missionId = platId + 1; // mission IDs = platform index + 1
+
+    const activate = () => {
+      // Switch to list view so mission renders in mission-pane
+      document.getElementById('map-pane').style.display = 'none';
+      document.getElementById('mission-pane').style.display = 'block';
+      document.querySelectorAll('.pane-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'list'));
+
+      import('./ui/mission-view.js').then(mod => mod.renderMission(missionId));
+      import('./scene/scene-manager.js').then(m => m.highlightPlatforms([platId])).catch(() => {});
+    };
+
+    g.addEventListener('click', activate);
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
+  });
 }
 
 // ── Top Bar ──

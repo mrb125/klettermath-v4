@@ -95,7 +95,17 @@
       </div>
     </div>
     <div class="mission-pane">
-      <div class="mission-pane-scroll" id="mission-pane">
+      <div class="pane-tabs">
+        <button class="pane-tab active" data-tab="map">🗺️ Karte</button>
+        <button class="pane-tab" data-tab="list">📋 Liste</button>
+      </div>
+      <div id="map-pane" class="map-pane">
+        <div class="map-pane__inner">
+          <img src="assets/park-map.png" alt="Kletterpark-Karte" class="map-pane__img" id="map-pane-img">
+          <svg id="map-pane-svg" class="map-pane__svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+      </div>
+      <div class="mission-pane-scroll" id="mission-pane" style="display:none">
         <!-- Mission list or active mission rendered here -->
       </div>
     </div>

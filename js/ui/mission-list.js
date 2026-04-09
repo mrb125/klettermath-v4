@@ -212,6 +212,8 @@ function startReviewSession(concept) {
 export function backToList() {
   activeMissionId = null;
   renderMissionList();
+  // Signal main to switch back to map tab and refresh markers
+  document.dispatchEvent(new CustomEvent('km-back-to-map'));
 }
 
 export function getActiveMissionId() { return activeMissionId }
