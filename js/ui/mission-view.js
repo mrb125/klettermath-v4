@@ -66,6 +66,7 @@ function renderMissionUI() {
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn btn-sm tisch-stl-btn">🖨️ Park mit Boden (STL)</button>
           <button class="btn btn-sm tisch-stl-plat-btn">🏗️ Nur Plattformen (STL)</button>
+          <button class="btn btn-sm tisch-stl-indiv-btn" style="border-color:rgba(91,155,213,.4);color:#6495ed">📦 Einzeln für Bambu Lab (ZIP)</button>
         </div>
       </details>`;
   }
@@ -111,6 +112,9 @@ function renderMissionUI() {
   });
   pane.querySelector('.tisch-stl-plat-btn')?.addEventListener('click', () => {
     import('../export/stl-model.js').then(m => m.downloadPlatformsSTL()).catch(console.error);
+  });
+  pane.querySelector('.tisch-stl-indiv-btn')?.addEventListener('click', () => {
+    import('../export/stl-model.js').then(m => m.downloadIndividualSTLs()).catch(console.error);
   });
 
   document.getElementById('btn-next-mission')?.addEventListener('click', () => {

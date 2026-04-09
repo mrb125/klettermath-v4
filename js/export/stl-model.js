@@ -10,10 +10,10 @@ const BX0    = -6 * S;
 const BX1    = 11 * S;
 const BY0    = -5 * S;
 const BY1    = 10 * S;
-const BASE_Z = 3;       // Bodenplatte-Dicke (mm)
-const SOCK_H = 4;       // Sockel-Höhe über Bodenplatte
+const BASE_Z = 5;       // Bodenplatte-Dicke (mm) — etwas dicker für Stabilität
+const SOCK_H = 6;       // Sockel-Höhe über Bodenplatte — größerer Standfuß
 const SOCK_Z = BASE_Z + SOCK_H;
-const SOCK_R = 9;
+const SOCK_R = 12;      // Sockelradius vergrößert (war 9)
 const N_CYL  = 16;      // Zylinder-Subdivisions (Kompromiss Qualität/Größe)
 
 // ── Geometrie-Grundbausteine ─────────────────────────────────────────────────
@@ -348,6 +348,50 @@ export function downloadPlatformsSTL() {
 
   data += 'endsolid klettermath_plattformen\n';
   _triggerDownload(data, 'klettermath-plattformen.stl');
+}
+
+// Einzelne STL-Dateien pro Plattform als ZIP (für Bambu Lab / PrusaSlicer Multi-Plate)
+// Jede Plattform landet als eigene .stl auf einem eigenen Plate.
+// Lädt eine ZIP-Datei mit 8 STL-Dateien (kein Server nötig, alles im Browser).
+export async function downloadIndividualSTLs() {
+  // Dynamisch fflate laden (tiny ZIP-Lib, ~45 KB gzipped)
+  let zip;
+  try {
+    const fflate = await import('https://cdn.jsdelivr.net/npm/fflate@0.8.2/esm/browser.js');
+    zip = fflate;
+  } catch {
+    // Fallback: einzelne Downloads
+    _downloadIndividualFallback();
+    return;
+  }
+
+  const files = {};
+  for (const p of PLATS) {
+    const { stl } = buildPlatformGeometry(p);
+    const stlData = `solid km_${p.lbl}\n${stl}endsolid km_${p.lbl}\n`;
+    // fflate erwartet Uint8Array
+    files[`km_${p.lbl}_${p.name}.stl`] = new TextEncoder().encode(stlData);
+  }
+
+  const zipped = zip.zipSync(files, { level: 1 });
+  const blob = new Blob([zipped], { type: 'application/zip' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'klettermath-plattformen-einzeln.zip';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Fallback: 8 einzelne Downloads nacheinander (kein ZIP nötig)
+function _downloadIndividualFallback() {
+  PLATS.forEach((p, i) => {
+    const { stl } = buildPlatformGeometry(p);
+    const data = `solid km_${p.lbl}\n${stl}endsolid km_${p.lbl}\n`;
+    setTimeout(() => _triggerDownload(data, `km_${p.lbl}_${p.name}.stl`), i * 200);
+  });
 }
 
 function _triggerDownload(data, filename) {
