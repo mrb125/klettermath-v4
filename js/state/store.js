@@ -139,6 +139,17 @@ export function exportJSON() {
   return JSON.stringify(state, null, 2);
 }
 
+export function saveReflection(missionId, data) {
+  // data: { stars, tags, note, ts }
+  if (!state.analytics.reflections) state.analytics.reflections = {};
+  state.analytics.reflections[missionId] = { ...data, ts: new Date().toISOString() };
+  save();
+}
+
+export function getReflection(missionId) {
+  return state?.analytics?.reflections?.[missionId] || null;
+}
+
 function getWeekKey() {
   const d = new Date();
   const day = d.getDay();

@@ -2,7 +2,7 @@ import { MISSIONS } from '../data/missions.js';
 import { PLATS } from '../data/platforms.js';
 import { checkAnswer, runDiagnostics } from '../math/checks.js';
 import { classifyError } from '../math/error-classifier.js';
-import { getState, completeMission, completeCustomMission, addAttempt, useHint, getMissionStep, addErrorPattern, awardBadge } from '../state/store.js';
+import { getState, completeMission, completeCustomMission, addAttempt, useHint, getMissionStep, addErrorPattern, awardBadge, saveReflection, getReflection } from '../state/store.js';
 import { isExamMode } from '../state/exam-mode.js';
 import { renderMath } from './math-render.js';
 import { showToast } from './toast.js';
@@ -108,6 +108,10 @@ function renderMissionUI() {
 
   bindStepEvents();
 
+  if (currentStepIdx >= m.steps.length) {
+    bindReflectionEvents();
+  }
+
   document.getElementById('btn-back')?.addEventListener('click', () => {
     clearHighlights();
     backToList();
@@ -121,11 +125,6 @@ function renderMissionUI() {
   });
   pane.querySelector('.tisch-stl-indiv-btn')?.addEventListener('click', () => {
     import('../export/stl-model.js').then(m => m.downloadIndividualSTLs()).catch(console.error);
-  });
-
-  document.getElementById('btn-next-mission')?.addEventListener('click', () => {
-    clearHighlights();
-    backToList();
   });
 }
 
@@ -462,9 +461,90 @@ function renderCompletion() {
       </div>`;
   }
 
-  html += `<button class="btn btn-primary" style="margin-top:16px;width:100%" id="btn-next-mission">Nächste Mission</button>`;
+  // Show reflection card unless in exam mode
+  if (!isExamMode()) {
+    html += renderReflectionCard();
+  } else {
+    html += `<button class="btn btn-primary" style="margin-top:16px;width:100%" id="btn-next-mission">Nächste Mission</button>`;
+  }
 
   return html;
+}
+
+function renderReflectionCard() {
+  const prev = getReflection(currentMission?.id);
+  const prevStars = prev?.stars || 0;
+
+  return `
+    <div class="reflect-card" id="reflect-card">
+      <div class="reflect-title">🪞 Kurze Reflexion <span class="reflect-skip" id="reflect-skip">Überspringen →</span></div>
+
+      <div class="reflect-q">Wie sicher fühlst du dich jetzt?</div>
+      <div class="reflect-stars" id="reflect-stars">
+        ${[1,2,3,4,5].map(i => `<button class="star-btn${i <= prevStars ? ' active' : ''}" data-star="${i}">★</button>`).join('')}
+      </div>
+
+      <div class="reflect-q">Was war schwierig?</div>
+      <div class="reflect-tags" id="reflect-tags">
+        ${['Vorzeichen', 'Rechenweg', 'Bedeutung verstehen', 'Aufgabe lesen', 'War nicht schwierig'].map(t =>
+          `<button class="tag-btn" data-tag="${t}">${t}</button>`
+        ).join('')}
+      </div>
+
+      <div class="reflect-q">Notiz (optional):</div>
+      <input class="reflect-note" id="reflect-note" type="text" placeholder="z.B. Normalenvektor nochmal anschauen…" maxlength="80">
+
+      <button class="btn btn-primary" id="reflect-submit" style="margin-top:12px;width:100%">Speichern &amp; weiter</button>
+    </div>
+  `;
+}
+
+function bindReflectionEvents() {
+  let selectedStars = 0;
+  const selectedTags = new Set();
+
+  // Stars
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedStars = parseInt(btn.dataset.star);
+      document.querySelectorAll('.star-btn').forEach((b, i) => {
+        b.classList.toggle('active', i < selectedStars);
+      });
+    });
+  });
+
+  // Tags
+  document.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('selected');
+      if (btn.classList.contains('selected')) selectedTags.add(btn.dataset.tag);
+      else selectedTags.delete(btn.dataset.tag);
+    });
+  });
+
+  // Submit
+  document.getElementById('reflect-submit')?.addEventListener('click', () => {
+    const note = document.getElementById('reflect-note')?.value || '';
+    saveReflection(currentMission.id, {
+      stars: selectedStars,
+      tags: [...selectedTags],
+      note,
+    });
+    showToast('🪞 Reflexion gespeichert!', 'ok', 2000);
+    setTimeout(() => { clearHighlights(); backToList(); }, 400);
+  });
+
+  // Skip
+  document.getElementById('reflect-skip')?.addEventListener('click', () => {
+    clearHighlights();
+    backToList();
+  });
+
+  // Exam mode fallback: btn-next-mission
+  document.getElementById('btn-next-mission')?.addEventListener('click', () => {
+    clearHighlights();
+    backToList();
+  });
 }
 
 // ── Selbsterklärungscheck ─────────────────────────────────────────────────────

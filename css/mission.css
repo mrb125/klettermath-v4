@@ -487,3 +487,95 @@
   text-decoration: underline;
 }
 .se-skip:hover { color: rgba(255,255,255,0.6); }
+
+/* ── Reflexionskarte ── */
+.reflect-card {
+  margin-top: 20px;
+  padding: 16px;
+  background: rgba(91,155,213,0.08);
+  border: 1px solid rgba(91,155,213,0.3);
+  border-radius: 12px;
+}
+
+.reflect-title {
+  font-size: .9rem;
+  font-weight: 800;
+  color: #5b9bd5;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reflect-skip {
+  font-size: .75rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.35);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.reflect-skip:hover { color: rgba(255,255,255,0.6); }
+
+.reflect-q {
+  font-size: .8rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  margin: 10px 0 6px;
+}
+
+.reflect-stars {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: rgba(255,255,255,0.2);
+  cursor: pointer;
+  padding: 0;
+  transition: color .1s, transform .1s;
+}
+.star-btn.active { color: var(--gold); }
+.star-btn:hover { transform: scale(1.15); }
+
+.reflect-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.tag-btn {
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  color: rgba(255,255,255,0.65);
+  font-size: .75rem;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.tag-btn.selected {
+  background: rgba(91,155,213,0.25);
+  border-color: #5b9bd5;
+  color: #90c8f0;
+}
+
+.reflect-note {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: .82rem;
+  box-sizing: border-box;
+}
+.reflect-note::placeholder { color: rgba(255,255,255,0.3); }
+.reflect-note:focus {
+  outline: none;
+  border-color: rgba(91,155,213,0.5);
+}
