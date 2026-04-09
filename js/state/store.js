@@ -14,7 +14,8 @@ const DEFAULT_STATE = {
   missionMastery: {},
   analytics: {
     errorPatterns: {},
-    weeklyXP: {}
+    weeklyXP: {},
+    spacedReview: {}
   }
 };
 
@@ -148,6 +149,49 @@ export function saveReflection(missionId, data) {
 
 export function getReflection(missionId) {
   return state?.analytics?.reflections?.[missionId] || null;
+}
+
+// ── Spaced Review ─────────────────────────────────────────────────────────────
+
+export function updateSpacedReview(concept, wasCorrect) {
+  if (!state.analytics.spacedReview) state.analytics.spacedReview = {};
+  const today = new Date().toISOString().slice(0, 10);
+  const cur = state.analytics.spacedReview[concept] || { lastDate: null, interval: 1 };
+
+  if (wasCorrect) {
+    // Double interval, cap at 14 days
+    const newInterval = Math.min((cur.interval || 1) * 2, 14);
+    state.analytics.spacedReview[concept] = { lastDate: today, interval: newInterval };
+  } else {
+    // Reset to 1 day on error
+    state.analytics.spacedReview[concept] = { lastDate: today, interval: 1 };
+  }
+  save();
+}
+
+export function getDueReviews() {
+  if (!state?.analytics?.spacedReview) return [];
+  const today = new Date().toISOString().slice(0, 10);
+  const due = [];
+  for (const [concept, data] of Object.entries(state.analytics.spacedReview)) {
+    if (!data.lastDate) continue;
+    const nextDate = new Date(data.lastDate);
+    nextDate.setDate(nextDate.getDate() + (data.interval || 1));
+    if (today >= nextDate.toISOString().slice(0, 10)) {
+      due.push({ concept, interval: data.interval, lastDate: data.lastDate });
+    }
+  }
+  return due.sort((a, b) => a.lastDate.localeCompare(b.lastDate)); // oldest first
+}
+
+export function getReviewStatus(concept) {
+  const data = state?.analytics?.spacedReview?.[concept];
+  if (!data) return null;
+  const today = new Date().toISOString().slice(0, 10);
+  const nextDate = new Date(data.lastDate);
+  nextDate.setDate(nextDate.getDate() + (data.interval || 1));
+  const daysUntil = Math.ceil((nextDate - new Date()) / 86400000);
+  return { ...data, daysUntil, isDue: today >= nextDate.toISOString().slice(0, 10) };
 }
 
 function getWeekKey() {

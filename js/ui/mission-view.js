@@ -2,7 +2,7 @@ import { MISSIONS } from '../data/missions.js';
 import { PLATS } from '../data/platforms.js';
 import { checkAnswer, runDiagnostics } from '../math/checks.js';
 import { classifyError } from '../math/error-classifier.js';
-import { getState, completeMission, completeCustomMission, addAttempt, useHint, getMissionStep, addErrorPattern, awardBadge, saveReflection, getReflection } from '../state/store.js';
+import { getState, completeMission, completeCustomMission, addAttempt, useHint, getMissionStep, addErrorPattern, awardBadge, saveReflection, getReflection, updateSpacedReview } from '../state/store.js';
 import { isExamMode } from '../state/exam-mode.js';
 import { renderMath } from './math-render.js';
 import { showToast } from './toast.js';
@@ -257,6 +257,7 @@ function doCheck(idx, step, userAnswer) {
     markInputsCorrect(step, idx);
     if (step.type === 'vector3') showVectorArrow(userAnswer, true);
     currentStepIdx = idx + 1;
+    updateSpacedReview(currentMission.concept, true);
 
     const advanceStep = () => {
       if (currentStepIdx >= currentMission.steps.length) {
@@ -275,6 +276,7 @@ function doCheck(idx, step, userAnswer) {
     }, 600);
   } else {
     missionIsGold = false;
+    updateSpacedReview(currentMission.concept, false);
     // Check diagnostics (suppressed in exam mode)
     const diagMsg = isExamMode() ? null : runDiagnostics(step.type, userAnswer, step.diagnostics);
     const classified = (!isExamMode() && !diagMsg)

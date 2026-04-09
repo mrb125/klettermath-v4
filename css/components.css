@@ -181,3 +181,51 @@
   color: var(--text3);
   text-align: right;
 }
+
+/* ── Spacing Review Banner ── */
+.review-banner {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  background: rgba(255,193,7,0.08);
+  border: 1px solid rgba(255,193,7,0.3);
+  border-radius: 10px;
+}
+
+.review-banner__title {
+  font-size: .78rem;
+  font-weight: 800;
+  color: #ffc107;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.review-banner__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.review-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255,193,7,0.12);
+  border: 1px solid rgba(255,193,7,0.35);
+  border-radius: 20px;
+  color: #fff;
+  font-size: .8rem;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+
+.review-chip:hover {
+  background: rgba(255,193,7,0.25);
+  border-color: #ffc107;
+}
+
+.review-chip__age {
+  font-size: .7rem;
+  opacity: 0.6;
+}

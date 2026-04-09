@@ -1,4 +1,4 @@
-import { getState, isDone, getMastery } from '../state/store.js';
+import { getState, isDone, getMastery, getDueReviews } from '../state/store.js';
 import { isAvailable } from '../state/progress.js';
 import { MISSIONS } from '../data/missions.js';
 import { renderMath } from './math-render.js';
@@ -16,7 +16,27 @@ export async function renderMissionList() {
   // If a mission is active, don't overwrite
   if (activeMissionId !== null) return;
 
+  const dueReviews = getDueReviews();
+  // Only show concepts that have at least one done mission
+  const doneConcepts = new Set(MISSIONS.filter(m => isDone(m.id)).map(m => m.concept));
+  const actionableDue = dueReviews.filter(r => doneConcepts.has(r.concept)).slice(0, 3);
+
   let html = '<div class="mission-list-header">Missionen</div>';
+
+  if (actionableDue.length > 0) {
+    html += `<div class="review-banner">
+      <div class="review-banner__title">🔔 Heute zur Wiederholung empfohlen</div>
+      <div class="review-banner__items">
+        ${actionableDue.map(r => {
+          const daysSince = Math.floor((new Date() - new Date(r.lastDate)) / 86400000);
+          return `<button class="review-chip" data-concept="${r.concept}">
+            ${getConceptIcon(r.concept)} ${r.concept}
+            <span class="review-chip__age">vor ${daysSince}d</span>
+          </button>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
 
   html += buildMasteryOverview();
 
@@ -42,6 +62,13 @@ export async function renderMissionList() {
   });
 
   pane.innerHTML = html;
+
+  pane.querySelectorAll('.review-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const concept = btn.dataset.concept;
+      startReviewSession(concept);
+    });
+  });
 
   // Fetch & append custom missions
   fetchCustomMissions().then(customs => {
@@ -144,6 +171,22 @@ function getConceptIcon(concept) {
     'Spiegelung an Ebene': '🪞',
   };
   return MAP[concept] || '🎯';
+}
+
+function startReviewSession(concept) {
+  // Find all done missions for this concept
+  const conceptMissions = MISSIONS.filter(m => m.concept === concept && isDone(m.id));
+  if (!conceptMissions.length) return;
+
+  // Pick first available mission (or rotate based on date)
+  const dayOfYear = Math.floor(Date.now() / 86400000);
+  const mission = conceptMissions[dayOfYear % conceptMissions.length];
+
+  // Open that mission directly
+  import('./mission-view.js').then(mod => {
+    activeMissionId = mission.id;
+    mod.renderMission(mission.id);
+  });
 }
 
 export function backToList() {
