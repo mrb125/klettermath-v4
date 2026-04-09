@@ -81,8 +81,11 @@
     <div class="canvas-pane">
       <canvas id="park-canvas"></canvas>
       <div id="map-overlay" class="map-overlay" style="display:none">
-        <img src="assets/park-map.png" alt="Kletterpark-Karte" class="map-overlay__img">
-        <div class="map-overlay__hint">Karte — tippe erneut zum Schließen</div>
+        <div class="map-overlay__inner">
+          <img src="assets/park-map.png" alt="Kletterpark-Karte" class="map-overlay__img">
+          <svg id="map-svg" class="map-overlay__svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div class="map-overlay__hint">🗺️ Karte — tippe erneut zum Schließen</div>
       </div>
       <div class="canvas-legend">
         <span style="color:var(--rope)">●</span> Plattform
