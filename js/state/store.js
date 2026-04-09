@@ -61,6 +61,9 @@ export function isDone(id) {
   return state.progress.done.includes(id);
 }
 
+let _onComplete = null;
+export function onMissionCompleted(fn) { _onComplete = fn; }
+
 export function completeMission(id, xp, isGold = false) {
   const isNew = !state.progress.done.includes(id);
   if (isNew) {
@@ -74,6 +77,7 @@ export function completeMission(id, xp, isGold = false) {
     state.missionMastery[id] = isGold ? 'gold' : 'silver';
   }
   save();
+  if (_onComplete) _onComplete(state);
 }
 
 export function getMastery(id) {

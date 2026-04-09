@@ -71,6 +71,34 @@
 }
 .wlc-continue:hover { border-color: var(--rope); color: var(--rope) }
 
+/* ── Code Entry ── */
+.code-input {
+  font-family: 'JetBrains Mono', 'Bebas Neue', monospace;
+  font-size: 2rem;
+  letter-spacing: 6px;
+  text-align: center;
+  text-transform: uppercase;
+  background: rgba(255,255,255,.06);
+  border: 2px solid var(--stone);
+  color: var(--gold);
+  border-radius: 12px;
+  padding: 14px 24px;
+  width: 220px;
+  margin: 24px auto 8px;
+  display: block;
+  outline: none;
+  transition: border-color .2s;
+}
+.code-input:focus { border-color: var(--rope) }
+.code-error {
+  color: #ff5e5b;
+  font-size: .85rem;
+  text-align: center;
+  min-height: 1.2em;
+  margin-bottom: 12px;
+}
+.code-error.hidden { visibility: hidden }
+
 /* ── Top Bar ── */
 .top-bar {
   display: flex;

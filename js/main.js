@@ -1,7 +1,8 @@
-import { load as loadState, getState } from './state/store.js';
+import { load as loadState, getState, onMissionCompleted } from './state/store.js';
 import { registerScreen, navigate, initNav, onNavigate } from './ui/router.js';
 import { initToast } from './ui/toast.js';
 import { PLATS } from './data/platforms.js';
+import { getStoredCode, storeCode, validateCode, syncProgress } from './api/sync.js';
 
 // ── Boot ──
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,9 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initToast();
 
   // Register screens
+  registerScreen('code',    document.getElementById('s-code'));
   registerScreen('welcome', document.getElementById('s-welcome'));
-  registerScreen('park', document.getElementById('s-park'), onParkShow);
-  registerScreen('badges', document.getElementById('s-badges'), onBadgesShow);
+  registerScreen('park',    document.getElementById('s-park'), onParkShow);
+  registerScreen('badges',  document.getElementById('s-badges'), onBadgesShow);
 
   // Navigation
   initNav();
@@ -24,20 +26,62 @@ document.addEventListener('DOMContentLoaded', () => {
   // Welcome buttons
   document.getElementById('btn-enter').addEventListener('click', () => navigate('park'));
   const btnContinue = document.getElementById('btn-continue');
-  if (btnContinue) {
-    btnContinue.addEventListener('click', () => navigate('park'));
+  if (btnContinue) btnContinue.addEventListener('click', () => navigate('park'));
+
+  // Code entry
+  const codeInput = document.getElementById('code-input');
+  const codeError = document.getElementById('code-error');
+  const btnSubmit = document.getElementById('btn-code-submit');
+
+  async function trySubmitCode() {
+    const code = (codeInput?.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (code.length !== 6) {
+      codeError.textContent = 'Code muss genau 6 Zeichen haben.';
+      codeError.classList.remove('hidden');
+      return;
+    }
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = '…';
+    const result = await validateCode(code);
+    if (result.valid) {
+      storeCode(code);
+      codeError.classList.add('hidden');
+      goToApp(state);
+    } else {
+      codeError.textContent = result.error || 'Ungültiger Code';
+      codeError.classList.remove('hidden');
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'WEITER';
+    }
   }
 
-  // Show welcome or park
+  btnSubmit?.addEventListener('click', trySubmitCode);
+  codeInput?.addEventListener('keydown', e => { if (e.key === 'Enter') trySubmitCode() });
+  codeInput?.addEventListener('input', () => {
+    codeInput.value = codeInput.value.toUpperCase();
+  });
+
+  // Start: check for stored code
+  if (getStoredCode()) {
+    goToApp(state);
+  } else {
+    navigate('code');
+  }
+
+  // Sync after each completed mission
+  onMissionCompleted(s => { syncProgress(s); updateTopBar(); });
+
+  updateTopBar();
+});
+
+function goToApp(state) {
   if (state.progress.done.length > 0) {
     document.getElementById('btn-continue')?.classList.remove('hidden');
     navigate('park');
   } else {
     navigate('welcome');
   }
-
-  updateTopBar();
-});
+}
 
 // ── Scene (lazy load) ──
 let sceneInitialized = false;
