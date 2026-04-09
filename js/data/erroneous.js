@@ -1,0 +1,66 @@
+// erroneous.js — Finde-den-Fehler Aufgaben
+// Fehlerbehaftete Musterlösungen zum Analysieren (nach Ersbach & Renkl, Grosse & Renkl)
+// unlock: concept that must be done first
+
+export const ERRONEOUS = [
+  {
+    id: 'e01',
+    concept: 'Verbindungsvektor & Betrag',
+    title: 'Verbindungsvektor falsch berechnet',
+    context: 'Seil von A(4|1|3) nach B(8|3|1)',
+    solution: `\\(\\vec{AB} = A - B = \\begin{pmatrix}4-8\\\\1-3\\\\3-1\\end{pmatrix} = \\begin{pmatrix}-4\\\\-2\\\\2\\end{pmatrix}\\)`,
+    error: 'Start und Ziel wurden vertauscht: \\(\\vec{AB} = A - B\\) statt \\(B - A\\)',
+    correct: `\\(\\vec{AB} = B - A = \\begin{pmatrix}4\\\\2\\\\-2\\end{pmatrix}\\)`,
+    category: 'Vorzeichenfehler',
+  },
+  {
+    id: 'e02',
+    concept: 'Skalarprodukt',
+    title: 'Skalarprodukt mit Addition verwechselt',
+    context: 'Skalarprodukt von \\(\\vec{a}=(2|1|3)\\) und \\(\\vec{b}=(1|4|-1)\\)',
+    solution: `\\(\\vec{a} \\cdot \\vec{b} = (2+1) + (1+4) + (3+(-1)) = 3+5+2 = 10\\)`,
+    error: 'Die Komponenten wurden addiert statt multipliziert: \\(a_1+b_1\\) statt \\(a_1 \\cdot b_1\\)',
+    correct: `\\(\\vec{a} \\cdot \\vec{b} = 2\\cdot1 + 1\\cdot4 + 3\\cdot(-1) = 2+4-3 = 3\\)`,
+    category: 'Operationsfehler',
+  },
+  {
+    id: 'e03',
+    concept: 'Abstand Punkt-Ebene',
+    title: 'Nenner der Abstandsformel vergessen',
+    context: 'Abstand von G(-3|6|5) zur Ebene mit \\(\\vec{n}=(1|2|-1)\\), d=4',
+    solution: `\\(d = |\\vec{n} \\cdot \\vec{OG} - 4| = |1\\cdot(-3)+2\\cdot6+(-1)\\cdot5-4| = |-3+12-5-4| = 0\\)`,
+    error: 'Der Nenner \\(|\\vec{n}|\\) fehlt! Die Formel lautet \\(d = \\frac{|\\vec{n}\\cdot\\vec{AP}|}{|\\vec{n}|}\\)',
+    correct: `\\(d = \\frac{|-3+12-5-4|}{\\sqrt{1^2+2^2+1^2}} = \\frac{0}{\\sqrt{6}} = 0\\) (Punkt liegt zufällig auf der Ebene)`,
+    category: 'Formel unvollständig',
+  },
+  {
+    id: 'e04',
+    concept: 'Ebene',
+    title: 'Normalenvektor falsch berechnet',
+    context: 'Normalenvektor für Ebene durch S(0|0|0), A(4|1|3), B(8|3|1)',
+    solution: `\\(\\vec{n} = \\vec{SA} + \\vec{SB} = \\begin{pmatrix}4+8\\\\1+3\\\\3+1\\end{pmatrix} = \\begin{pmatrix}12\\\\4\\\\4\\end{pmatrix}\\)`,
+    error: 'Der Normalenvektor ist das Kreuzprodukt \\(\\vec{SA} \\times \\vec{SB}\\), nicht die Summe!',
+    correct: `\\(\\vec{n} = \\vec{SA} \\times \\vec{SB} = \\begin{pmatrix}1\\cdot1-3\\cdot3\\\\3\\cdot8-4\\cdot1\\\\4\\cdot3-1\\cdot8\\end{pmatrix} = \\begin{pmatrix}-8\\\\20\\\\4\\end{pmatrix}\\)`,
+    category: 'Falsche Operation',
+  },
+  {
+    id: 'e05',
+    concept: 'Lagebeziehung',
+    title: 'Windschief und parallel verwechselt',
+    context: 'Geraden g₁: Stütz (0|0|0), Richtung (1|2|3) und g₂: Stütz (1|1|1), Richtung (2|4|6)',
+    solution: 'Kreuzprodukt ≠ 0, also windschief.',
+    error: 'Die Richtungsvektoren (1|2|3) und (2|4|6) sind vielfache voneinander (Faktor 2) — das Kreuzprodukt ist \\(\\vec{0}\\), nicht ≠ 0!',
+    correct: 'Richtungsvektoren sind kollinear → Geraden sind parallel (oder identisch). Prüfung: Liegt (1|1|1) auf g₁? Nein → parallel.',
+    category: 'Lagebeziehung falsch',
+  },
+  {
+    id: 'e06',
+    concept: 'Parameterdarstellung',
+    title: 'Parametergleichung falsch aufgestellt',
+    context: 'Gerade durch A(2|0|1) mit Richtung \\(\\vec{v}=(3|1|-2)\\)',
+    solution: `\\(g: \\vec{x} = \\begin{pmatrix}3\\\\1\\\\-2\\end{pmatrix} + t \\cdot \\begin{pmatrix}2\\\\0\\\\1\\end{pmatrix}\\)`,
+    error: 'Stützvektor und Richtungsvektor wurden vertauscht: Der Stützvektor muss ein Punkt der Geraden sein (hier A), der Richtungsvektor gibt die Richtung an.',
+    correct: `\\(g: \\vec{x} = \\begin{pmatrix}2\\\\0\\\\1\\end{pmatrix} + t \\cdot \\begin{pmatrix}3\\\\1\\\\-2\\end{pmatrix}\\)`,
+    category: 'Vertauschungsfehler',
+  },
+];

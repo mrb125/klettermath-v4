@@ -1,5 +1,6 @@
 import { getState, exportJSON } from '../state/store.js';
 import { TASKS_LIBRARY } from '../data/tasks-library.js';
+import { ERRONEOUS } from '../data/erroneous.js';
 
 const FLASHCARDS = [
   {
@@ -163,6 +164,7 @@ export function renderBadges() {
   });
 
   renderTaskLibrarySection(container);
+  renderErroneousSection(container);
 }
 
 const CONCEPT_MAP = {
@@ -241,6 +243,54 @@ function renderTaskCards() {
       <a href="${t.source}" target="_blank" rel="noopener" style="font-size:.73rem;color:var(--rope);opacity:.8;text-decoration:none">🔗 ${t.label}</a>
     </div>`;
   }).join('');
+}
+
+function renderErroneousSection(container) {
+  const section = document.createElement('details');
+  section.className = 'badge-section';
+  section.style.cssText = 'margin-top:20px;border:1px solid rgba(239,68,68,.2);border-radius:12px;overflow:hidden';
+
+  section.innerHTML = `
+    <summary style="padding:14px 16px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--rope);list-style:none;display:flex;align-items:center;gap:10px;background:rgba(239,68,68,.06)">
+      <span>🔎</span> Finde den Fehler
+      <span style="font-family:'Nunito',sans-serif;font-size:.72rem;color:var(--text2);font-weight:400;letter-spacing:.5px;margin-left:4px">${ERRONEOUS.length} Aufgaben</span>
+      <span style="margin-left:auto;font-size:.75rem;color:var(--text2)">▼</span>
+    </summary>
+    <div style="padding:14px 16px">
+      <p style="font-size:.8rem;color:var(--text2);margin:0 0 14px">Analysiere fehlerhafte Musterlösungen — eine Schlüsselkompetenz für das Abitur.</p>
+      <div id="erroneous-list"></div>
+    </div>
+  `;
+  container.appendChild(section);
+
+  const list = section.querySelector('#erroneous-list');
+  ERRONEOUS.forEach(e => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--bg3);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:14px;margin-bottom:12px';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="background:rgba(239,68,68,.15);color:#ef4444;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:20px">${e.category}</span>
+        <span style="font-weight:700;font-size:.9rem">${e.title}</span>
+      </div>
+      <div style="font-size:.8rem;color:var(--text2);margin-bottom:10px">${e.context}</div>
+      <div style="background:var(--bg4);border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:.85rem">
+        <div style="font-size:.7rem;color:var(--text3);margin-bottom:4px">Angebliche Lösung:</div>
+        ${e.solution}
+      </div>
+      <details style="margin-top:8px">
+        <summary style="font-size:.8rem;color:var(--rope);cursor:pointer;padding:4px 0">🔍 Fehler aufdecken</summary>
+        <div style="margin-top:8px;padding:10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;font-size:.82rem">
+          <strong style="color:#ef4444">❌ Fehler:</strong> ${e.error}
+        </div>
+        <div style="margin-top:8px;padding:10px;background:rgba(107,203,119,.08);border:1px solid rgba(107,203,119,.2);border-radius:8px;font-size:.82rem">
+          <strong style="color:var(--ok)">✓ Richtig:</strong> ${e.correct}
+        </div>
+      </details>
+    `;
+    list.appendChild(card);
+  });
+
+  import('../ui/math-render.js').then(m => m.renderMath(section));
 }
 
 export function checkBadges() {
