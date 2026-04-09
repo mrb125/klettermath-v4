@@ -209,20 +209,40 @@ export function clearUserPoints() {
 }
 
 export function highlightPlatforms(ids) {
-  platMeshes.forEach(m => { m.visible = true; });
-  ropeMeshes.forEach(m => { m.visible = true; });
+  // Only show platforms relevant to this mission
   platMeshes.forEach(m => {
-    const isHighlighted = ids.includes(m.userData.platId);
-    if (m.userData.indicator) {
-      m.userData.indicator.material.emissiveIntensity = isHighlighted ? 1.2 : 0.3;
-      m.userData.indicator.scale.setScalar(isHighlighted ? 1.2 : 0.8);
+    m.visible = ids.includes(m.userData.platId);
+    if (m.visible && m.userData.indicator) {
+      m.userData.indicator.material.emissiveIntensity = 1.2;
+      m.userData.indicator.scale.setScalar(1.2);
     }
+  });
+  // Only show ropes between the highlighted platforms
+  ropeMeshes.forEach((m, i) => {
+    const rope = ROPES[i];
+    m.visible = !!(rope && ids.includes(rope[0]) && ids.includes(rope[1]));
   });
 }
 
 export function clearHighlights() {
   platMeshes.forEach(m => { m.visible = false; });
   ropeMeshes.forEach(m => { m.visible = false; });
+}
+
+// Show all platforms one by one (no ropes) — used for Ortsvektor overview
+export function animateAllPlatforms(delayMs = 380) {
+  // Hide everything first
+  platMeshes.forEach(m => { m.visible = false; });
+  ropeMeshes.forEach(m => { m.visible = false; });
+
+  platMeshes.forEach((m, i) => {
+    setTimeout(() => {
+      m.visible = true;
+      if (m.userData.indicator) {
+        m.userData.indicator.material.emissiveIntensity = 1.0;
+      }
+    }, i * delayMs);
+  });
 }
 
 export function setCameraPreset(name) {

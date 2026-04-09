@@ -100,8 +100,8 @@
   user-select: none;
 }
 .vec-col-fields {
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
   gap: 6px;
   padding: 0 4px;
 }

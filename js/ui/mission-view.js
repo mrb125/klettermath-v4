@@ -7,7 +7,7 @@ import { isExamMode } from '../state/exam-mode.js';
 import { renderMath } from './math-render.js';
 import { showToast } from './toast.js';
 import { backToList } from './mission-list.js';
-import { updateTopBar } from '../main.js';
+import { updateTopBar, showMissionMode } from '../main.js';
 import { checkBadges } from './badges-view.js';
 import { renderTheoryButton, refreshGlossar, applyInlineGlossar } from './theory-panel.js';
 
@@ -52,8 +52,16 @@ export function renderMission(missionId, customMission = null) {
   // Reset to standard camera view on mission start
   import('../scene/scene-manager.js').then(m => m.setCameraPreset('default')).catch(() => {});
 
+  // Ensure map is hidden while working
+  try { showMissionMode(); } catch(e) {}
+
   // Highlight platforms in scene
-  highlightPlatforms(mission.platforms);
+  // For the Ortsvektor intro mission: reveal ALL platforms one-by-one so students see the park
+  if (mission.concept === 'Ortsvektor' && currentStepIdx === 0) {
+    import('../scene/scene-manager.js').then(m => m.animateAllPlatforms(400)).catch(() => {});
+  } else {
+    highlightPlatforms(mission.platforms);
+  }
 
   // Show coordinate anchor hint on first visit to this mission
   const ms0 = getMissionStep(missionId, 0);

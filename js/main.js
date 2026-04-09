@@ -240,25 +240,23 @@ async function onParkShow() {
     btn.addEventListener('click', () => {
       const tab = btn.dataset.tab;
       document.querySelectorAll('.pane-tab').forEach(b => b.classList.toggle('active', b === btn));
-      document.getElementById('map-pane').style.display = tab === 'map' ? 'flex' : 'none';
-      document.getElementById('mission-pane').style.display = tab === 'list' ? 'block' : 'none';
+      if (tab === 'map') {
+        showMapMode();
+      } else {
+        document.getElementById('map-pane').style.display = 'none';
+        document.getElementById('mission-pane').style.display = 'block';
+      }
     });
   });
 
-  // Render the interactive map
+  // Render the interactive map and ensure tabs are visible
+  document.querySelector('.pane-tabs')?.style.setProperty('display', 'flex');
   renderMapPane();
 
-  // km-back-to-map: switch back to map tab after mission complete
+  // km-back-to-map: switch back to map after mission complete / back button
   if (!window._kmMapListenerAdded) {
     window._kmMapListenerAdded = true;
-    document.addEventListener('km-back-to-map', () => {
-      document.getElementById('map-pane').style.display = 'flex';
-      document.getElementById('mission-pane').style.display = 'none';
-      document.querySelectorAll('.pane-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'map'));
-      const svg = document.getElementById('map-pane-svg');
-      if (svg) delete svg.dataset.rendered;
-      renderMapPane();
-    });
+    document.addEventListener('km-back-to-map', () => showMapMode());
   }
 }
 
@@ -268,50 +266,57 @@ async function onBadgesShow() {
 }
 
 // ── Interactive Map Pane ──
+// Pixel positions (in 400×400 SVG space) are mapped visually to park-map.jpg
+// They match the hand-drawn platform locations, NOT the raw math coordinates.
+const MAP_PLATS = [
+  { id: 0, lbl: 'S', cx: 148, cy: 253, color: '#94a3b8', name: 'Start' },
+  { id: 1, lbl: 'A', cx: 224, cy: 228, color: '#e8a030', name: 'Adlerhorst' },
+  { id: 2, lbl: 'B', cx: 290, cy: 184, color: '#ff6b35', name: 'Brücke' },
+  { id: 3, lbl: 'G', cx: 100, cy: 128, color: '#6bcb77', name: 'Gipfel' },
+  { id: 4, lbl: 'T', cx: 236, cy: 336, color: '#5b9bd5', name: 'Trapez' },
+  { id: 5, lbl: 'H', cx:  56, cy:  76, color: '#a78bfa', name: 'Hängenest' },
+  { id: 6, lbl: 'K', cx: 244, cy:  52, color: '#f472b6', name: 'Kletternetz' },
+  { id: 7, lbl: 'E', cx: 340, cy: 296, color: '#ffd166', name: 'Endstation' },
+];
+const MAP_ROPES = [[0,1],[0,3],[1,2],[1,3],[2,4],[2,7],[3,4],[3,5],[4,6],[5,6],[6,7]];
+
+export function showMapMode() {
+  document.querySelector('.pane-tabs')?.style.setProperty('display', 'flex');
+  document.getElementById('map-pane').style.display = 'flex';
+  document.getElementById('mission-pane').style.display = 'none';
+  document.querySelectorAll('.pane-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'map'));
+  const svg = document.getElementById('map-pane-svg');
+  if (svg) delete svg.dataset.rendered;
+  renderMapPane();
+}
+
+export function showMissionMode() {
+  document.querySelector('.pane-tabs')?.style.setProperty('display', 'none');
+  document.getElementById('map-pane').style.display = 'none';
+  document.getElementById('mission-pane').style.display = 'block';
+}
+
 export function renderMapPane() {
   const svg = document.getElementById('map-pane-svg');
   if (!svg || svg.dataset.rendered) return;
   svg.dataset.rendered = '1';
 
-  const PLATS_DATA = [
-    { id: 0, lbl: 'S', x: 0,  y: 0,  color: '#94a3b8', name: 'Start' },
-    { id: 1, lbl: 'A', x: 4,  y: 1,  color: '#e8a030', name: 'Adlerhorst' },
-    { id: 2, lbl: 'B', x: 8,  y: 3,  color: '#ff6b35', name: 'Brücke' },
-    { id: 3, lbl: 'G', x: -3, y: 6,  color: '#6bcb77', name: 'Gipfel' },
-    { id: 4, lbl: 'T', x: 6,  y: -4, color: '#5b9bd5', name: 'Trapez' },
-    { id: 5, lbl: 'H', x: -5, y: 8,  color: '#a78bfa', name: 'Hängenest' },
-    { id: 6, lbl: 'K', x: 5,  y: 9,  color: '#f472b6', name: 'Kletternetz' },
-    { id: 7, lbl: 'E', x: 10, y: -2, color: '#ffd166', name: 'Endstation' },
-  ];
-  const ROPES_DATA = [[0,1],[0,3],[1,2],[1,3],[2,4],[2,7],[3,4],[3,5],[4,6],[5,6],[6,7]];
-
-  // Map math coords to SVG viewport (400×400), pad 40
-  const PAD = 40, W = 400, H = 400;
-  const xMin = -6, xMax = 11, yMin = -5, yMax = 10;
-  const sx = (W - 2 * PAD) / (xMax - xMin);
-  const sy = (H - 2 * PAD) / (yMax - yMin);
-  function toSVG(mx, my) {
-    return [PAD + (mx - xMin) * sx, H - PAD - (my - yMin) * sy];
-  }
-
   let html = '';
 
-  // Rope lines
-  ROPES_DATA.forEach(([a, b]) => {
-    const [x1, y1] = toSVG(PLATS_DATA[a].x, PLATS_DATA[a].y);
-    const [x2, y2] = toSVG(PLATS_DATA[b].x, PLATS_DATA[b].y);
-    html += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="rgba(200,150,60,0.8)" stroke-width="2.5" stroke-linecap="round"/>`;
+  // Rope lines between platform positions
+  MAP_ROPES.forEach(([a, b]) => {
+    const pa = MAP_PLATS[a], pb = MAP_PLATS[b];
+    html += `<line x1="${pa.cx}" y1="${pa.cy}" x2="${pb.cx}" y2="${pb.cy}" stroke="rgba(200,150,60,0.75)" stroke-width="2" stroke-linecap="round" opacity="0.8"/>`;
   });
 
   // Platform markers (clickable)
-  PLATS_DATA.forEach((p) => {
-    const [cx, cy] = toSVG(p.x, p.y);
+  MAP_PLATS.forEach((p) => {
     html += `
       <g class="map-plat" data-plat-id="${p.id}" style="cursor:pointer" role="button" tabindex="0" aria-label="${p.name}">
-        <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="14" fill="${p.color}" opacity="0.25" class="map-plat__pulse"/>
-        <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="9" fill="${p.color}" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
-        <text x="${cx.toFixed(1)}" y="${(cy + 3.5).toFixed(1)}" text-anchor="middle" font-size="8" font-weight="bold" fill="#111" pointer-events="none">${p.lbl}</text>
-        <text x="${cx.toFixed(1)}" y="${(cy + 20).toFixed(1)}" text-anchor="middle" font-size="7" fill="rgba(255,255,255,0.85)" font-weight="600" pointer-events="none">${p.name}</text>
+        <circle cx="${p.cx}" cy="${p.cy}" r="15" fill="${p.color}" opacity="0.22" class="map-plat__pulse"/>
+        <circle cx="${p.cx}" cy="${p.cy}" r="10" fill="${p.color}" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/>
+        <text x="${p.cx}" y="${p.cy + 4}" text-anchor="middle" font-size="9" font-weight="bold" fill="#111" pointer-events="none">${p.lbl}</text>
+        <text x="${p.cx}" y="${p.cy + 22}" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,0.9)" font-weight="600" pointer-events="none">${p.name}</text>
       </g>`;
   });
 
@@ -319,19 +324,18 @@ export function renderMapPane() {
 
   // Update completion status
   import('./state/store.js').then(({ isDone }) => {
-    PLATS_DATA.forEach((p) => {
+    MAP_PLATS.forEach((p) => {
       const g = svg.querySelector(`[data-plat-id="${p.id}"]`);
       if (!g) return;
-      const done = isDone(p.id + 1); // mission IDs start at 1
+      const done = isDone(p.id + 1); // mission IDs = platform index + 1
       if (done) {
         const circles = g.querySelectorAll('circle');
         circles[1]?.setAttribute('stroke', '#4caf50');
         circles[1]?.setAttribute('stroke-width', '2.5');
-        const [cx, cy] = toSVG(p.x, p.y);
         const check = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        check.setAttribute('x', (cx - 8).toFixed(1));
-        check.setAttribute('y', (cy - 8).toFixed(1));
-        check.setAttribute('font-size', '9');
+        check.setAttribute('x', p.cx + 7);
+        check.setAttribute('y', p.cy - 8);
+        check.setAttribute('font-size', '10');
         check.setAttribute('fill', '#4caf50');
         check.setAttribute('pointer-events', 'none');
         check.textContent = '✓';
@@ -343,14 +347,10 @@ export function renderMapPane() {
   // Click handlers — open mission
   svg.querySelectorAll('.map-plat').forEach(g => {
     const platId = parseInt(g.dataset.platId);
-    const missionId = platId + 1; // mission IDs = platform index + 1
+    const missionId = platId + 1;
 
     const activate = () => {
-      // Switch to list view so mission renders in mission-pane
-      document.getElementById('map-pane').style.display = 'none';
-      document.getElementById('mission-pane').style.display = 'block';
-      document.querySelectorAll('.pane-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'list'));
-
+      showMissionMode();
       import('./ui/mission-view.js').then(mod => mod.renderMission(missionId));
       import('./scene/scene-manager.js').then(m => m.highlightPlatforms([platId])).catch(() => {});
     };
