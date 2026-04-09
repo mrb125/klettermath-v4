@@ -10,12 +10,14 @@ import { checkBadges } from './badges-view.js';
 
 let currentMission = null;
 let currentStepIdx = 0;
+let missionIsGold = true;
 
 export function renderMission(missionId) {
   const mission = MISSIONS.find(m => m.id === missionId);
   if (!mission) return;
   currentMission = mission;
   currentStepIdx = 0;
+  missionIsGold = true;
 
   // Find first incomplete step
   const state = getState();
@@ -59,6 +61,7 @@ function renderMissionUI() {
       <details class="tisch-box">
         <summary>🪵 Tischaufgabe</summary>
         ${m.tischaufgabe.setup()}
+        <button class="btn btn-sm tisch-stl-btn" style="margin-top:10px">🖨️ Modell als STL</button>
       </details>`;
   }
 
@@ -82,6 +85,15 @@ function renderMissionUI() {
   bindStepEvents();
 
   document.getElementById('btn-back')?.addEventListener('click', () => {
+    clearHighlights();
+    backToList();
+  });
+
+  pane.querySelector('.tisch-stl-btn')?.addEventListener('click', () => {
+    import('../export/stl-model.js').then(m => m.downloadParkSTL()).catch(console.error);
+  });
+
+  document.getElementById('btn-next-mission')?.addEventListener('click', () => {
     clearHighlights();
     backToList();
   });
@@ -210,6 +222,7 @@ function doCheck(idx, step, userAnswer) {
   if (isCorrect) {
     showFeedback(idx, 'Richtig! ✓', true);
     markInputsCorrect(step, idx);
+    if (step.type === 'vector3') showVectorArrow(userAnswer, true);
     currentStepIdx = idx + 1;
 
     setTimeout(() => {
@@ -220,12 +233,21 @@ function doCheck(idx, step, userAnswer) {
       }
     }, 600);
   } else {
+    missionIsGold = false;
     // Check diagnostics
     const diagMsg = runDiagnostics(step.type, userAnswer, step.diagnostics);
     const msg = diagMsg || 'Leider falsch. Versuch es nochmal!';
     showFeedback(idx, msg, false);
     markInputsWrong(step, idx);
     addErrorPattern(currentMission.concept);
+    if (step.type === 'vector3') {
+      const ms = getMissionStep(currentMission.id, idx);
+      showVectorArrow(userAnswer, false);
+      if (ms.attempts >= 3) {
+        const correct = typeof step.answer === 'function' ? step.answer() : step.answer;
+        if (Array.isArray(correct)) showVectorArrow(correct, true);
+      }
+    }
   }
 }
 
@@ -276,6 +298,7 @@ function markInputsWrong(step, idx) {
 }
 
 function handleHint(idx) {
+  missionIsGold = false;
   const step = currentMission.steps[idx];
   const ms = getMissionStep(currentMission.id, idx);
   const tier = Math.min(ms.hintTier, step.hints.length - 1);
@@ -299,7 +322,7 @@ function handleHint(idx) {
 
 function onMissionComplete() {
   const m = currentMission;
-  completeMission(m.id, m.xp);
+  completeMission(m.id, m.xp, missionIsGold);
   showToast(`+${m.xp} XP`, 'xp');
   updateTopBar();
 
@@ -347,6 +370,16 @@ function clearHighlights() {
   try {
     import('../scene/scene-manager.js').then(mod => {
       if (mod.clearHighlights) mod.clearHighlights();
+      if (mod.clearVectorArrows) mod.clearVectorArrows();
+    }).catch(() => {});
+  } catch {}
+}
+
+function showVectorArrow(vec, correct) {
+  try {
+    import('../scene/scene-manager.js').then(mod => {
+      if (!correct) mod.clearVectorArrows?.();
+      mod.addVectorArrow?.(0, 0, 0, vec[0], vec[1], vec[2], correct ? 0x00ff88 : 0xff4444);
     }).catch(() => {});
   } catch {}
 }

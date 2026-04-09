@@ -114,6 +114,13 @@
   border-radius: 99px;
   transition: width .5s ease;
 }
+.top-streak {
+  font-size: .9rem;
+  font-weight: 700;
+  color: var(--rope);
+  flex-shrink: 0;
+  transition: opacity .3s;
+}
 .top-xp {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1.1rem;

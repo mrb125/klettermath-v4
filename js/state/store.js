@@ -10,6 +10,7 @@ const DEFAULT_STATE = {
     lastLogin: null
   },
   missionState: {},
+  missionMastery: {},
   analytics: {
     errorPatterns: {},
     weeklyXP: {}
@@ -29,6 +30,7 @@ export function load() {
       const parsed = JSON.parse(raw);
       if (parsed.version === 4) {
         state = parsed;
+        if (!state.missionMastery) state.missionMastery = {};
       } else {
         state = deepClone(DEFAULT_STATE);
       }
@@ -59,14 +61,23 @@ export function isDone(id) {
   return state.progress.done.includes(id);
 }
 
-export function completeMission(id, xp) {
-  if (!state.progress.done.includes(id)) {
+export function completeMission(id, xp, isGold = false) {
+  const isNew = !state.progress.done.includes(id);
+  if (isNew) {
     state.progress.done.push(id);
+    state.progress.xp += xp;
+    const week = getWeekKey();
+    state.analytics.weeklyXP[week] = (state.analytics.weeklyXP[week] || 0) + xp;
   }
-  state.progress.xp += xp;
-  const week = getWeekKey();
-  state.analytics.weeklyXP[week] = (state.analytics.weeklyXP[week] || 0) + xp;
+  const current = state.missionMastery[id];
+  if (!current || (isGold && current !== 'gold')) {
+    state.missionMastery[id] = isGold ? 'gold' : 'silver';
+  }
   save();
+}
+
+export function getMastery(id) {
+  return state?.missionMastery?.[id] || null;
 }
 
 export function getMissionStep(missionId, stepIdx) {

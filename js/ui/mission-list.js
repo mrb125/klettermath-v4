@@ -1,4 +1,4 @@
-import { getState, isDone } from '../state/store.js';
+import { getState, isDone, getMastery } from '../state/store.js';
 import { isAvailable } from '../state/progress.js';
 import { MISSIONS } from '../data/missions.js';
 import { renderMath } from './math-render.js';
@@ -22,11 +22,13 @@ export function renderMissionList() {
     const done = isDone(m.id);
     const avail = isAvailable(m.id);
     const status = done ? 'done' : avail ? 'available' : 'locked';
+    const mastery = done ? getMastery(m.id) : null;
+    const statusIcon = mastery === 'gold' ? '⭐' : done ? '✓' : m.id;
     const title = typeof m.title === 'function' ? m.title() : m.title;
 
     html += `
       <div class="mission-card ${status}" data-id="${m.id}">
-        <div class="mission-num">${done ? '✓' : m.id}</div>
+        <div class="mission-num">${statusIcon}</div>
         <div class="mission-info">
           <div class="mission-title">${title}</div>
           <div class="mission-meta">

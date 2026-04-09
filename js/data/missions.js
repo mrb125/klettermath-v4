@@ -21,12 +21,13 @@ export const MISSIONS = [
         answer: () => pArr(1),
         tolerance: 0.1,
         hints: [
-          () => 'Der Ortsvektor hat dieselben Komponenten wie die Koordinaten des Punktes.',
-          () => `${PLATS[1].name} hat die Koordinaten ${pCoord(1)}. Der Ortsvektor ist identisch.`,
+          () => `Schau auf das 3D-Modell: Welche x₁-, x₂- und x₃-Koordinate hat ${PLATS[1].name}? Der Ortsvektor hat genau diese drei Werte als Komponenten.`,
+          () => `${PLATS[1].name} hat die Koordinaten ${pCoord(1)}. Der Ortsvektor ist identisch mit diesen Koordinaten.`,
           () => `$$\\vec{O${PLATS[1].lbl}} = \\begin{pmatrix}${PLATS[1].x}\\\\${PLATS[1].y}\\\\${PLATS[1].z}\\end{pmatrix}$$`
         ],
         diagnostics: [
-          { pattern: (ans) => ans[0] === 0 && ans[1] === 0 && ans[2] === 0, msg: 'Das ist der Nullvektor — der Ortsvektor von S, nicht von A!' }
+          { pattern: (ans) => ans[0] === 0 && ans[1] === 0 && ans[2] === 0, msg: 'Das ist der Nullvektor — der Ortsvektor von S, nicht von A! Schau auf die Koordinaten von A.' },
+          { pattern: (ans) => { const p = PLATS[1]; return Math.abs(ans[0]-p.y)<0.1 && Math.abs(ans[1]-p.z)<0.1 && Math.abs(ans[2]-p.x)<0.1 }, msg: 'Die Komponenten sind vertauscht. x₁ ist die erste, x₂ die zweite, x₃ die dritte Koordinate.' }
         ]
       },
       {
@@ -66,12 +67,12 @@ export const MISSIONS = [
         prompt: () => `Berechne \\(\\vec{${PLATS[0].lbl}${PLATS[1].lbl}} = ${PLATS[1].lbl} - ${PLATS[0].lbl}\\):`,
         type: 'vector3', answer: () => connArr(0, 1), tolerance: 0.1,
         hints: [
-          () => 'Verbindungsvektor = Ziel minus Start',
-          () => `\\(\\vec{${PLATS[0].lbl}${PLATS[1].lbl}} = ${pCoord(1)} - ${pCoord(0)}\\)`,
+          () => `Welcher Punkt ist Start, welcher Ziel? Der Pfeil \\(\\vec{${PLATS[0].lbl}${PLATS[1].lbl}}\\) zeigt von ${PLATS[0].name} nach ${PLATS[1].name} — also: Zielkoordinaten minus Startkoordinaten.`,
+          () => `\\(\\vec{${PLATS[0].lbl}${PLATS[1].lbl}} = ${pCoord(1)} - ${pCoord(0)}\\) — rechne jede Koordinate einzeln.`,
           () => { const v = connArr(0, 1); return `$$\\vec{${PLATS[0].lbl}${PLATS[1].lbl}} = \\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
         ],
         diagnostics: [
-          { pattern: (ans) => { const rev = connArr(1, 0); return Math.abs(ans[0]-rev[0])<0.1 && Math.abs(ans[1]-rev[1])<0.1 && Math.abs(ans[2]-rev[2])<0.1 }, msg: 'Du hast Start − Ziel berechnet statt Ziel − Start. Achte auf die Richtung!' }
+          { pattern: (ans) => { const rev = connArr(1, 0); return Math.abs(ans[0]-rev[0])<0.1 && Math.abs(ans[1]-rev[1])<0.1 && Math.abs(ans[2]-rev[2])<0.1 }, msg: 'Richtung falsch: Du hast Start−Ziel statt Ziel−Start gerechnet. Der Pfeil zeigt immer vom ersten zum zweiten Buchstaben.' }
         ]
       },
       {
@@ -174,11 +175,13 @@ export const MISSIONS = [
         prompt: () => `Berechne das Skalarprodukt \\(\\vec{${PLATS[0].lbl}${PLATS[1].lbl}} \\cdot \\vec{${PLATS[1].lbl}${PLATS[2].lbl}}\\):`,
         type: 'number', answer: () => connV(0, 1).dot(connV(1, 2)), tolerance: 0.1,
         hints: [
-          () => '\\(\\vec{a} \\cdot \\vec{b} = a_1 b_1 + a_2 b_2 + a_3 b_3\\)',
+          () => `Jede gleichnamige Komponente multiplizieren, dann addieren: \\(a_1 \\cdot b_1 + a_2 \\cdot b_2 + a_3 \\cdot b_3\\). Nicht die Vektoren addieren!`,
           () => { const a = connArr(0,1), b = connArr(1,2); return `\\(${a[0]} \\cdot ${b[0]} + ${a[1]} \\cdot ${b[1]} + ${a[2]} \\cdot ${b[2]}\\)` },
           () => `$$\\vec{r_1} \\cdot \\vec{r_2} = ${connV(0,1).dot(connV(1,2))}$$`
         ],
-        diagnostics: []
+        diagnostics: [
+          { pattern: (ans) => { const a = connArr(0,1), b = connArr(1,2); const wrongSum = (a[0]+b[0])+(a[1]+b[1])+(a[2]+b[2]); return Math.abs(ans - wrongSum) < 0.5 }, msg: 'Du hast die Komponenten addiert statt multipliziert. Das Skalarprodukt ist a₁·b₁ + a₂·b₂ + a₃·b₃.' }
+        ]
       },
       {
         prompt: () => `Berechne den Winkel \\(\\alpha\\) in Grad (1 Dezimalstelle):`,
@@ -412,11 +415,13 @@ export const MISSIONS = [
         prompt: () => `Normalenvektor \\(\\vec{n} = \\vec{${PLATS[0].lbl}${PLATS[1].lbl}} \\times \\vec{${PLATS[0].lbl}${PLATS[2].lbl}}\\):`,
         type: 'vector3', answer: () => connV(0, 1).cross(connV(0, 2)).toArr(), tolerance: 0.1,
         hints: [
-          () => 'Kreuzprodukt berechnen',
-          () => { const a = connArr(0,1), b = connArr(0,2); return `\\(\\begin{pmatrix}${a[1]}\\cdot${b[2]}-${a[2]}\\cdot${b[1]}\\\\ \\ldots \\\\ \\ldots\\end{pmatrix}\\)` },
+          () => { const a = connArr(0,1), b = connArr(0,2); return `Kreuzprodukt-Schema: \\(\\vec{n} = \\begin{pmatrix}a_2 b_3 - a_3 b_2\\\\ a_3 b_1 - a_1 b_3\\\\ a_1 b_2 - a_2 b_1\\end{pmatrix}\\). Setze \\(\\vec{SA}=(${a[0]};${a[1]};${a[2]})\\) und \\(\\vec{SB}=(${b[0]};${b[1]};${b[2]})\\) ein.` },
+          () => { const a = connArr(0,1), b = connArr(0,2); return `\\(\\vec{n} = \\begin{pmatrix}${a[1]}\\cdot${b[2]}-${a[2]}\\cdot${b[1]}\\\\ ${a[2]}\\cdot${b[0]}-${a[0]}\\cdot${b[2]}\\\\ ${a[0]}\\cdot${b[1]}-${a[1]}\\cdot${b[0]}\\end{pmatrix}\\)` },
           () => { const c = connV(0,1).cross(connV(0,2)); return `$$\\vec{n} = \\begin{pmatrix}${c.x}\\\\${c.y}\\\\${c.z}\\end{pmatrix}$$` }
         ],
-        diagnostics: []
+        diagnostics: [
+          { pattern: (ans) => { const c = connV(0,2).cross(connV(0,1)); return Math.abs(ans[0]-c.x)<0.1 && Math.abs(ans[1]-c.y)<0.1 && Math.abs(ans[2]-c.z)<0.1 }, msg: 'Richtung des Normalenvektors ist umgekehrt (andere Vorzeichen). Für die Ebene ist das auch gültig — die Richtung \\(\\vec{SA}\\times\\vec{SB}\\) ist die Konvention.' }
+        ]
       },
       {
         prompt: () => `Berechne d = \\(\\vec{n} \\cdot \\vec{O${PLATS[0].lbl}}\\) für die Koordinatenform:`,
@@ -435,6 +440,69 @@ export const MISSIONS = [
       body: 'Eine Ebene wird definiert durch einen Punkt und einen Normalenvektor, der senkrecht auf ihr steht.'
     },
     badge: 'ebenen_explorer'
+  },
+  {
+    id: 11, title: 'Wie weit ist der Gipfel?', concept: 'Abstand Punkt-Ebene',
+    difficulty: 'vertiefung', xp: 80, prerequisites: [9, 8],
+    platforms: [0, 1, 2, 3],
+    story: () => `Die Kletterwand (Ebene durch ${P(0)}, ${P(1)}, ${P(2)}) liegt im Park. Wie weit ist der ${P(3)} von dieser Wand entfernt?`,
+    task: () => `Berechne den Abstand von ${PLATS[3].name} ${PLATS[3].lbl}${pCoord(3)} zur Ebene durch S, A, B.`,
+    tischaufgabe: {
+      setup: () => `<ol><li>Lege ein Blatt Papier durch <strong>${PLATS[0].lbl}</strong>, <strong>${PLATS[1].lbl}</strong>, <strong>${PLATS[2].lbl}</strong></li><li>Messe mit einem Lineal den senkrechten Abstand von <strong>${PLATS[3].lbl}</strong> zur Papierfläche</li><li>Vergleiche mit deiner Rechnung</li></ol>`,
+      materials: ['Koordinatengitter', 'Blatt Papier', 'Lineal']
+    },
+    steps: [
+      {
+        prompt: () => `Gib den Normalenvektor \\(\\vec{n} = \\vec{SA} \\times \\vec{SB}\\) der Ebene an:`,
+        type: 'vector3',
+        answer: () => connV(0, 1).cross(connV(0, 2)).toArr(),
+        tolerance: 0.1,
+        hints: [
+          () => { const a = connArr(0,1), b = connArr(0,2); return `Kreuzprodukt \\(\\vec{SA}\\times\\vec{SB}\\): \\(\\begin{pmatrix}${a[1]}\\cdot${b[2]}-${a[2]}\\cdot${b[1]}\\\\ ${a[2]}\\cdot${b[0]}-${a[0]}\\cdot${b[2]}\\\\ ${a[0]}\\cdot${b[1]}-${a[1]}\\cdot${b[0]}\\end{pmatrix}\\)` },
+          () => { const a = connArr(0,1), b = connArr(0,2); return `\\(\\vec{SA}=(${a[0]};${a[1]};${a[2]}),\\ \\vec{SB}=(${b[0]};${b[1]};${b[2]})\\)` },
+          () => { const c = connV(0,1).cross(connV(0,2)); return `$$\\vec{n} = \\begin{pmatrix}${c.x}\\\\${c.y}\\\\${c.z}\\end{pmatrix}$$` }
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => {
+          const n = connV(0,1).cross(connV(0,2));
+          const sg = pV(3).sub(pV(0));
+          return `Berechne \\(\\vec{n} \\cdot \\vec{SG}\\) (Zähler der Abstandsformel):`;
+        },
+        type: 'number',
+        answer: () => connV(0,1).cross(connV(0,2)).dot(pV(3).sub(pV(0))),
+        tolerance: 0.5,
+        hints: [
+          () => `\\(\\vec{SG}\\) zeigt von S nach G — also Koordinaten von G minus Koordinaten von S.`,
+          () => { const n = connV(0,1).cross(connV(0,2)); const sg = pV(3).sub(pV(0)); return `\\(\\vec{n} \\cdot \\vec{SG} = ${n.x}\\cdot${sg.x} + ${n.y}\\cdot${sg.y} + ${n.z}\\cdot${sg.z}\\)` },
+          () => { const d = connV(0,1).cross(connV(0,2)).dot(pV(3).sub(pV(0))); return `$$\\vec{n} \\cdot \\vec{SG} = ${d}$$` }
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => `Berechne den Abstand \\(d = \\frac{|\\vec{n} \\cdot \\vec{SG}|}{|\\vec{n}|}\\) (2 Dez.):`,
+        type: 'number',
+        answer: () => {
+          const n = connV(0,1).cross(connV(0,2));
+          return Math.abs(n.dot(pV(3).sub(pV(0)))) / n.len();
+        },
+        tolerance: 0.05,
+        hints: [
+          () => `\\(d = \\frac{|\\vec{n} \\cdot \\vec{SG}|}{|\\vec{n}|}\\) — Betrag des Zählers durch Betrag des Normalenvektors.`,
+          () => { const n = connV(0,1).cross(connV(0,2)); const dot = n.dot(pV(3).sub(pV(0))); return `\\(d = \\frac{|${dot}|}{${n.len().toFixed(2)}}\\)` },
+          () => { const n = connV(0,1).cross(connV(0,2)); const d = Math.abs(n.dot(pV(3).sub(pV(0)))) / n.len(); return `$$d \\approx ${d.toFixed(2)}$$` }
+        ],
+        diagnostics: [
+          { pattern: (ans) => { const n = connV(0,1).cross(connV(0,2)); const raw = n.dot(pV(3).sub(pV(0))); return Math.abs(ans - Math.abs(raw)) < 0.5 }, msg: 'Du hast vergessen, durch |n⃗| zu dividieren! Der Abstand ist |n⃗·SG⃗| geteilt durch den Betrag des Normalenvektors.' }
+        ]
+      }
+    ],
+    insight: {
+      title: 'Abstand Punkt — Ebene',
+      formula: '$$d(P, E) = \\frac{|\\vec{n} \\cdot \\vec{AP}|}{|\\vec{n}|}$$',
+      body: 'Der Abstand eines Punktes P von einer Ebene E (mit Normalenvektor n⃗ und Punkt A ∈ E) berechnet sich über das Skalarprodukt mit dem normalisierten Normalenvektor.'
+    }
   },
   {
     id: 10, title: 'Seil trifft Wand', concept: 'Schnitt Gerade–Ebene',
@@ -491,6 +559,73 @@ export const MISSIONS = [
       title: 'Schnitt Gerade–Ebene',
       formula: '$$t = \\frac{-\\vec{n}\\cdot(\\vec{a}-\\vec{p})}{\\vec{n}\\cdot\\vec{r}}$$',
       body: 'Den Schnittpunkt findet man, indem man die Geradengleichung in die Ebenengleichung einsetzt.'
+    }
+  },
+  {
+    id: 12, title: 'Spiegelpunkt im Wald', concept: 'Spiegelung an Ebene',
+    difficulty: 'vertiefung', xp: 100, prerequisites: [11],
+    platforms: [0, 1, 2, 4],
+    story: () => `${P(4)} soll an der Kletterwand (Ebene durch S, A, B) gespiegelt werden — wie bei einem Hochseilgarten-Parallelkurs. Wo liegt der Spiegelpunkt?`,
+    task: () => `Spiegle Plattform ${PLATS[4].name} ${PLATS[4].lbl}${pCoord(4)} an der Ebene durch S, A, B.`,
+    badge: 'spiegel_held',
+    steps: [
+      {
+        prompt: () => `Berechne den Parameter \\(t = \\frac{-\\vec{n} \\cdot (\\vec{OT} - \\vec{OS})}{|\\vec{n}|^2}\\) für die Lotgerade durch T mit Richtung \\(\\vec{n}\\):`,
+        type: 'number',
+        answer: () => {
+          const n = connV(0,1).cross(connV(0,2));
+          return -n.dot(pV(4).sub(pV(0))) / n.dot(n);
+        },
+        tolerance: 0.005,
+        hints: [
+          () => { const n = connV(0,1).cross(connV(0,2)); return `Die Lotgerade durch T lautet \\(\\vec{x} = \\vec{OT} + t \\cdot \\vec{n}\\). Einsetzen in die Ebenengleichung \\(\\vec{n}\\cdot(\\vec{x}-\\vec{OS})=0\\) liefert t.` },
+          () => { const n = connV(0,1).cross(connV(0,2)); const dots = n.dot(pV(4).sub(pV(0))); return `\\(t = \\frac{-${dots}}{${n.dot(n)}}\\)` },
+          () => { const n = connV(0,1).cross(connV(0,2)); const t = -n.dot(pV(4).sub(pV(0)))/n.dot(n); return `$$t = ${t.toFixed(4)}$$` }
+        ],
+        diagnostics: [
+          { pattern: (ans) => { const n = connV(0,1).cross(connV(0,2)); const t = n.dot(pV(4).sub(pV(0)))/n.dot(n); return Math.abs(ans - t) < 0.01 }, msg: 'Vorzeichen falsch! Der Parameter t muss negativ sein, wenn T auf der positiven Seite der Ebene liegt.' }
+        ]
+      },
+      {
+        prompt: () => `Berechne den Lotfußpunkt \\(F = T + t \\cdot \\vec{n}\\) (als Vektor):`,
+        type: 'vector3',
+        answer: () => {
+          const n = connV(0,1).cross(connV(0,2));
+          const t = -n.dot(pV(4).sub(pV(0))) / n.dot(n);
+          return pV(4).add(n.scale(t)).toArr();
+        },
+        tolerance: 0.05,
+        hints: [
+          () => { const n = connV(0,1).cross(connV(0,2)); return `F liegt auf der Lotgeraden \\(\\vec{x} = \\vec{OT} + t \\cdot \\vec{n}\\). Setze den berechneten t-Wert ein.` },
+          () => { const n = connV(0,1).cross(connV(0,2)); const t = -n.dot(pV(4).sub(pV(0)))/n.dot(n); return `\\(F = \\vec{OT} + ${t.toFixed(4)} \\cdot \\begin{pmatrix}${n.x}\\\\${n.y}\\\\${n.z}\\end{pmatrix}\\)` },
+          () => { const n = connV(0,1).cross(connV(0,2)); const t = -n.dot(pV(4).sub(pV(0)))/n.dot(n); const f = pV(4).add(n.scale(t)); return `$$F \\approx \\begin{pmatrix}${f.x.toFixed(2)}\\\\${f.y.toFixed(2)}\\\\${f.z.toFixed(2)}\\end{pmatrix}$$` }
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => `Berechne den Spiegelpunkt \\(T' = 2F - T\\):`,
+        type: 'vector3',
+        answer: () => {
+          const n = connV(0,1).cross(connV(0,2));
+          const t = -n.dot(pV(4).sub(pV(0))) / n.dot(n);
+          const f = pV(4).add(n.scale(t));
+          return f.scale(2).sub(pV(4)).toArr();
+        },
+        tolerance: 0.1,
+        hints: [
+          () => 'Der Spiegelpunkt T\\' liegt auf der anderen Seite von F: T\\' = 2·F − T',
+          () => { const n = connV(0,1).cross(connV(0,2)); const t = -n.dot(pV(4).sub(pV(0)))/n.dot(n); const f = pV(4).add(n.scale(t)); return `\\(T' = 2 \\cdot \\begin{pmatrix}${f.x.toFixed(2)}\\\\${f.y.toFixed(2)}\\\\${f.z.toFixed(2)}\\end{pmatrix} - \\begin{pmatrix}${pV(4).x}\\\\${pV(4).y}\\\\${pV(4).z}\\end{pmatrix}\\)` },
+          () => { const n = connV(0,1).cross(connV(0,2)); const t = -n.dot(pV(4).sub(pV(0)))/n.dot(n); const f = pV(4).add(n.scale(t)); const tp = f.scale(2).sub(pV(4)); return `$$T' \\approx \\begin{pmatrix}${tp.x.toFixed(2)}\\\\${tp.y.toFixed(2)}\\\\${tp.z.toFixed(2)}\\end{pmatrix}$$` }
+        ],
+        diagnostics: [
+          { pattern: (ans) => { const n = connV(0,1).cross(connV(0,2)); const t = -n.dot(pV(4).sub(pV(0)))/n.dot(n); const f = pV(4).add(n.scale(t)); const wrong = pV(4).sub(f.sub(pV(4))); return Math.abs(ans[0]-wrong.x)<0.1 && Math.abs(ans[1]-wrong.y)<0.1 }, msg: 'Fast! Prüfe die Formel: T\\' = 2·F − T, nicht F − (T − F).' }
+        ]
+      }
+    ],
+    insight: {
+      title: 'Spiegelung an einer Ebene',
+      formula: '$$T' = 2F - T, \\quad F = T + t \\cdot \\vec{n}, \\quad t = \\frac{-\\vec{n}\\cdot(T-A)}{|\\vec{n}|^2}$$',
+      body: 'Der Spiegelpunkt liegt symmetrisch zum Lotfußpunkt F: F ist der Mittelpunkt von T und T\'.'
     }
   }
 ];

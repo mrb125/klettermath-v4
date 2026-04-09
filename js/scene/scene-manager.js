@@ -93,16 +93,18 @@ export function initScene(canvas) {
   // Axes
   scene.add(createAxes());
 
-  // Platforms
+  // Platforms — hidden until a mission activates them
   PLATS.forEach((p, idx) => {
     const mesh = buildPlatform(p, idx);
+    mesh.visible = false;
     scene.add(mesh);
     platMeshes.push(mesh);
   });
 
-  // Ropes
+  // Ropes — hidden until a mission activates them
   ROPES.forEach(([a, b]) => {
     const rope = createRope(a, b);
+    rope.visible = false;
     scene.add(rope);
     ropeMeshes.push(rope);
   });
@@ -201,6 +203,8 @@ export function clearUserPoints() {
 }
 
 export function highlightPlatforms(ids) {
+  platMeshes.forEach(m => { m.visible = true; });
+  ropeMeshes.forEach(m => { m.visible = true; });
   platMeshes.forEach(m => {
     const isHighlighted = ids.includes(m.userData.platId);
     if (m.userData.indicator) {
@@ -211,7 +215,8 @@ export function highlightPlatforms(ids) {
 }
 
 export function clearHighlights() {
-  highlightPlatforms([]);
+  platMeshes.forEach(m => { m.visible = false; });
+  ropeMeshes.forEach(m => { m.visible = false; });
 }
 
 export function dispose() {

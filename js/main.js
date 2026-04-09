@@ -64,7 +64,7 @@ export function updateTopBar() {
   const state = getState();
   if (!state) return;
   const done = state.progress.done.length;
-  const total = 10;
+  const total = 12;
   const pct = Math.round((done / total) * 100);
   const fill = document.getElementById('progress-fill');
   if (fill) fill.style.width = pct + '%';
@@ -72,4 +72,10 @@ export function updateTopBar() {
   if (lbl) lbl.textContent = `${done}/${total}`;
   const xp = document.getElementById('top-xp');
   if (xp) xp.textContent = `${state.progress.xp} XP`;
+  const streak = document.getElementById('top-streak');
+  if (streak) {
+    const s = state.progress.streak || 0;
+    streak.textContent = `🔥 ${s}`;
+    streak.style.opacity = s > 0 ? '1' : '0.4';
+  }
 }
