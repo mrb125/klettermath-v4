@@ -329,7 +329,6 @@ function handleHint(idx) {
   // Determine which tier to reveal next.
   // ms.hintTier stays 0 after showing tier 0 (useHint uses Math.max),
   // so we use DOM presence to distinguish "first click" from "already showing".
-  const hintEl = document.getElementById(`hint-${idx}`);
   const hintsAlreadyShown = hintEl && hintEl.querySelector('.hint-tier-label');
   let nextTier;
   if (!hintsAlreadyShown) {
