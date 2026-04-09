@@ -112,6 +112,9 @@ export function initScene(canvas) {
     ropeMeshes.push(rope);
   });
 
+  // Landmarks — always visible reference points
+  initLandmarks();
+
   // Animate
   function animate() {
     animId = requestAnimationFrame(animate);
@@ -280,6 +283,61 @@ export function showLiveVector(ox, oy, oz, dx, dy, dz) {
 
 export function clearLiveVector() {
   if (liveArrow && scene) { scene.remove(liveArrow); liveArrow = null; }
+}
+
+function initLandmarks() {
+  if (landmarkGroup) return;
+  landmarkGroup = new THREE.Group();
+
+  const landmarks = [
+    { x: 0, y: 0, z: 0, lbl: 'S', coord: '(0|0|0)' },
+    { x: -3, y: 6, z: 5, lbl: 'G', coord: '(-3|6|5)' },
+    { x: 6, y: -4, z: 7, lbl: 'T', coord: '(6|-4|7)' },
+  ];
+
+  landmarks.forEach(({ x, y, z, lbl, coord }) => {
+    // mathToScene: THREE pos = (x, z, -y)
+    const pos = new THREE.Vector3(x, z, -y);
+
+    // Small grey sphere
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.18, 12, 12),
+      new THREE.MeshStandardMaterial({
+        color: 0x888888,
+        emissive: 0x444444,
+        emissiveIntensity: 0.3,
+        transparent: true,
+        opacity: 0.7,
+      })
+    );
+    sphere.position.copy(pos);
+    landmarkGroup.add(sphere);
+
+    // Text sprite using canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = 128;
+    canvas.height = 48;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'rgba(0,0,0,0)';
+    ctx.fillRect(0, 0, 128, 48);
+    ctx.font = 'bold 18px sans-serif';
+    ctx.fillStyle = 'rgba(200,200,200,0.85)';
+    ctx.textAlign = 'center';
+    ctx.fillText(lbl, 64, 20);
+    ctx.font = '13px sans-serif';
+    ctx.fillStyle = 'rgba(160,160,160,0.7)';
+    ctx.fillText(coord, 64, 38);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+    const sprite = new THREE.Sprite(spriteMat);
+    sprite.position.copy(pos);
+    sprite.position.y += 0.5; // float above sphere
+    sprite.scale.set(1.2, 0.45, 1);
+    landmarkGroup.add(sprite);
+  });
+
+  scene.add(landmarkGroup);
 }
 
 export function dispose() {

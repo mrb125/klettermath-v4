@@ -52,6 +52,17 @@ export function renderMission(missionId, customMission = null) {
   // Highlight platforms in scene
   highlightPlatforms(mission.platforms);
 
+  // Show coordinate anchor hint on first visit to this mission
+  const ms0 = getMissionStep(missionId, 0);
+  if (!ms0 || ms0.attempts === 0) {
+    // Only show on first open, not on revisit
+    // Pick which landmark is closest to the mission's platforms for context
+    const nearestLandmark = mission.platforms?.includes(0) ? 'S(0|0|0) ist der Eingang' :
+      mission.platforms?.includes(6) ? 'T(6|-4|7) ist der Aussichtsturm' :
+      'S(0|0|0) ist der Eingang des Parks';
+    setTimeout(() => showToast(`📍 Orientierung: ${nearestLandmark}`, 'ok', 2500), 800);
+  }
+
   renderMissionUI();
 }
 
