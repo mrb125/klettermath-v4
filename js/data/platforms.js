@@ -27,9 +27,16 @@ export function connArr(a, b) {
   return connV(a, b).toArr();
 }
 
+// Textdarstellung: NRW-Notation (x₁|x₂|x₃) für Fließtext
 export function pCoord(i) {
   const p = PLATS[i];
   return `(${p.x}|${p.y}|${p.z})`;
+}
+
+// LaTeX-Darstellung: \mid-Abstände für Einsatz innerhalb \(...\) oder $$...$$
+export function pCoordTeX(i) {
+  const p = PLATS[i];
+  return `(${p.x} \\mid ${p.y} \\mid ${p.z})`;
 }
 
 export function P(i) {

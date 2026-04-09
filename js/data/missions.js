@@ -1,4 +1,4 @@
-import { PLATS, platV3, connV, connArr, pCoord, P } from './platforms.js';
+import { PLATS, platV3, connV, connArr, pCoord, pCoordTeX, P } from './platforms.js';
 
 const pV = platV3;
 const pArr = i => platV3(i).toArr();
@@ -68,7 +68,7 @@ export const MISSIONS = [
         type: 'vector3', answer: () => connArr(0, 1), tolerance: 0.1,
         hints: [
           () => `Welcher Punkt ist Start, welcher Ziel? Der Pfeil \\(\\vec{${PLATS[0].lbl}${PLATS[1].lbl}}\\) zeigt von ${PLATS[0].name} nach ${PLATS[1].name} — also: Zielkoordinaten minus Startkoordinaten.`,
-          () => `\\(\\vec{${PLATS[0].lbl}${PLATS[1].lbl}} = ${pCoord(1)} - ${pCoord(0)}\\) — rechne jede Koordinate einzeln.`,
+          () => `\\(\\vec{${PLATS[0].lbl}${PLATS[1].lbl}} = ${pCoordTeX(1)} - ${pCoordTeX(0)}\\) — rechne jede Koordinate einzeln.`,
           () => { const v = connArr(0, 1); return `$$\\vec{${PLATS[0].lbl}${PLATS[1].lbl}} = \\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
         ],
         diagnostics: [
@@ -92,7 +92,7 @@ export const MISSIONS = [
         tolerance: 0.1,
         hints: [
           () => 'M = (A + B) / 2',
-          () => `\\(M = \\frac{1}{2}(${pCoord(0)} + ${pCoord(1)})\\)`,
+          () => `\\(M = \\frac{1}{2}(${pCoordTeX(0)} + ${pCoordTeX(1)})\\)`,
           () => { const m = [(pV(0).x+pV(1).x)/2,(pV(0).y+pV(1).y)/2,(pV(0).z+pV(1).z)/2]; return `$$M = \\begin{pmatrix}${m[0]}\\\\${m[1]}\\\\${m[2]}\\end{pmatrix}$$` }
         ],
         diagnostics: []
@@ -129,7 +129,7 @@ export const MISSIONS = [
         prompt: () => `Setze t = 2 in \\(g: \\vec{x} = \\vec{O${PLATS[0].lbl}} + t \\cdot \\vec{r}\\) ein. Welcher Punkt?`,
         type: 'vector3', answer: () => connArr(0, 1).map(x => x * 2), tolerance: 0.1,
         hints: [
-          () => `\\(\\vec{x} = ${pCoord(0)} + 2 \\cdot \\vec{r}\\)`,
+          () => `\\(\\vec{x} = ${pCoordTeX(0)} + 2 \\cdot \\vec{r}\\)`,
           () => { const v = connArr(0, 1); return `\\(\\vec{x} = \\begin{pmatrix}0\\\\0\\\\0\\end{pmatrix} + 2 \\cdot \\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}\\)` },
           () => { const v = connArr(0, 1); return `$$\\vec{x} = \\begin{pmatrix}${v[0]*2}\\\\${v[1]*2}\\\\${v[2]*2}\\end{pmatrix}$$` }
         ],
@@ -166,7 +166,7 @@ export const MISSIONS = [
         type: 'vector3', answer: () => connArr(1, 2), tolerance: 0.1,
         hints: [
           () => 'Ziel minus Start',
-          () => `\\(${pCoord(2)} - ${pCoord(1)}\\)`,
+          () => `\\(${pCoordTeX(2)} - ${pCoordTeX(1)}\\)`,
           () => { const v = connArr(1, 2); return `$$\\vec{${PLATS[1].lbl}${PLATS[2].lbl}} = \\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
         ],
         diagnostics: []
@@ -300,7 +300,7 @@ export const MISSIONS = [
         type: 'vector3', answer: () => connArr(3, 4), tolerance: 0.1,
         hints: [
           () => 'Ziel minus Start',
-          () => `\\(${pCoord(4)} - ${pCoord(3)}\\)`,
+          () => `\\(${pCoordTeX(4)} - ${pCoordTeX(3)}\\)`,
           () => { const v = connArr(3, 4); return `$$\\vec{r_2} = \\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
         ],
         diagnostics: []
@@ -396,7 +396,7 @@ export const MISSIONS = [
         type: 'vector3', answer: () => connArr(0, 1), tolerance: 0.1,
         hints: [
           () => 'Ziel minus Start',
-          () => `\\(${pCoord(1)} - ${pCoord(0)}\\)`,
+          () => `\\(${pCoordTeX(1)} - ${pCoordTeX(0)}\\)`,
           () => { const v = connArr(0,1); return `$$\\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
         ],
         diagnostics: []
@@ -406,7 +406,7 @@ export const MISSIONS = [
         type: 'vector3', answer: () => connArr(0, 2), tolerance: 0.1,
         hints: [
           () => 'Ziel minus Start',
-          () => `\\(${pCoord(2)} - ${pCoord(0)}\\)`,
+          () => `\\(${pCoordTeX(2)} - ${pCoordTeX(0)}\\)`,
           () => { const v = connArr(0,2); return `$$\\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
         ],
         diagnostics: []
@@ -516,7 +516,7 @@ export const MISSIONS = [
         type: 'vector3', answer: () => connArr(5, 7), tolerance: 0.1,
         hints: [
           () => 'Ziel minus Start',
-          () => `\\(${pCoord(7)} - ${pCoord(5)}\\)`,
+          () => `\\(${pCoordTeX(7)} - ${pCoordTeX(5)}\\)`,
           () => { const v = connArr(5, 7); return `$$\\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
         ],
         diagnostics: []
