@@ -27,7 +27,7 @@ export const MISSIONS = [
         ],
         diagnostics: [
           { pattern: (ans) => ans[0] === 0 && ans[1] === 0 && ans[2] === 0, msg: 'Das ist der Nullvektor — der Ortsvektor von S, nicht von A! Schau auf die Koordinaten von A.' },
-          { pattern: (ans) => { const p = PLATS[1]; return Math.abs(ans[0]-p.y)<0.1 && Math.abs(ans[1]-p.z)<0.1 && Math.abs(ans[2]-p.x)<0.1 }, msg: 'Die Komponenten sind vertauscht. x₁ ist die erste, x₂ die zweite, x₃ die dritte Koordinate.' }
+          { pattern: (ans) => { const p = PLATS[1]; return (Math.abs(ans[0]-p.y)<0.1 && Math.abs(ans[1]-p.x)<0.1 && Math.abs(ans[2]-p.z)<0.1) || (Math.abs(ans[0]-p.y)<0.1 && Math.abs(ans[1]-p.z)<0.1 && Math.abs(ans[2]-p.x)<0.1) || (Math.abs(ans[0]-p.z)<0.1 && Math.abs(ans[1]-p.x)<0.1 && Math.abs(ans[2]-p.y)<0.1) || (Math.abs(ans[0]-p.x)<0.1 && Math.abs(ans[1]-p.z)<0.1 && Math.abs(ans[2]-p.y)<0.1) || (Math.abs(ans[0]-p.z)<0.1 && Math.abs(ans[1]-p.y)<0.1 && Math.abs(ans[2]-p.x)<0.1) }, msg: 'Die Komponenten sind vertauscht. x₁ ist die erste, x₂ die zweite, x₃ die dritte Koordinate des Punktes.' }
         ]
       },
       {

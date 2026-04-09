@@ -72,6 +72,13 @@
 .wlc-continue:hover { border-color: var(--rope); color: var(--rope) }
 
 /* ── Code Entry ── */
+#s-code {
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 50% 30%, #2e2416 0%, #1a1614 70%);
+  text-align: center;
+  padding: 24px;
+}
 .code-input {
   font-family: 'JetBrains Mono', 'Bebas Neue', monospace;
   font-size: 2rem;
