@@ -62,7 +62,10 @@ function renderMissionUI() {
       <details class="tisch-box">
         <summary>🪵 Tischaufgabe</summary>
         ${m.tischaufgabe.setup()}
-        <button class="btn btn-sm tisch-stl-btn" style="margin-top:10px">🖨️ Modell als STL</button>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn btn-sm tisch-stl-btn">🖨️ Park mit Boden (STL)</button>
+          <button class="btn btn-sm tisch-stl-plat-btn">🏗️ Nur Plattformen (STL)</button>
+        </div>
       </details>`;
   }
 
@@ -99,6 +102,9 @@ function renderMissionUI() {
 
   pane.querySelector('.tisch-stl-btn')?.addEventListener('click', () => {
     import('../export/stl-model.js').then(m => m.downloadParkSTL()).catch(console.error);
+  });
+  pane.querySelector('.tisch-stl-plat-btn')?.addEventListener('click', () => {
+    import('../export/stl-model.js').then(m => m.downloadPlatformsSTL()).catch(console.error);
   });
 
   document.getElementById('btn-next-mission')?.addEventListener('click', () => {

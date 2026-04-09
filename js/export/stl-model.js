@@ -333,12 +333,29 @@ export function downloadParkSTL() {
   }
 
   data += 'endsolid klettermath_park\n';
+  _triggerDownload(data, 'klettermath-park.stl');
+}
 
+// Nur die 8 Plattform-Objekte — keine Bodenplatte, kein Gitter, keine Seile.
+// Ideal für Einzeldruck der thematischen Tokens.
+export function downloadPlatformsSTL() {
+  let data = 'solid klettermath_plattformen\n';
+
+  for (const p of PLATS) {
+    const { stl } = buildPlatformGeometry(p);
+    data += stl;
+  }
+
+  data += 'endsolid klettermath_plattformen\n';
+  _triggerDownload(data, 'klettermath-plattformen.stl');
+}
+
+function _triggerDownload(data, filename) {
   const blob = new Blob([data], { type: 'model/stl' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
-  a.download = 'klettermath-park.stl';
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
