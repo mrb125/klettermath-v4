@@ -1,11 +1,12 @@
 // KletterMath Service Worker
 // Cache-first for static assets, network-first for API calls
 
-const CACHE = 'km4-v2';
+const CACHE = 'km4-v3';
 
 const STATIC = [
   './',
   './index.html',
+  './assets/welcome-bg.jpg',
   './css/variables.css',
   './css/base.css',
   './css/layout.css',

@@ -85,12 +85,41 @@
 
 .step-prompt { margin-bottom: 12px; line-height: 1.6 }
 
-.step-input-row {
+/* ── Column Vector Input ── */
+.vec-col-input {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 8px 0;
+}
+.vec-bracket {
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--text2);
+  font-weight: 100;
+  user-select: none;
+}
+.vec-col-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 4px;
+}
+.vec-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
 }
+.vec-lbl {
+  font-size: .78rem;
+  color: var(--text2);
+  width: 18px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Legacy ── kept for compat */
+.step-input-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .vec-label { font-size: .8rem; color: var(--text2) }
 
 .step-actions {
@@ -110,9 +139,9 @@
 .step-feedback.correct { background: rgba(107,203,119,.12); color: var(--ok) }
 .step-feedback.wrong { background: rgba(239,68,68,.12); color: var(--err) }
 
-/* ── Hints ── */
+/* ── Hints (gestufte Hilfen) ── */
 .hint-box {
-  margin-top: 10px;
+  margin-top: 8px;
   padding: 10px 14px;
   background: rgba(232,160,48,.08);
   border: 1px solid rgba(232,160,48,.2);
@@ -121,16 +150,52 @@
   font-size: .85rem;
   animation: fadeIn .3s ease;
 }
+.hint-tier-2 {
+  background: rgba(232,160,48,.13);
+  border-color: rgba(232,160,48,.3);
+}
+.hint-tier-label {
+  display: block;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--rope);
+  margin-bottom: 4px;
+  letter-spacing: .5px;
+}
+.hint-content { line-height: 1.5 }
 
 /* ── Worked Solution ── */
 .worked-box {
-  margin-top: 10px;
+  margin-top: 8px;
   padding: 12px 14px;
   background: rgba(91,155,213,.08);
   border: 1px solid rgba(91,155,213,.2);
   border-radius: 8px;
   font-size: .85rem;
   animation: fadeIn .3s ease;
+}
+.hint-tier-3 .hint-tier-label { color: #6495ed }
+
+/* ── Hint progress dots ── */
+.hint-progress {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+}
+.hint-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(232,160,48,.2);
+  border: 1px solid rgba(232,160,48,.35);
+  flex-shrink: 0;
+}
+.hint-dot.filled { background: var(--rope); border-color: var(--rope) }
+.hint-progress-txt {
+  font-size: .7rem;
+  color: var(--text3);
+  margin-left: 4px;
 }
 
 /* ── Insight Card ── */

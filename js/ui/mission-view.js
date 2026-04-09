@@ -127,10 +127,14 @@ function renderStep(step, idx, isActive, isDone, isLocked) {
 function renderInput(step, idx) {
   let html = '';
   if (step.type === 'vector3') {
-    html += `<div class="step-input-row">
-      <span class="vec-label">x₁</span><input class="input-field" id="v-${idx}-0" type="number" step="any">
-      <span class="vec-label">x₂</span><input class="input-field" id="v-${idx}-1" type="number" step="any">
-      <span class="vec-label">x₃</span><input class="input-field" id="v-${idx}-2" type="number" step="any">
+    html += `<div class="vec-col-input">
+      <span class="vec-bracket">⎛<br>⎜<br>⎝</span>
+      <div class="vec-col-fields">
+        <div class="vec-row"><span class="vec-lbl">x₁</span><input class="input-field" id="v-${idx}-0" type="number" step="any" inputmode="decimal"></div>
+        <div class="vec-row"><span class="vec-lbl">x₂</span><input class="input-field" id="v-${idx}-1" type="number" step="any" inputmode="decimal"></div>
+        <div class="vec-row"><span class="vec-lbl">x₃</span><input class="input-field" id="v-${idx}-2" type="number" step="any" inputmode="decimal"></div>
+      </div>
+      <span class="vec-bracket">⎞<br>⎟<br>⎠</span>
     </div>`;
   } else if (step.type === 'number') {
     html += `<div class="step-input-row">
@@ -308,6 +312,7 @@ function markInputsWrong(step, idx) {
 function handleHint(idx) {
   missionIsGold = false;
   const step = currentMission.steps[idx];
+  if (!step.hints || !step.hints.length) return;
   const ms = getMissionStep(currentMission.id, idx);
   const tier = Math.min(ms.hintTier, step.hints.length - 1);
 
@@ -327,15 +332,40 @@ function handleHint(idx) {
   const hintEl = document.getElementById(`hint-${idx}`);
   if (!hintEl) return;
 
+  const totalTiers = step.hints.length;
+  const TIER_META = [
+    { label: '💡 Hinweis',       cls: 'hint-box hint-tier-1' },
+    { label: '🔍 Strategie',     cls: 'hint-box hint-tier-2' },
+    { label: '📝 Musterlösung',  cls: 'worked-box hint-tier-3' },
+  ];
+
   let html = '';
   for (let t = 0; t <= nextTier; t++) {
     const hint = typeof step.hints[t] === 'function' ? step.hints[t]() : step.hints[t];
-    const label = t === 0 ? '💡 Hinweis' : t === 1 ? '🔍 Strategie' : '📝 Musterlösung';
-    html += `<div class="${t === step.hints.length - 1 ? 'worked-box' : 'hint-box'}">${label}: ${hint}</div>`;
+    const meta = TIER_META[t] || TIER_META[TIER_META.length - 1];
+    html += `<div class="${meta.cls}">
+      <span class="hint-tier-label">${meta.label}</span>
+      <div class="hint-content">${hint}</div>
+    </div>`;
+  }
+
+  // Progress dots
+  html += '<div class="hint-progress">';
+  for (let t = 0; t < totalTiers; t++) {
+    html += `<span class="hint-dot ${t <= nextTier ? 'filled' : ''}"></span>`;
+  }
+  html += `<span class="hint-progress-txt">${nextTier + 1} / ${totalTiers}</span>`;
+  html += '</div>';
+
+  // "Nächste Stufe" button if more tiers remain
+  if (nextTier < totalTiers - 1) {
+    html += `<button class="btn btn-sm hint-next-btn" id="hint-next-${idx}" style="margin-top:6px">▶ Nächste Stufe</button>`;
   }
 
   hintEl.innerHTML = html;
   renderMath(hintEl);
+
+  document.getElementById(`hint-next-${idx}`)?.addEventListener('click', () => handleHint(idx));
 }
 
 function onMissionComplete() {
