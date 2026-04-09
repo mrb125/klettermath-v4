@@ -1,5 +1,6 @@
 const API_BASE = 'https://mrbl.4lima.de/klettermath-dashboard/api';
-const CODE_KEY = 'km4_code';
+const CODE_KEY  = 'km4_code';
+const CLASS_KEY = 'km4_class_id';
 
 export function getStoredCode() {
   return localStorage.getItem(CODE_KEY) || null;
@@ -20,9 +21,42 @@ export async function validateCode(code) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code: code.toUpperCase() })
     });
-    return await res.json(); // { valid, class } or { valid: false, error }
+    const data = await res.json(); // { valid, class, class_id } or { valid: false, error }
+    if (data.valid && data.class_id) {
+      localStorage.setItem(CLASS_KEY, data.class_id);
+    }
+    return data;
   } catch {
     return { valid: false, error: 'Keine Verbindung zum Server' };
+  }
+}
+
+export async function fetchCustomMissions() {
+  const code = getStoredCode();
+  if (!code) return [];
+  try {
+    const res = await fetch(`${API_BASE}/custom-missions.php?code=${code}`);
+    const list = await res.json();
+    // Convert DB format to mission object format
+    return list.map(m => ({
+      id: `cm_${m.id}`,
+      title: m.title,
+      story: () => m.story || '',
+      task:  () => '',
+      steps: JSON.parse(m.data || '[]').map(s => ({
+        ...s,
+        prompt: typeof s.prompt === 'string' ? s.prompt : '',
+        hints:  Array.isArray(s.hints) ? s.hints : [s.hints || ''],
+      })),
+      xp: m.xp || 60,
+      difficulty: 'Mittel',
+      concept: 'custom',
+      platforms: [],
+      prerequisites: [],
+      isCustom: true,
+    }));
+  } catch {
+    return [];
   }
 }
 
@@ -38,7 +72,8 @@ export async function syncProgress(state) {
         missions: state.progress.done,
         xp:       state.progress.xp,
         streak:   state.progress.streak,
-        mastery:  state.missionMastery || {}
+        mastery:  state.missionMastery || {},
+        errors:   state.analytics?.errorPatterns || {}
       })
     });
   } catch {

@@ -1,7 +1,8 @@
 import { MISSIONS } from '../data/missions.js';
 import { PLATS } from '../data/platforms.js';
 import { checkAnswer, runDiagnostics } from '../math/checks.js';
-import { getState, completeMission, addAttempt, useHint, getMissionStep, addErrorPattern, awardBadge } from '../state/store.js';
+import { getState, completeMission, completeCustomMission, addAttempt, useHint, getMissionStep, addErrorPattern, awardBadge } from '../state/store.js';
+import { isExamMode } from '../state/exam-mode.js';
 import { renderMath } from './math-render.js';
 import { showToast } from './toast.js';
 import { backToList } from './mission-list.js';
@@ -12,8 +13,8 @@ let currentMission = null;
 let currentStepIdx = 0;
 let missionIsGold = true;
 
-export function renderMission(missionId) {
-  const mission = MISSIONS.find(m => m.id === missionId);
+export function renderMission(missionId, customMission = null) {
+  const mission = customMission || MISSIONS.find(m => m.id === missionId);
   if (!mission) return;
   currentMission = mission;
   currentStepIdx = 0;
@@ -66,6 +67,13 @@ function renderMissionUI() {
   }
 
   // Steps
+  // Exam mode banner
+  if (isExamMode()) {
+    html += `<div style="background:rgba(255,94,91,.12);border:1px solid rgba(255,94,91,.35);border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:.8rem;color:#ff5e5b">
+      🎓 Prüfungsmodus — keine Hinweise verfügbar
+    </div>`;
+  }
+
   html += '<div id="steps-container">';
   m.steps.forEach((step, i) => {
     const isActive = i === currentStepIdx;
@@ -138,7 +146,7 @@ function renderInput(step, idx) {
 
   html += `<div class="step-actions">
     ${step.type !== 'mc' ? `<button class="btn btn-primary" id="check-${idx}">Prüfen</button>` : ''}
-    <button class="btn btn-sm" id="hint-btn-${idx}">💡 Hinweis</button>
+    ${isExamMode() ? '' : `<button class="btn btn-sm" id="hint-btn-${idx}">💡 Hinweis</button>`}
   </div>`;
 
   return html;
@@ -234,8 +242,8 @@ function doCheck(idx, step, userAnswer) {
     }, 600);
   } else {
     missionIsGold = false;
-    // Check diagnostics
-    const diagMsg = runDiagnostics(step.type, userAnswer, step.diagnostics);
+    // Check diagnostics (suppressed in exam mode)
+    const diagMsg = isExamMode() ? null : runDiagnostics(step.type, userAnswer, step.diagnostics);
     const msg = diagMsg || 'Leider falsch. Versuch es nochmal!';
     showFeedback(idx, msg, false);
     markInputsWrong(step, idx);
@@ -302,9 +310,19 @@ function handleHint(idx) {
   const step = currentMission.steps[idx];
   const ms = getMissionStep(currentMission.id, idx);
   const tier = Math.min(ms.hintTier, step.hints.length - 1);
-  const nextTier = Math.min(tier + (ms.hintTier === 0 && ms.attempts === 0 ? 0 : 1), step.hints.length - 1);
+
+  // Adaptive: if student has ≥3 prior errors on this concept, skip straight to strategy hint
+  const state = getState();
+  const priorErrors = state.analytics?.errorPatterns?.[currentMission.concept] || 0;
+  const startTier = (ms.hintTier === 0 && ms.attempts === 0 && priorErrors >= 3) ? 1 : 0;
+  const nextTier = Math.min(tier + (ms.hintTier === 0 && ms.attempts === 0 ? startTier : 1), step.hints.length - 1);
 
   useHint(currentMission.id, idx, nextTier);
+
+  // Show adaptive notice once (first hint request, high prior errors)
+  if (ms.hintTier === 0 && priorErrors >= 3 && nextTier >= 1) {
+    showToast('💡 Adaptiver Modus: Du bekommst direkt eine ausführlichere Hilfe.', 'ok', 3500);
+  }
 
   const hintEl = document.getElementById(`hint-${idx}`);
   if (!hintEl) return;
@@ -322,7 +340,11 @@ function handleHint(idx) {
 
 function onMissionComplete() {
   const m = currentMission;
-  completeMission(m.id, m.xp, missionIsGold);
+  if (m.isCustom) {
+    completeCustomMission(m.id, m.xp);
+  } else {
+    completeMission(m.id, m.xp, missionIsGold);
+  }
   showToast(`+${m.xp} XP`, 'xp');
   updateTopBar();
 

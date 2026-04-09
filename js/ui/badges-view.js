@@ -1,5 +1,62 @@
 import { getState, exportJSON } from '../state/store.js';
 
+const FLASHCARDS = [
+  {
+    icon: '📍', term: 'Ortsvektor',
+    def: 'Vektor vom Ursprung zu einem Punkt P',
+    formula: 'OP⃗ = (x₁|x₂|x₃)',
+    unlockMission: 1
+  },
+  {
+    icon: '➡️', term: 'Verbindungsvektor',
+    def: 'Vektor von Punkt A nach Punkt B',
+    formula: 'AB⃗ = OB⃗ − OA⃗',
+    unlockMission: 4
+  },
+  {
+    icon: '📏', term: 'Betrag',
+    def: 'Länge eines Vektors',
+    formula: '|v⃗| = √(x₁²+x₂²+x₃²)',
+    unlockMission: 6
+  },
+  {
+    icon: '🎯', term: 'Einheitsvektor',
+    def: 'Vektor der Länge 1 in Richtung v⃗',
+    formula: 'v̂ = v⃗ / |v⃗|',
+    unlockMission: 6
+  },
+  {
+    icon: '📐', term: 'Gerade',
+    def: 'Alle Punkte auf einer Linie durch A in Richtung u⃗',
+    formula: 'g: x⃗ = a⃗ + t·u⃗',
+    unlockMission: 7
+  },
+  {
+    icon: '✅', term: 'Punktprobe',
+    def: 'Liegt Punkt P auf Gerade g?',
+    formula: 'Löse x⃗ = a⃗ + t·u⃗ nach t',
+    unlockMission: 8
+  },
+  {
+    icon: '🪟', term: 'Spurpunkt',
+    def: 'Schnittpunkt einer Geraden mit einer Koordinatenebene',
+    formula: 'Setze xᵢ = 0, löse nach t',
+    unlockMission: 9
+  },
+  {
+    icon: '⚡', term: 'Skalarprodukt',
+    def: 'Maß für den "Gleichlauf" zweier Vektoren',
+    formula: 'a⃗·b⃗ = x₁y₁+x₂y₂+x₃y₃',
+    unlockMission: 11
+  },
+  {
+    icon: '📐', term: 'Winkel',
+    def: 'Winkel zwischen zwei Vektoren',
+    formula: 'cos φ = a⃗·b⃗ / (|a⃗||b⃗|)',
+    unlockMission: 12
+  },
+];
+
 const BADGE_DEFS = [
   { id: 'erste_schritte',   name: 'Erste Schritte',    icon: '🥾', desc: 'Mission 1 abgeschlossen' },
   { id: 'vektor_meister',   name: 'Vektormeister',     icon: '🧭', desc: '5 Missionen abgeschlossen' },
@@ -51,9 +108,45 @@ export function renderBadges() {
   });
 
   html += `</div>
+
+    <div style="margin-top:28px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--rope);margin-bottom:6px">
+        🃏 Lernkarten
+      </div>
+      <div style="font-size:.75rem;color:var(--text2);margin-bottom:12px">
+        Tippe auf eine Karte zum Umdrehen · Schalte neue Karten durch Missionen frei
+      </div>
+      <div class="flashcard-grid" id="flashcard-grid">`;
+
+  FLASHCARDS.forEach((card, i) => {
+    const unlocked = state.progress.done.includes(card.unlockMission);
+    html += `
+      <div class="flashcard${unlocked ? '' : ' locked'}" data-idx="${i}">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">
+            <div class="flashcard-icon">${card.icon}</div>
+            <div class="flashcard-term">${card.term}</div>
+            ${unlocked
+              ? '<div style="font-size:.65rem;color:var(--text3);margin-top:4px">→ umdrehen</div>'
+              : `<div style="font-size:.65rem;color:var(--text3);margin-top:4px">🔒 M${card.unlockMission}</div>`}
+          </div>
+          <div class="flashcard-back">
+            <div class="flashcard-def">${card.def}</div>
+            <div class="flashcard-formula">${card.formula}</div>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  html += `</div></div>
     <button class="btn btn-sm" id="btn-export" style="margin-top:20px;width:100%">📊 Fortschritt exportieren (Lehrkraft)</button>`;
 
   container.innerHTML = html;
+
+  // Flip cards on click (unlocked only)
+  document.querySelectorAll('.flashcard:not(.locked)').forEach(card => {
+    card.addEventListener('click', () => card.classList.toggle('flipped'));
+  });
 
   document.getElementById('btn-export')?.addEventListener('click', () => {
     const data = exportJSON();

@@ -4,6 +4,7 @@ const DEFAULT_STATE = {
   version: 4,
   progress: {
     done: [],
+    customDone: [],
     xp: 0,
     badges: [],
     streak: 0,
@@ -31,6 +32,7 @@ export function load() {
       if (parsed.version === 4) {
         state = parsed;
         if (!state.missionMastery) state.missionMastery = {};
+        if (!state.progress.customDone) state.progress.customDone = [];
       } else {
         state = deepClone(DEFAULT_STATE);
       }
@@ -75,6 +77,15 @@ export function completeMission(id, xp, isGold = false) {
   const current = state.missionMastery[id];
   if (!current || (isGold && current !== 'gold')) {
     state.missionMastery[id] = isGold ? 'gold' : 'silver';
+  }
+  save();
+  if (_onComplete) _onComplete(state);
+}
+
+export function completeCustomMission(id, xp) {
+  if (!state.progress.customDone.includes(id)) {
+    state.progress.customDone.push(id);
+    state.progress.xp += xp;
   }
   save();
   if (_onComplete) _onComplete(state);

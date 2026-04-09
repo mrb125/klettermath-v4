@@ -4,6 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>KletterMath — Vektoren im Kletterwald</title>
+<meta name="description" content="Vektorrechnung Q1 NRW – Lerne Vektoren an echten Kletterpark-Aufgaben">
+<meta name="theme-color" content="#c8833a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KletterMath">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
@@ -31,14 +46,24 @@
 
 <!-- ════ Welcome ════ -->
 <div id="s-welcome" class="screen">
-  <div class="wlc-title">KletterMath</div>
-  <div class="wlc-sub">Vektoren im Kletterwald</div>
-  <div class="wlc-desc">
-    Entdecke Vektorrechnung an echten Kletterpark-Aufgaben.
-    Plattform = Punkt, Seil = Gerade — rechne dich durch den Park!
+  <div class="wlc-bg">
+    <img src="assets/welcome-bg.jpg" alt="" class="wlc-bg-img" id="wlc-bg-img" onerror="this.style.display='none';document.getElementById('wlc-bg-fallback').style.display='block'">
+    <div class="wlc-bg-fallback" id="wlc-bg-fallback" style="display:none"></div>
+    <div class="wlc-bg-overlay"></div>
+    <div class="wlc-rope-line"></div>
+    <img src="assets/zipline-person.png" alt="" class="wlc-zipline-person" id="zipline-person" onerror="this.style.display='none'">
   </div>
-  <button id="btn-enter" class="btn-start">PARK BETRETEN</button>
-  <button id="btn-continue" class="wlc-continue hidden">WEITER KLETTERN</button>
+  <div class="wlc-content">
+    <div class="wlc-badge">Q1 · Vektorrechnung · NRW</div>
+    <div class="wlc-title">KletterMath</div>
+    <div class="wlc-sub">Vektoren im Kletterwald</div>
+    <div class="wlc-desc">
+      Entdecke Vektorrechnung an echten Kletterpark-Aufgaben.<br>
+      Plattform&nbsp;=&nbsp;Punkt &nbsp;·&nbsp; Seil&nbsp;=&nbsp;Gerade
+    </div>
+    <button id="btn-enter" class="btn-start">PARK BETRETEN</button>
+    <button id="btn-continue" class="wlc-continue hidden">WEITER KLETTERN</button>
+  </div>
 </div>
 
 <!-- ════ Park ════ -->

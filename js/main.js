@@ -23,10 +23,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Welcome buttons
-  document.getElementById('btn-enter').addEventListener('click', () => navigate('park'));
+  // Welcome buttons — trigger zipline then navigate
+  function enterPark() {
+    const person = document.getElementById('zipline-person');
+    if (person && person.style.display !== 'none') {
+      person.classList.add('active');
+      setTimeout(() => { person.classList.remove('active'); navigate('park'); }, 1650);
+    } else {
+      navigate('park');
+    }
+  }
+  document.getElementById('btn-enter').addEventListener('click', enterPark);
   const btnContinue = document.getElementById('btn-continue');
-  if (btnContinue) btnContinue.addEventListener('click', () => navigate('park'));
+  if (btnContinue) btnContinue.addEventListener('click', enterPark);
 
   // Code entry
   const codeInput = document.getElementById('code-input');
@@ -61,8 +70,24 @@ document.addEventListener('DOMContentLoaded', () => {
     codeInput.value = codeInput.value.toUpperCase();
   });
 
-  // Start: check for stored code
-  if (getStoredCode()) {
+  // Start: check for ?code= URL param (from QR scan) or stored code
+  const urlCode = new URLSearchParams(location.search).get('code')?.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (urlCode && urlCode.length === 6) {
+    // Validate and store code from URL, then remove param from address bar
+    history.replaceState(null, '', location.pathname);
+    btnSubmit.disabled = true;
+    const result = await validateCode(urlCode);
+    if (result.valid) {
+      storeCode(urlCode);
+      goToApp(state);
+    } else {
+      if (codeInput) codeInput.value = urlCode;
+      navigate('code');
+      codeError.textContent = result.error || 'Ungültiger Code';
+      codeError.classList.remove('hidden');
+    }
+    btnSubmit.disabled = false;
+  } else if (getStoredCode()) {
     goToApp(state);
   } else {
     navigate('code');

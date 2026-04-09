@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!-- Run this once in a browser to generate icon PNGs for the PWA manifest.
+     Click "Download both" and save into the assets/ folder. -->
+<html><body style="background:#1a1614;color:#fff;font-family:sans-serif;padding:24px">
+<canvas id="c192" width="192" height="192" style="display:none"></canvas>
+<canvas id="c512" width="512" height="512" style="display:none"></canvas>
+<button onclick="go()" style="padding:12px 24px;font-size:1rem;cursor:pointer">Download beide Icons</button>
+<script>
+function drawIcon(canvas) {
+  const s = canvas.width;
+  const ctx = canvas.getContext('2d');
+  // Background
+  ctx.fillStyle = '#1a1614';
+  ctx.fillRect(0,0,s,s);
+  // Gradient circle
+  const g = ctx.createRadialGradient(s*.5,s*.4,0,s*.5,s*.5,s*.48);
+  g.addColorStop(0,'#e8a030');
+  g.addColorStop(1,'#c8833a');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(s*.5,s*.5,s*.42,0,Math.PI*2);
+  ctx.fill();
+  // "K" letter
+  ctx.fillStyle = '#1a1614';
+  ctx.font = `bold ${s*.52}px 'Arial Black', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('K', s*.5, s*.53);
+}
+function go() {
+  ['c192','c512'].forEach(id => {
+    const c = document.getElementById(id);
+    drawIcon(c);
+    const a = document.createElement('a');
+    a.href = c.toDataURL('image/png');
+    a.download = `icon-${c.width}.png`;
+    a.click();
+  });
+}
+</script>
+</body></html>

@@ -65,5 +65,56 @@
 .input-field.correct { border-color: var(--ok); box-shadow: var(--glow-ok) }
 .input-field.wrong { border-color: var(--err); box-shadow: var(--glow-err) }
 
+/* ── Lernkarten (Flip Cards) ── */
+.flashcard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+.flashcard {
+  perspective: 600px;
+  height: 110px;
+  cursor: pointer;
+}
+.flashcard-inner {
+  position: relative;
+  width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform .45s ease;
+}
+.flashcard.flipped .flashcard-inner { transform: rotateY(180deg) }
+.flashcard-front, .flashcard-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid rgba(139,115,85,.25);
+}
+.flashcard-front {
+  background: var(--bg3);
+}
+.flashcard-back {
+  background: linear-gradient(135deg, rgba(200,131,58,.15), rgba(255,107,53,.1));
+  border-color: rgba(200,131,58,.35);
+  transform: rotateY(180deg);
+}
+.flashcard.locked .flashcard-front {
+  opacity: .3;
+  filter: grayscale(1);
+  cursor: default;
+}
+.flashcard-icon { font-size: 1.6rem; margin-bottom: 4px }
+.flashcard-term { font-size: .78rem; font-weight: 700; line-height: 1.3 }
+.flashcard-def  { font-size: .72rem; color: var(--text2); line-height: 1.45 }
+.flashcard-formula { font-size: .8rem; color: var(--gold); font-family: 'JetBrains Mono', monospace; margin-top: 4px }
+
 /* ── Hidden utility ── */
 .hidden { display: none !important }
