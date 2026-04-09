@@ -121,6 +121,9 @@ async function onParkShow() {
   // Load mission list
   const { renderMissionList } = await import('./ui/mission-list.js');
   renderMissionList();
+  // Init glossar sidebar
+  const { initGlossar } = await import('./ui/theory-panel.js');
+  initGlossar();
 }
 
 async function onBadgesShow() {

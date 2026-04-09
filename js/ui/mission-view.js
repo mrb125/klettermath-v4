@@ -8,6 +8,7 @@ import { showToast } from './toast.js';
 import { backToList } from './mission-list.js';
 import { updateTopBar } from '../main.js';
 import { checkBadges } from './badges-view.js';
+import { renderTheoryButton, refreshGlossar } from './theory-panel.js';
 
 let currentMission = null;
 let currentStepIdx = 0;
@@ -93,6 +94,11 @@ function renderMissionUI() {
 
   pane.innerHTML = html;
   renderMath(pane);
+
+  // Theory button — nach mission-task einsetzen
+  const taskEl = pane.querySelector('.mission-task');
+  if (taskEl && m.concept) renderTheoryButton(m.concept, taskEl);
+
   bindStepEvents();
 
   document.getElementById('btn-back')?.addEventListener('click', () => {
@@ -397,6 +403,7 @@ function onMissionComplete() {
   newBadges.forEach(b => {
     if (awardBadge(b)) showToast(`Badge freigeschaltet: ${b}`, 'ok', 4000);
   });
+  refreshGlossar();
 
   renderMissionUI();
 }

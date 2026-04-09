@@ -1,7 +1,7 @@
 // KletterMath Service Worker
 // Cache-first for static assets, network-first for API calls
 
-const CACHE = 'km4-v5';
+const CACHE = 'km4-v6';
 
 const STATIC = [
   './',
@@ -21,8 +21,10 @@ const STATIC = [
   './js/ui/mission-view.js',
   './js/ui/badges-view.js',
   './js/ui/math-render.js',
+  './js/ui/theory-panel.js',
   './js/data/missions.js',
   './js/data/platforms.js',
+  './js/data/theory.js',
   './js/data/tasks-library.js',
   './js/math/vec3.js',
   './js/math/checks.js',

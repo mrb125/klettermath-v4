@@ -287,3 +287,76 @@
 .mc-option.selected { border-color: var(--rope); background: rgba(232,160,48,.1) }
 .mc-option.correct { border-color: var(--ok); background: rgba(107,203,119,.1) }
 .mc-option.wrong { border-color: var(--err); background: rgba(239,68,68,.1) }
+
+/* ── Theory Card ── */
+.theory-toggle-btn {
+  margin: 8px 0;
+  border-color: var(--tc-color, var(--rope));
+  color: var(--tc-color, var(--rope));
+  background: transparent;
+  font-size: .78rem;
+  padding: 5px 12px;
+}
+.theory-toggle-btn:hover {
+  background: rgba(232,160,48,.08);
+}
+
+.theory-card {
+  --tc-color: #e8a030;
+  margin: 10px 0 14px;
+  border: 1px solid color-mix(in srgb, var(--tc-color) 40%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--tc-color) 6%, var(--bg2));
+  overflow: hidden;
+  animation: fadeIn .25s ease;
+}
+.theory-card--hidden { display: none }
+
+.theory-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--tc-color) 20%, transparent);
+}
+.theory-card__icon { font-size: 1.4rem }
+.theory-card__title {
+  font-weight: 800;
+  font-size: .95rem;
+  color: var(--tc-color);
+}
+.theory-card__sub { font-size: .75rem; color: var(--text3) }
+
+.theory-card__formula {
+  padding: 10px 14px 4px;
+  font-size: .9rem;
+  text-align: center;
+}
+.theory-card__body {
+  padding: 8px 14px;
+  font-size: .82rem;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.theory-card__body p { margin: 0 0 6px }
+.theory-card__body ul { margin: 4px 0; padding-left: 18px }
+
+.theory-card__facts {
+  padding: 8px 14px 12px;
+  background: color-mix(in srgb, var(--tc-color) 4%, transparent);
+}
+.theory-card__facts-label {
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--tc-color);
+  margin-bottom: 6px;
+}
+.theory-card__facts ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: .8rem;
+  color: var(--text2);
+  line-height: 1.7;
+}
