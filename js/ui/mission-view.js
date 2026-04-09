@@ -96,10 +96,6 @@ function renderMissionUI() {
   pane.innerHTML = html;
   renderMath(pane);
 
-  // Theory button — nach mission-task einsetzen
-  const taskEl = pane.querySelector('.mission-task');
-  if (taskEl && m.concept) renderTheoryButton(m.concept, taskEl);
-
   bindStepEvents();
 
   document.getElementById('btn-back')?.addEventListener('click', () => {
@@ -268,6 +264,17 @@ function doCheck(idx, step, userAnswer) {
     showFeedback(idx, msg, false);
     markInputsWrong(step, idx);
     addErrorPattern(currentMission.concept);
+    // Generation Effect: Erklärung nach ≥2 Fehlversuchen automatisch einblenden
+    const msNow = getMissionStep(currentMission.id, idx);
+    if (msNow.attempts >= 2) {
+      const taskEl = document.querySelector('#mission-pane .mission-task');
+      if (taskEl && !document.querySelector('.theory-card') && !document.querySelector('.theory-toggle-btn')) {
+        showToast('💡 Erklärung freigeschaltet — du kämpfst nicht allein!', 'ok', 3000);
+        renderTheoryButton(currentMission.concept, taskEl);
+        const autoBtn = taskEl.querySelector('.theory-toggle-btn');
+        if (autoBtn) setTimeout(() => autoBtn.click(), 500);
+      }
+    }
     if (step.type === 'vector3') {
       const ms = getMissionStep(currentMission.id, idx);
       showVectorArrow(userAnswer, false);
