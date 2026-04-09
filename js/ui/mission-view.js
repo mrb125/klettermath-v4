@@ -15,6 +15,22 @@ let currentMission = null;
 let currentStepIdx = 0;
 let missionIsGold = true;
 
+// Live vector preview (debounced)
+let _liveTimer = null;
+function updateLiveVector(idx) {
+  clearTimeout(_liveTimer);
+  _liveTimer = setTimeout(() => {
+    const x = parseFloat(document.getElementById(`v-${idx}-0`)?.value);
+    const y = parseFloat(document.getElementById(`v-${idx}-1`)?.value);
+    const z = parseFloat(document.getElementById(`v-${idx}-2`)?.value);
+    if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
+      import('../scene/scene-manager.js').then(m => m.showLiveVector(0, 0, 0, x, y, z));
+    } else {
+      import('../scene/scene-manager.js').then(m => m.clearLiveVector());
+    }
+  }, 150);
+}
+
 export function renderMission(missionId, customMission = null) {
   const mission = customMission || MISSIONS.find(m => m.id === missionId);
   if (!mission) return;
@@ -156,7 +172,8 @@ function renderInput(step, idx) {
         <div class="vec-row"><span class="vec-lbl">x₃</span><input class="input-field" id="v-${idx}-2" type="number" step="any" inputmode="decimal"></div>
       </div>
       <span class="vec-bracket">⎞<br>⎟<br>⎠</span>
-    </div>`;
+    </div>
+    <div class="live-preview-hint">📡 Vorschau aktiv — Eingabe erscheint sofort im 3D-Modell</div>`;
   } else if (step.type === 'number') {
     html += `<div class="step-input-row">
       <input class="input-field" id="num-${idx}" type="number" step="any" style="width:120px">
@@ -193,6 +210,13 @@ function bindStepEvents() {
   document.querySelectorAll(`#v-${idx}-0, #v-${idx}-1, #v-${idx}-2, #num-${idx}`).forEach(inp => {
     inp.addEventListener('keydown', e => { if (e.key === 'Enter') handleCheck(idx) });
   });
+
+  // Live vector preview
+  if (currentMission.steps[idx]?.type === 'vector3') {
+    document.querySelectorAll(`#v-${idx}-0, #v-${idx}-1, #v-${idx}-2`).forEach(inp => {
+      inp.addEventListener('input', () => updateLiveVector(idx));
+    });
+  }
 
   // MC options
   document.querySelectorAll(`.mc-option[data-step="${idx}"]`).forEach(btn => {
@@ -255,6 +279,7 @@ function doCheck(idx, step, userAnswer) {
   if (isCorrect) {
     showFeedback(idx, 'Richtig! ✓', true);
     markInputsCorrect(step, idx);
+    import('../scene/scene-manager.js').then(m => m.clearLiveVector());
     if (step.type === 'vector3') showVectorArrow(userAnswer, true);
     currentStepIdx = idx + 1;
     updateSpacedReview(currentMission.concept, true);

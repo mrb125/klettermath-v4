@@ -579,3 +579,12 @@
   outline: none;
   border-color: rgba(91,155,213,0.5);
 }
+
+/* ── Live-Vorschau Hinweis ── */
+.live-preview-hint {
+  font-size: .7rem;
+  color: rgba(255,167,38,0.6);
+  margin-top: 4px;
+  margin-bottom: 6px;
+  font-style: italic;
+}

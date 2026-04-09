@@ -10,6 +10,8 @@ let renderer, scene, camera, controls;
 let platMeshes = [];
 let ropeMeshes = [];
 let animId = null;
+let liveArrow = null;
+let landmarkGroup = null;
 
 // Math coordinates (x,y,z) → THREE.js (x, z, -y)
 export function mathToScene(x, y, z) {
@@ -232,6 +234,52 @@ export function setCameraPreset(name) {
   camera.position.set(...p.pos);
   controls.target.set(...p.target);
   controls.update();
+}
+
+export function showLiveVector(ox, oy, oz, dx, dy, dz) {
+  if (!scene) return;
+  // Remove previous live arrow
+  if (liveArrow) { scene.remove(liveArrow); liveArrow = null; }
+
+  const len = Math.sqrt(dx*dx + dy*dy + dz*dz);
+  if (len < 0.01) return;
+
+  // Semi-transparent amber preview
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0xffa726,
+    emissive: 0xffa726,
+    emissiveIntensity: 0.6,
+    transparent: true,
+    opacity: 0.65,
+    metalness: 0.2,
+  });
+
+  const shaftLen = len * 0.8;
+  const g = new THREE.Group();
+
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, shaftLen, 6), mat);
+  shaft.position.y = shaftLen / 2;
+  g.add(shaft);
+
+  const head = new THREE.Mesh(new THREE.CylinderGeometry(0, 0.14, len * 0.2, 8), mat);
+  head.position.y = shaftLen + len * 0.1;
+  g.add(head);
+
+  const sceneDir = new THREE.Vector3(dx, dz, -dy).normalize();
+  const up = new THREE.Vector3(0, 1, 0);
+  if (Math.abs(sceneDir.dot(up)) > 0.999) {
+    if (sceneDir.y < 0) g.rotation.z = Math.PI;
+  } else {
+    g.quaternion.setFromUnitVectors(up, sceneDir);
+  }
+  g.position.set(ox, oz, -oy);
+
+  scene.add(g);
+  liveArrow = g;
+}
+
+export function clearLiveVector() {
+  if (liveArrow && scene) { scene.remove(liveArrow); liveArrow = null; }
 }
 
 export function dispose() {
