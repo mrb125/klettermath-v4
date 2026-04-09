@@ -21,6 +21,14 @@ export const THEORY = {
       'O selbst hat den Ortsvektor \\(\\vec{0}\\)',
     ],
     missionIds: [1],
+    selfExplain: {
+      q: 'Warum gilt: Ortsvektor = Koordinaten des Punktes?',
+      options: [
+        { text: 'Weil der Ortsvektor vom Ursprung O zum Punkt P zeigt — die Verschiebung entspricht genau den Koordinaten.', correct: true, fb: 'Genau! Ursprung → Punkt = Koordinaten als Verschiebung.' },
+        { text: 'Weil Vektoren immer am Ursprung starten — das gilt für alle Vektoren.', correct: false, fb: 'Nicht ganz: Nicht alle Vektoren starten am Ursprung — nur der Ortsvektor ist speziell so definiert.' },
+        { text: 'Weil Punkte im Raum nur durch Vektoren definiert werden können.', correct: false, fb: 'Nicht ganz: Punkte haben Koordinaten unabhängig von Vektoren.' },
+      ],
+    },
   },
 
   'Verbindungsvektor & Betrag': {
@@ -41,6 +49,14 @@ export const THEORY = {
       'Mittelpunkt: \\(M = \\frac{A+B}{2}\\)',
     ],
     missionIds: [2],
+    selfExplain: {
+      q: 'Warum gilt \\(\\vec{AB} = B - A\\), nicht \\(A - B\\)?',
+      options: [
+        { text: 'Weil der Vektor vom Start A zum Ziel B zeigt — Ziel minus Start ergibt die Verschiebung.', correct: true, fb: 'Richtig: Ziel minus Start — immer in diese Reihenfolge merken!' },
+        { text: 'Weil Vektoren immer in positiver Koordinatenrichtung zeigen.', correct: false, fb: 'Nicht korrekt: Verbindungsvektoren können in jede Richtung zeigen.' },
+        { text: 'Weil B weiter vom Ursprung entfernt liegt als A.', correct: false, fb: 'Nicht korrekt: Die Reihenfolge hängt von der Richtung ab, nicht vom Abstand zum Ursprung.' },
+      ],
+    },
   },
 
   'Parameterdarstellung': {
@@ -63,6 +79,14 @@ export const THEORY = {
       '\\(t < 0\\): Punkte "hinter" dem Stützpunkt',
     ],
     missionIds: [3],
+    selfExplain: {
+      q: 'Was bedeutet der Parameter t geometrisch?',
+      options: [
+        { text: 't gibt die Position auf der Geraden an: t=0 ist der Stützpunkt, t=1 ein Schritt in Richtungsvektor-Richtung.', correct: true, fb: 'Genau! t ist ein geometrischer Skalierungsfaktor, kein Zeitwert.' },
+        { text: 't ist die Zeit, die ein Kletterer braucht, um die Strecke zurückzulegen.', correct: false, fb: 'Nicht korrekt: t ist keine Zeit, sondern ein geometrischer Parameter.' },
+        { text: 't ist die Länge des Richtungsvektors.', correct: false, fb: 'Nicht korrekt: t skaliert den Richtungsvektor, gibt aber nicht dessen Länge an.' },
+      ],
+    },
   },
 
   'Skalarprodukt': {
@@ -84,6 +108,14 @@ export const THEORY = {
       'Ergebnis ist eine Zahl, kein Vektor',
     ],
     missionIds: [4],
+    selfExplain: {
+      q: 'Warum ist das Skalarprodukt senkrechter Vektoren null?',
+      options: [
+        { text: 'Weil senkrechte Vektoren keine gemeinsame Richtungskomponente haben — das Produkt der Projektionen ist 0.', correct: true, fb: 'Richtig! Das ist das zentrale Orthogonalitätskriterium.' },
+        { text: 'Weil bei 90° einer der Vektoren den Betrag 0 hat.', correct: false, fb: 'Nicht korrekt: Die Vektoren selbst haben Betrag > 0 — nur ihre Projektion aufeinander ist 0.' },
+        { text: 'Weil 90° der maximale Winkel zwischen zwei Vektoren ist.', correct: false, fb: 'Nicht korrekt: Vektoren können auch stumpfe Winkel (> 90°) einschließen.' },
+      ],
+    },
   },
 
   'Winkel zwischen Vektoren': {
@@ -105,6 +137,14 @@ export const THEORY = {
       'Senkrecht: \\(\\alpha = 90°\\), parallel: \\(\\alpha = 0°\\)',
     ],
     missionIds: [6],
+    selfExplain: {
+      q: 'Welche Formel liefert den Winkel zwischen zwei Vektoren?',
+      options: [
+        { text: '\\(\\cos\\alpha = \\frac{\\vec{a}\\cdot\\vec{b}}{|\\vec{a}|\\cdot|\\vec{b}|}\\) — Skalarprodukt geteilt durch Produkt der Beträge.', correct: true, fb: 'Genau! Das normierte Skalarprodukt gibt den Kosinus des Winkels.' },
+        { text: '\\(\\alpha = \\vec{a} \\cdot \\vec{b}\\) — das Skalarprodukt direkt.', correct: false, fb: 'Nicht korrekt: Das Skalarprodukt ist ein Längenwert, kein Winkel.' },
+        { text: '\\(\\alpha = |\\vec{a} - \\vec{b}|\\) — die Länge der Differenz.', correct: false, fb: 'Nicht korrekt: Das ist der Abstand der Spitzen, kein Winkel.' },
+      ],
+    },
   },
 
   'Punktprobe': {
@@ -124,6 +164,14 @@ export const THEORY = {
       'Ein anderer t pro Koordinate → Punkt liegt nicht auf g',
     ],
     missionIds: [5],
+    selfExplain: {
+      q: 'Wie prüft man, ob Punkt P auf Gerade g liegt?',
+      options: [
+        { text: 'Man setzt P als \\(\\vec{x}\\) ein und löst nach t auf — gibt es ein t, liegt P auf g.', correct: true, fb: 'Richtig! Ein eindeutiges t → P liegt auf g; Widerspruch → P liegt nicht auf g.' },
+        { text: 'Man berechnet den Abstand von P zur Geraden und prüft, ob er < 0,1 ist.', correct: false, fb: 'Nicht korrekt: Bei der Punktprobe prüfen wir exakte Zugehörigkeit, nicht Näherungswerte.' },
+        { text: 'Man vergleicht die Richtungsvektoren von P und g.', correct: false, fb: 'Nicht korrekt: Der Richtungsvektor allein sagt nichts über den Punkt P aus.' },
+      ],
+    },
   },
 
   'Lagebeziehung': {
@@ -148,6 +196,14 @@ export const THEORY = {
       'Spatprodukt = 0, Kreuzprodukt ≠ 0 → schneidend',
     ],
     missionIds: [7],
+    selfExplain: {
+      q: 'Woran erkennt man windschiefe Geraden?',
+      options: [
+        { text: 'Das Gleichungssystem ist widersprüchlich (kein t/s löst alle 3 Gleichungen) — und die Richtungsvektoren sind nicht parallel.', correct: true, fb: 'Genau! Kein gemeinsamer Punkt + nicht parallel = windschief.' },
+        { text: 'Die Geraden haben keinen gemeinsamen Punkt — das bedeutet automatisch windschief.', correct: false, fb: 'Nicht ganz: Parallele Geraden haben auch keinen gemeinsamen Punkt — sind aber nicht windschief.' },
+        { text: 'Die Richtungsvektoren zeigen in verschiedene Richtungen.', correct: false, fb: 'Nicht korrekt: Verschiedene Richtungen allein genügen nicht — auch schneidende Geraden können verschiedene Richtungen haben.' },
+      ],
+    },
   },
 
   'Lotfußpunkt': {
@@ -167,6 +223,14 @@ export const THEORY = {
       'Abstand: \\(d = |P - F|\\)',
     ],
     missionIds: [8],
+    selfExplain: {
+      q: 'Warum ist am Lotfußpunkt das Skalarprodukt null?',
+      options: [
+        { text: 'Der Lotfußpunkt ist der nächste Punkt auf der Geraden — das Lot steht senkrecht zur Geraden, also \\(\\vec{FL} \\perp \\vec{v}\\).', correct: true, fb: 'Richtig! Das Skalarprodukt des Lotvektors mit dem Richtungsvektor = 0 bestimmt t.' },
+        { text: 'Weil am Lotfußpunkt der Richtungsvektor den Betrag 0 hat.', correct: false, fb: 'Nicht korrekt: Der Richtungsvektor behält seinen Betrag — nur die Senkrechtenbeziehung ändert sich.' },
+        { text: 'Weil der Lotfußpunkt immer im Ursprung liegt.', correct: false, fb: 'Nicht korrekt: Der Lotfußpunkt liegt auf der Geraden, nicht notwendigerweise im Ursprung.' },
+      ],
+    },
   },
 
   'Ebene': {
@@ -187,6 +251,14 @@ export const THEORY = {
       '\\(d = \\vec{n} \\cdot \\vec{a}\\) (a = Aufpunkt)',
     ],
     missionIds: [9],
+    selfExplain: {
+      q: 'Was beschreibt der Normalenvektor einer Ebene?',
+      options: [
+        { text: 'Der Normalenvektor steht senkrecht auf der Ebene — jeder in der Ebene liegende Vektor ist senkrecht zum Normalenvektor.', correct: true, fb: 'Genau! \\(\\vec{n} \\perp\\) Ebene ist das zentrale Konzept.' },
+        { text: 'Der Normalenvektor gibt die Richtung der Ebene an.', correct: false, fb: 'Nicht korrekt: Richtungen in der Ebene werden durch Richtungsvektoren beschrieben, nicht den Normalenvektor.' },
+        { text: 'Der Normalenvektor zeigt von der Ebene zum Ursprung.', correct: false, fb: 'Nicht korrekt: Der Normalenvektor zeigt senkrecht aus der Ebene, nicht notwendig zum Ursprung.' },
+      ],
+    },
   },
 
   'Abstand Punkt-Ebene': {
@@ -207,6 +279,14 @@ export const THEORY = {
       'Mit normiertem \\(\\vec{n_0}\\): \\(d = |\\vec{n_0} \\cdot \\vec{AP}|\\)',
     ],
     missionIds: [11],
+    selfExplain: {
+      q: 'Warum muss man bei der Abstandsformel durch \\(|\\vec{n}|\\) teilen?',
+      options: [
+        { text: 'Weil der Normalenvektor nicht normiert sein muss — die Formel mit \\(|\\vec{n}|\\) liefert den echten geometrischen Abstand.', correct: true, fb: 'Richtig! Ohne Normierung würde die Länge des Normalenvektors das Ergebnis verfälschen.' },
+        { text: 'Damit das Ergebnis immer positiv ist.', correct: false, fb: 'Nicht ganz: Der Betrag macht das Ergebnis positiv — aber der Grund für die Division ist die Normierung.' },
+        { text: 'Damit die Einheit stimmt.', correct: false, fb: 'Nicht korrekt: Die Einheit ändert sich nicht durch die Division.' },
+      ],
+    },
   },
 
   'Schnitt Gerade–Ebene': {
@@ -226,6 +306,14 @@ export const THEORY = {
       '\\(\\vec{n} \\cdot \\vec{r} = 0\\) → Gerade parallel zur Ebene',
     ],
     missionIds: [10],
+    selfExplain: {
+      q: 'Wie bestimmt man die Schnittgerade zweier Ebenen?',
+      options: [
+        { text: 'Man löst das Gleichungssystem der beiden Ebenengleichungen mit einem freien Parameter — der Parameter wird zum t der Schnittgeraden.', correct: true, fb: 'Richtig! Das Gleichungssystem mit 1 Freiheitsgrad liefert genau eine Gerade.' },
+        { text: 'Man berechnet das Kreuzprodukt der Normalenvektoren als Richtungsvektor.', correct: false, fb: 'Nicht vollständig: Das Kreuzprodukt gibt den Richtungsvektor, aber nicht den Stützpunkt.' },
+        { text: 'Man setzt die Ebenengleichungen gleich und löst nach x₁ auf.', correct: false, fb: 'Nicht vollständig: Nur eine Koordinate reicht nicht — man braucht eine Parameterdarstellung.' },
+      ],
+    },
   },
 
   'Spiegelung an Ebene': {
@@ -245,6 +333,14 @@ export const THEORY = {
       "Spiegelpunkt: \\(P' = 2F - P\\)",
     ],
     missionIds: [12],
+    selfExplain: {
+      q: 'Welche Schritte braucht man zur Spiegelung eines Punktes an einer Ebene?',
+      options: [
+        { text: "Lotfußpunkt berechnen → Spiegelpunkt durch \\(P' = 2L - P\\), wobei L der Lotfußpunkt ist.", correct: true, fb: "Genau! L ist der Mittelpunkt von PP' — daher P' = 2L - P." },
+        { text: 'Normalenvektor umkehren und an P ansetzen.', correct: false, fb: 'Nicht korrekt: Das beschreibt keine Spiegelung, sondern eine Reflexion des Vektors.' },
+        { text: 'P an der Ebene reflektieren, indem man die Koordinaten des Normalenvektors subtrahiert.', correct: false, fb: 'Nicht korrekt: Das ist eine Verschiebung, keine Spiegelung.' },
+      ],
+    },
   },
 };
 

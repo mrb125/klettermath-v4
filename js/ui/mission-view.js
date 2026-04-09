@@ -250,11 +250,19 @@ function doCheck(idx, step, userAnswer) {
     if (step.type === 'vector3') showVectorArrow(userAnswer, true);
     currentStepIdx = idx + 1;
 
-    setTimeout(() => {
+    const advanceStep = () => {
       if (currentStepIdx >= currentMission.steps.length) {
         onMissionComplete();
       } else {
         renderMissionUI();
+      }
+    };
+
+    setTimeout(() => {
+      if (!isExamMode()) {
+        showSelfExplain(idx, currentMission.concept, advanceStep);
+      } else {
+        advanceStep();
       }
     }, 600);
   } else {
@@ -440,6 +448,44 @@ function renderCompletion() {
   html += `<button class="btn btn-primary" style="margin-top:16px;width:100%" id="btn-next-mission">Nächste Mission</button>`;
 
   return html;
+}
+
+// ── Selbsterklärungscheck ─────────────────────────────────────────────────────
+async function showSelfExplain(idx, concept, onDone) {
+  const { THEORY } = await import('../data/theory.js');
+  const se = THEORY[concept]?.selfExplain;
+  if (!se) { onDone(); return; }
+
+  const fb = document.getElementById(`feedback-${idx}`);
+  if (!fb) { onDone(); return; }
+
+  // Shuffle options
+  const opts = [...se.options].sort(() => Math.random() - 0.5);
+
+  const el = document.createElement('div');
+  el.className = 'self-explain';
+  el.innerHTML = `
+    <div class="se-question">🤔 ${se.q}</div>
+    <div class="se-options">
+      ${opts.map((o, i) => `<button class="se-opt" data-idx="${i}">${o.text}</button>`).join('')}
+    </div>
+    <button class="se-skip">Überspringen →</button>
+  `;
+  fb.appendChild(el);
+  renderMath(el);
+
+  el.querySelector('.se-skip').addEventListener('click', onDone);
+  el.querySelectorAll('.se-opt').forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      el.querySelectorAll('.se-opt').forEach(b => b.disabled = true);
+      const opt = opts[i];
+      const fbDiv = document.createElement('div');
+      fbDiv.className = opt.correct ? 'se-feedback se-ok' : 'se-feedback se-err';
+      fbDiv.textContent = opt.fb;
+      el.appendChild(fbDiv);
+      setTimeout(onDone, 1800);
+    });
+  });
 }
 
 // Scene integration stubs

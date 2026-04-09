@@ -385,3 +385,67 @@
   max-width: 260px;
   line-height: 1.4;
 }
+
+/* ── Selbsterklärungscheck ── */
+.self-explain {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: rgba(200,131,58,0.08);
+  border: 1px solid rgba(200,131,58,0.3);
+  border-radius: 10px;
+}
+
+.se-question {
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--rope);
+  margin-bottom: 10px;
+}
+
+.se-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.se-opt {
+  text-align: left;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: .82rem;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+
+.se-opt:hover:not(:disabled) {
+  background: rgba(200,131,58,0.2);
+  border-color: var(--rope);
+}
+
+.se-opt:disabled { opacity: 0.6; cursor: default; }
+
+.se-feedback {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: .82rem;
+  font-weight: 600;
+}
+
+.se-ok  { background: rgba(76,175,80,0.2); color: #81c784; border: 1px solid rgba(76,175,80,0.4); }
+.se-err { background: rgba(255,94,91,0.15); color: #ff8a80; border: 1px solid rgba(255,94,91,0.3); }
+
+.se-skip {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.35);
+  font-size: .75rem;
+  cursor: pointer;
+  padding: 2px 0;
+  text-decoration: underline;
+}
+.se-skip:hover { color: rgba(255,255,255,0.6); }
