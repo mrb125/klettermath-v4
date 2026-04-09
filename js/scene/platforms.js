@@ -1,4 +1,5 @@
 import { SimplexNoise } from './terrain.js';
+import { C } from './colors.js';
 
 const simplex = new SimplexNoise();
 
@@ -47,7 +48,7 @@ function getMaterials() {
     wood = new THREE.MeshStandardMaterial({ map: createWoodTexture(), color: 0x8b6f47, roughness: 0.7 });
     bark = new THREE.MeshStandardMaterial({ map: createBarkTexture(), color: 0x5a4a3a, roughness: 0.95 });
     leaf = new THREE.MeshStandardMaterial({ color: 0x3a7a2a, roughness: 0.7 });
-    ropeMat = new THREE.MeshStandardMaterial({ color: 0xc89630, roughness: 0.9 });
+    ropeMat = new THREE.MeshStandardMaterial({ color: C.ROPE, roughness: 0.9 });
   }
   return { wood, bark, leaf, ropeMat };
 }

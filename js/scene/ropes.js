@@ -1,4 +1,5 @@
 import { PLATS } from '../data/platforms.js';
+import { C } from './colors.js';
 
 export function createRope(a, b) {
   const pa = PLATS[a], pb = PLATS[b];
@@ -8,7 +9,7 @@ export function createRope(a, b) {
   const len = dir.length();
 
   const cylGeo = new THREE.CylinderGeometry(0.03, 0.03, len, 8);
-  const ropeMat = new THREE.MeshStandardMaterial({ color: 0xc8963c, roughness: 0.85, metalness: 0.05 });
+  const ropeMat = new THREE.MeshStandardMaterial({ color: C.ROPE, roughness: 0.85, metalness: 0.05 });
   const cyl = new THREE.Mesh(cylGeo, ropeMat);
   cyl.castShadow = true;
   cyl.receiveShadow = true;
@@ -21,7 +22,7 @@ export function createRope(a, b) {
   cyl.quaternion.copy(q);
 
   const knotGeo = new THREE.SphereGeometry(0.04, 8, 8);
-  const knotMat = new THREE.MeshStandardMaterial({ color: 0xa07830, roughness: 0.7 });
+  const knotMat = new THREE.MeshStandardMaterial({ color: C.ROPE, roughness: 0.7 });
   const k1 = new THREE.Mesh(knotGeo, knotMat);
   k1.position.copy(start);
   const k2 = new THREE.Mesh(knotGeo, knotMat);

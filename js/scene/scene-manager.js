@@ -4,6 +4,7 @@ import { buildPlatform } from './platforms.js';
 import { createRope } from './ropes.js';
 import { createAxes } from './camera.js';
 import { createTree } from './trees.js';
+import { C } from './colors.js';
 
 let renderer, scene, camera, controls;
 let platMeshes = [];
@@ -143,7 +144,7 @@ let vectorArrows = [];
 let userPoints = [];
 let planeMesh = null;
 
-export function addVectorArrow(ox, oy, oz, dx, dy, dz, color = 0x00ff88) {
+export function addVectorArrow(ox, oy, oz, dx, dy, dz, color = C.CORRECT_ARROW) {
   if (!scene) return null;
   const len = Math.sqrt(dx * dx + dy * dy + dz * dz);
   if (len < 0.01) return null;
@@ -176,7 +177,7 @@ export function addVectorArrow(ox, oy, oz, dx, dy, dz, color = 0x00ff88) {
 
 export function addPlatArrow(fromIdx, toIdx, color) {
   const a = PLATS[fromIdx], b = PLATS[toIdx];
-  return addVectorArrow(a.x, a.y, a.z, b.x - a.x, b.y - a.y, b.z - a.z, color || 0x00ff88);
+  return addVectorArrow(a.x, a.y, a.z, b.x - a.x, b.y - a.y, b.z - a.z, color || C.CORRECT_ARROW);
 }
 
 export function clearVectorArrows() {
@@ -184,7 +185,7 @@ export function clearVectorArrows() {
   vectorArrows.length = 0;
 }
 
-export function placeUserPoint(x, y, z, label, color = 0x00ff88) {
+export function placeUserPoint(x, y, z, label, color = C.CORRECT_ARROW) {
   if (!scene) return;
   const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(0.25, 16, 16),
