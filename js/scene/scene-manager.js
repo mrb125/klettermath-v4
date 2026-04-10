@@ -27,13 +27,16 @@ export function initScene(canvas) {
   canvas.width = w;
   canvas.height = h;
 
+  // Mobile detection — iPad / iPhone / Android
+  const isMobile = /iPad|iPhone|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/i.test(navigator.userAgent));
+
   // Renderer
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: !isMobile, alpha: false });
   renderer.setSize(w, h);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.setPixelRatio(isMobile ? Math.min(window.devicePixelRatio, 1) : Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = !isMobile;  // no shadows on mobile → big speedup
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.toneMapping = isMobile ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.2;
   if (renderer.outputEncoding !== undefined) renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -60,8 +63,8 @@ export function initScene(canvas) {
   scene.add(new THREE.HemisphereLight(0x87ceeb, 0x3a2a1a, 0.5));
   const sun = new THREE.DirectionalLight(0xfff5e0, 1.0);
   sun.position.set(10, 15, 8);
-  sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
+  sun.castShadow = !isMobile;
+  sun.shadow.mapSize.set(isMobile ? 512 : 1024, isMobile ? 512 : 1024);
   sun.shadow.camera.left = -15;
   sun.shadow.camera.right = 15;
   sun.shadow.camera.top = 15;
@@ -171,6 +174,19 @@ const ZIP_FROM = mathToScene(0, 0, 0);   // S → scene (0,0,0)
 const ZIP_TO   = mathToScene(4, 1, 3);   // A → scene (4,3,-1)
 const ZIP_DURATION = 7000;
 
+// Capsule polyfill for Three.js r128 (no CapsuleGeometry available)
+function makeCapsule(r, h, mat) {
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 8), mat));
+  const topCap = new THREE.Mesh(new THREE.SphereGeometry(r, 8, 6), mat);
+  topCap.position.y = h / 2;
+  g.add(topCap);
+  const botCap = new THREE.Mesh(new THREE.SphereGeometry(r, 8, 6), mat);
+  botCap.position.y = -h / 2;
+  g.add(botCap);
+  return g;
+}
+
 function buildZiplinePerson() {
   const g = new THREE.Group();
   const skin  = new THREE.MeshStandardMaterial({ color: 0xe0a876, roughness: 0.8 });
@@ -181,7 +197,7 @@ function buildZiplinePerson() {
   const rope  = new THREE.MeshStandardMaterial({ color: 0x8b6034, roughness: 0.9 });
 
   // Pulley
-  const pulley = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.14, 10), metal);
+  const pulley = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.14, 8), metal);
   pulley.rotation.z = Math.PI / 2;
   pulley.position.set(0, 0.95, 0);
   g.add(pulley);
@@ -189,43 +205,43 @@ function buildZiplinePerson() {
   const connRope = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.18, 5), rope);
   connRope.position.set(0, 0.88, 0);
   g.add(connRope);
-  // Arms
+  // Arms (CylinderGeometry instead of CapsuleGeometry)
   for (const side of [-1, 1]) {
     const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.22, 6), metal.clone());
     grip.position.set(side * 0.11, 0.84, 0);
     g.add(grip);
-    const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.28, 4, 6), skin);
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.035, 0.30, 6), skin);
     arm.position.set(side * 0.19, 0.65, 0);
     arm.rotation.z = -side * 0.55;
     g.add(arm);
   }
   // Head
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.17, 10, 10), skin);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.17, 8, 8), skin);
   head.position.set(0, 0.55, 0);
   g.add(head);
   // Helmet
-  const helmBody = new THREE.Mesh(new THREE.SphereGeometry(0.19, 10, 6, 0, Math.PI*2, 0, Math.PI/2), helmt);
+  const helmBody = new THREE.Mesh(new THREE.SphereGeometry(0.19, 8, 6, 0, Math.PI*2, 0, Math.PI/2), helmt);
   helmBody.position.set(0, 0.57, 0);
   g.add(helmBody);
-  const helmBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.21, 0.05, 12), helmt);
+  const helmBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.21, 0.05, 10), helmt);
   helmBrim.position.set(0, 0.54, 0);
   g.add(helmBrim);
   // Body
-  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.13, 0.22, 4, 8), shirt);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.11, 0.30, 8), shirt);
   body.position.set(0, 0.24, 0);
   g.add(body);
   // Harness
-  const harness = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.025, 6, 12), metal);
+  const harness = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.025, 5, 10), metal);
   harness.position.set(0, 0.10, 0);
   harness.rotation.x = Math.PI / 2;
   g.add(harness);
   // Legs + boots
   for (const side of [-1, 1]) {
-    const upper = new THREE.Mesh(new THREE.CapsuleGeometry(0.055, 0.22, 4, 6), pants);
+    const upper = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.05, 0.26, 6), pants);
     upper.position.set(side * 0.085, -0.12, 0);
     upper.rotation.z = side * 0.12;
     g.add(upper);
-    const lower = new THREE.Mesh(new THREE.CapsuleGeometry(0.045, 0.18, 4, 6), pants);
+    const lower = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.04, 0.22, 6), pants);
     lower.position.set(side * 0.10, -0.38, 0.03);
     lower.rotation.z = side * 0.08;
     g.add(lower);
