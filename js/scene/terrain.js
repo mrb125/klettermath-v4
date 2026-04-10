@@ -48,8 +48,9 @@ function createGrassTexture() {
   return t;
 }
 
-export function createTerrain() {
-  const geo = new THREE.PlaneGeometry(30, 30, 64, 64);
+export function createTerrain(isMobile = false) {
+  const segs = isMobile ? 16 : 48;
+  const geo = new THREE.PlaneGeometry(30, 30, segs, segs);
   const pos = geo.attributes.position;
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i), z = pos.getY(i);
@@ -62,10 +63,10 @@ export function createTerrain() {
     color: 0x3a5a2a,
     roughness: 0.9,
     metalness: 0,
-    side: THREE.DoubleSide
+    side: THREE.FrontSide   // no need to render underside
   });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.rotation.x = -Math.PI / 2;
-  mesh.receiveShadow = true;
+  mesh.receiveShadow = !isMobile;
   return mesh;
 }

@@ -44,7 +44,7 @@ export function initScene(canvas) {
   scene = new THREE.Scene();
   const fogCol = 0x2a2218;
   scene.background = new THREE.Color(fogCol);
-  scene.fog = new THREE.FogExp2(fogCol, 0.035);
+  if (!isMobile) scene.fog = new THREE.FogExp2(fogCol, 0.035); // fog is expensive on mobile GPU
 
   // Camera
   camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 100);
@@ -79,17 +79,18 @@ export function initScene(canvas) {
   scene.add(pt);
 
   // Terrain
-  scene.add(createTerrain());
+  scene.add(createTerrain(isMobile));
 
-  // Trees
-  [
+  // Trees — fewer on mobile
+  const treeList = [
     { x: -2, z: -2, h: 4.5, r: 0.3 },
     { x: 9, z: -1, h: 4, r: 0.25 },
     { x: -1, z: 8, h: 5, r: 0.32 },
     { x: 10, z: 7, h: 4.2, r: 0.26 },
     { x: 5, z: -2, h: 4.8, r: 0.28 },
     { x: -2, z: 5, h: 4.6, r: 0.27 }
-  ].forEach(t => scene.add(createTree(t.x, t.z, t.h, t.r)));
+  ];
+  (isMobile ? treeList.slice(0, 3) : treeList).forEach(t => scene.add(createTree(t.x, t.z, t.h, t.r, isMobile)));
 
   // Grid
   const grid = new THREE.GridHelper(20, 20, 0x3a3228, 0x2e2820);
