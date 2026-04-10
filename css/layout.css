@@ -71,14 +71,15 @@
 }
 .wlc-zipline-person {
   position: absolute;
-  top: calc(28% - 88px);
-  left: -160px;
-  width: 130px;
+  top: calc(28% - 14px);   /* rope-in-image aligns with .wlc-rope-line */
+  left: -180px;
+  width: 180px;
   height: auto;
   opacity: 0;
   pointer-events: none;
-  filter: drop-shadow(0 8px 20px rgba(0,0,0,.85));
-  transform-origin: 50% 4px; /* pivot at the pulley top */
+  mix-blend-mode: screen;   /* black bg becomes transparent */
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,.5));
+  transform-origin: 50% 10px; /* pivot at pulley */
 }
 /* Looping slide + gentle swing */
 .wlc-zipline-person.active {
