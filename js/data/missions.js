@@ -89,6 +89,7 @@ export const MISSIONS = [
       {
         prompt: () => `Berechne den Mittelpunkt M der Strecke ${PLATS[0].lbl}${PLATS[1].lbl} (als Vektor):`,
         type: 'vector3',
+        showPoint: true, pointLabel: 'M',
         answer: () => [(pV(0).x + pV(1).x) / 2, (pV(0).y + pV(1).y) / 2, (pV(0).z + pV(1).z) / 2],
         tolerance: 0.1,
         hints: [

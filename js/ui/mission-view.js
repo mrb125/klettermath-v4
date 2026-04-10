@@ -303,7 +303,15 @@ function doCheck(idx, step, userAnswer) {
   if (isCorrect) {
     showFeedback(idx, 'Richtig! ✓', true);
     markInputsCorrect(step, idx);
-    import('../scene/scene-manager.js').then(m => m.clearLiveVector());
+    import('../scene/scene-manager.js').then(m => {
+      m.clearLiveVector();
+      if (step.type === 'vector3') {
+        if (step.showPoint) {
+          m.clearUserPoints?.();
+          m.placeUserPoint?.(userAnswer[0], userAnswer[1], userAnswer[2], step.pointLabel || 'M', 0xffd166);
+        }
+      }
+    });
     if (step.type === 'vector3') showVectorArrow(userAnswer, true);
     currentStepIdx = idx + 1;
     updateSpacedReview(currentMission.concept, true);
