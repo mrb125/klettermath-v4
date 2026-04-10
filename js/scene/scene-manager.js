@@ -12,7 +12,7 @@ let ropeMeshes = [];
 let animId = null;
 let liveArrow = null;
 let landmarkGroup = null;
-// zipline person removed from 3D scene (lives on welcome/code screens only)
+let ziplinePerson = null;
 
 // Math coordinates (x,y,z) → THREE.js (x, z, -y)
 export function mathToScene(x, y, z) {
@@ -116,6 +116,13 @@ export function initScene(canvas) {
   // Landmarks — always visible reference points
   initLandmarks();
 
+  // Zipline person — always visible ambient animation
+  initZiplinePerson();
+
+  // Precompute zipline direction for person facing
+  const _zipDir = ZIP_TO.clone().sub(ZIP_FROM).normalize();
+  const _zipAngle = Math.atan2(_zipDir.z, _zipDir.x);
+
   // Animate
   function animate() {
     animId = requestAnimationFrame(animate);
@@ -131,6 +138,18 @@ export function initScene(canvas) {
       }
     });
 
+    // Zipline person: ping-pong S→A
+    if (ziplinePerson) {
+      const cycle = (now % (ZIP_DURATION * 2)) / ZIP_DURATION; // 0..2
+      const tRaw = cycle <= 1 ? cycle : 2 - cycle;
+      const t = tRaw < 0.5 ? 2*tRaw*tRaw : 1 - 2*(1-tRaw)*(1-tRaw);
+      const pos = ZIP_FROM.clone().lerp(ZIP_TO, t);
+      ziplinePerson.position.set(pos.x, pos.y - 0.95, pos.z);
+      const swing = Math.sin(now * 0.0028) * 0.07 * Math.sin(Math.PI * t);
+      ziplinePerson.rotation.z = swing;
+      ziplinePerson.rotation.y = cycle <= 1 ? _zipAngle : _zipAngle + Math.PI;
+    }
+
     renderer.render(scene, camera);
   }
   animate();
@@ -145,6 +164,90 @@ export function initScene(canvas) {
   };
   window.addEventListener('resize', onResize);
   new ResizeObserver(onResize).observe(canvas.parentElement);
+}
+
+// ── Zipline Person ──
+const ZIP_FROM = mathToScene(0, 0, 0);   // S → scene (0,0,0)
+const ZIP_TO   = mathToScene(4, 1, 3);   // A → scene (4,3,-1)
+const ZIP_DURATION = 7000;
+
+function buildZiplinePerson() {
+  const g = new THREE.Group();
+  const skin  = new THREE.MeshStandardMaterial({ color: 0xe0a876, roughness: 0.8 });
+  const helmt = new THREE.MeshStandardMaterial({ color: 0xc8833a, roughness: 0.4, metalness: 0.2 });
+  const shirt = new THREE.MeshStandardMaterial({ color: 0x4a7a5a, roughness: 0.7 });
+  const pants = new THREE.MeshStandardMaterial({ color: 0x3a4a2a, roughness: 0.8 });
+  const metal = new THREE.MeshStandardMaterial({ color: 0xd4a030, roughness: 0.3, metalness: 0.7 });
+  const rope  = new THREE.MeshStandardMaterial({ color: 0x8b6034, roughness: 0.9 });
+
+  // Pulley
+  const pulley = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.14, 10), metal);
+  pulley.rotation.z = Math.PI / 2;
+  pulley.position.set(0, 0.95, 0);
+  g.add(pulley);
+  // Connecting rope
+  const connRope = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.18, 5), rope);
+  connRope.position.set(0, 0.88, 0);
+  g.add(connRope);
+  // Arms
+  for (const side of [-1, 1]) {
+    const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.22, 6), metal.clone());
+    grip.position.set(side * 0.11, 0.84, 0);
+    g.add(grip);
+    const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.28, 4, 6), skin);
+    arm.position.set(side * 0.19, 0.65, 0);
+    arm.rotation.z = -side * 0.55;
+    g.add(arm);
+  }
+  // Head
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.17, 10, 10), skin);
+  head.position.set(0, 0.55, 0);
+  g.add(head);
+  // Helmet
+  const helmBody = new THREE.Mesh(new THREE.SphereGeometry(0.19, 10, 6, 0, Math.PI*2, 0, Math.PI/2), helmt);
+  helmBody.position.set(0, 0.57, 0);
+  g.add(helmBody);
+  const helmBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.21, 0.05, 12), helmt);
+  helmBrim.position.set(0, 0.54, 0);
+  g.add(helmBrim);
+  // Body
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.13, 0.22, 4, 8), shirt);
+  body.position.set(0, 0.24, 0);
+  g.add(body);
+  // Harness
+  const harness = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.025, 6, 12), metal);
+  harness.position.set(0, 0.10, 0);
+  harness.rotation.x = Math.PI / 2;
+  g.add(harness);
+  // Legs + boots
+  for (const side of [-1, 1]) {
+    const upper = new THREE.Mesh(new THREE.CapsuleGeometry(0.055, 0.22, 4, 6), pants);
+    upper.position.set(side * 0.085, -0.12, 0);
+    upper.rotation.z = side * 0.12;
+    g.add(upper);
+    const lower = new THREE.Mesh(new THREE.CapsuleGeometry(0.045, 0.18, 4, 6), pants);
+    lower.position.set(side * 0.10, -0.38, 0.03);
+    lower.rotation.z = side * 0.08;
+    g.add(lower);
+    const boot = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.14), new THREE.MeshStandardMaterial({ color: 0x2a1a0a, roughness: 0.9 }));
+    boot.position.set(side * 0.11, -0.50, 0.04);
+    g.add(boot);
+  }
+  // Backpack
+  const pack = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.20, 0.10), new THREE.MeshStandardMaterial({ color: 0x2a5a3a, roughness: 0.8 }));
+  pack.position.set(0, 0.28, -0.16);
+  g.add(pack);
+  return g;
+}
+
+function initZiplinePerson() {
+  const pts = [ZIP_FROM.clone(), ZIP_TO.clone()];
+  const wireMat = new THREE.LineBasicMaterial({ color: 0xb08040, linewidth: 1, transparent: true, opacity: 0.55 });
+  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), wireMat));
+  ziplinePerson = buildZiplinePerson();
+  ziplinePerson.position.copy(ZIP_FROM);
+  ziplinePerson.position.y -= 0.95;
+  scene.add(ziplinePerson);
 }
 
 // ── Overlay API ──
