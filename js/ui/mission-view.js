@@ -2,7 +2,7 @@ import { MISSIONS } from '../data/missions.js';
 import { PLATS } from '../data/platforms.js';
 import { checkAnswer, runDiagnostics } from '../math/checks.js';
 import { classifyError } from '../math/error-classifier.js';
-import { getState, completeMission, completeCustomMission, addAttempt, useHint, getMissionStep, addErrorPattern, awardBadge, saveReflection, getReflection, updateSpacedReview } from '../state/store.js';
+import { getState, completeMission, completeCustomMission, addAttempt, useHint, getMissionStep, addErrorPattern, awardBadge, saveReflection, getReflection, updateSpacedReview, resetMissionForReplay } from '../state/store.js';
 import { isExamMode } from '../state/exam-mode.js';
 import { renderMath } from './math-render.js';
 import { showToast } from './toast.js';
@@ -181,6 +181,7 @@ function renderStep(step, idx, isActive, isDone, isLocked) {
 
   html += `<div id="feedback-${idx}"></div>`;
   html += `<div id="hint-${idx}"></div>`;
+  html += `<div id="solution-${idx}"></div>`;
   html += '</div>';
   return html;
 }
@@ -191,16 +192,16 @@ function renderInput(step, idx) {
     html += `<div class="vec-col-input">
       <span class="vec-bracket">⎛<br>⎜<br>⎝</span>
       <div class="vec-col-fields">
-        <div class="vec-row"><span class="vec-lbl">x₁</span><input class="input-field" id="v-${idx}-0" type="number" step="any" inputmode="decimal"></div>
-        <div class="vec-row"><span class="vec-lbl">x₂</span><input class="input-field" id="v-${idx}-1" type="number" step="any" inputmode="decimal"></div>
-        <div class="vec-row"><span class="vec-lbl">x₃</span><input class="input-field" id="v-${idx}-2" type="number" step="any" inputmode="decimal"></div>
+        <div class="vec-row"><span class="vec-lbl">x₁</span><input class="input-field" id="v-${idx}-0" type="number" step="any" inputmode="decimal" oninput="this.classList.toggle('has-value',this.value!=='')"></div>
+        <div class="vec-row"><span class="vec-lbl">x₂</span><input class="input-field" id="v-${idx}-1" type="number" step="any" inputmode="decimal" oninput="this.classList.toggle('has-value',this.value!=='')"></div>
+        <div class="vec-row"><span class="vec-lbl">x₃</span><input class="input-field" id="v-${idx}-2" type="number" step="any" inputmode="decimal" oninput="this.classList.toggle('has-value',this.value!=='')"></div>
       </div>
       <span class="vec-bracket">⎞<br>⎟<br>⎠</span>
     </div>
     <div class="live-preview-hint">📡 Vorschau aktiv — Eingabe erscheint sofort im 3D-Modell</div>`;
   } else if (step.type === 'number') {
     html += `<div class="step-input-row">
-      <input class="input-field" id="num-${idx}" type="number" step="any" style="width:120px">
+      <input class="input-field" id="num-${idx}" type="number" step="any" style="width:120px" oninput="this.classList.toggle('has-value',this.value!=='')">
     </div>`;
   } else if (step.type === 'mc') {
     html += '<div class="mc-options">';
@@ -300,6 +301,13 @@ function doCheck(idx, step, userAnswer) {
 
   addAttempt(currentMission.id, idx);
 
+  // Haptic feedback (mobile)
+  if (isCorrect) {
+    navigator.vibrate?.([50]);
+  } else {
+    navigator.vibrate?.([30, 50, 30]);
+  }
+
   if (isCorrect) {
     showFeedback(idx, 'Richtig! ✓', true);
     markInputsCorrect(step, idx);
@@ -357,6 +365,21 @@ function doCheck(idx, step, userAnswer) {
         renderTheoryButton(currentMission.concept, taskEl);
         const autoBtn = taskEl.querySelector('.theory-toggle-btn');
         if (autoBtn) setTimeout(() => autoBtn.click(), 500);
+      }
+    }
+    // After 3 fails: show explicit answer as collapsible solution
+    if (msNow.attempts >= 3) {
+      const solEl = document.getElementById(`solution-${idx}`);
+      if (solEl && !solEl.innerHTML) {
+        const correctAns = typeof step.answer === 'function' ? step.answer() : step.answer;
+        let solHtml = '';
+        if (Array.isArray(correctAns)) {
+          solHtml = `<details class="solution-box" open><summary>📝 Lösung anzeigen</summary><div class="solution-body">Richtige Antwort: \\(\\begin{pmatrix}${correctAns[0]}\\\\${correctAns[1]}\\\\${correctAns[2]}\\end{pmatrix}\\)</div></details>`;
+        } else {
+          solHtml = `<details class="solution-box" open><summary>📝 Lösung anzeigen</summary><div class="solution-body">Richtige Antwort: \\(${correctAns}\\)</div></details>`;
+        }
+        solEl.innerHTML = solHtml;
+        renderMath(solEl);
       }
     }
     if (step.type === 'vector3') {
@@ -493,6 +516,18 @@ function onMissionComplete() {
   showToast(`+${m.xp} XP`, 'xp');
   updateTopBar();
 
+  // Double XP for daily challenge
+  const dailyId = parseInt(sessionStorage.getItem('km4_daily'));
+  if (dailyId === m.id) {
+    sessionStorage.removeItem('km4_daily');
+    import('../state/store.js').then(s => {
+      const st = s.getState();
+      st.progress.xp += m.xp; // bonus XP
+      s.save();
+    });
+    showToast(`🌟 Tages-Challenge! +${m.xp} Bonus-XP`, 'ok', 3500);
+  }
+
   // Check badges
   const newBadges = checkBadges();
   newBadges.forEach(b => {
@@ -509,6 +544,7 @@ function renderCompletion() {
     <div class="completion-banner">
       <div class="completion-xp">+${m.xp} XP</div>
       <div class="completion-msg">Mission abgeschlossen!</div>
+      <button class="btn btn-sm replay-btn" id="btn-replay" style="margin-top:8px">🔄 Nochmal üben</button>
     </div>`;
 
   if (m.insight) {
@@ -561,6 +597,13 @@ function renderReflectionCard() {
 function bindReflectionEvents() {
   let selectedStars = 0;
   const selectedTags = new Set();
+
+  document.getElementById('btn-replay')?.addEventListener('click', () => {
+    resetMissionForReplay(currentMission.id);
+    currentStepIdx = 0;
+    missionIsGold = true;
+    renderMissionUI();
+  });
 
   // Stars
   document.querySelectorAll('.star-btn').forEach(btn => {

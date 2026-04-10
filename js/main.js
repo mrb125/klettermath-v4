@@ -9,6 +9,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const state = loadState();
   initToast();
 
+  // Offline/online banner
+  function updateOnlineStatus() {
+    const banner = document.getElementById('offline-banner');
+    if (!banner) return;
+    if (navigator.onLine) {
+      banner.classList.add('hidden');
+    } else {
+      banner.classList.remove('hidden');
+    }
+  }
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+  updateOnlineStatus();
+
   // Register screens
   registerScreen('code',    document.getElementById('s-code'), () => startZiplineLoop());
   registerScreen('welcome', document.getElementById('s-welcome'), () => startZiplineLoop());

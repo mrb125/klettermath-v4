@@ -27,6 +27,23 @@ export async function renderMissionList() {
 
   let html = '<div class="mission-list-header">Missionen</div>';
 
+  // Tages-Challenge: pick an available (not-done) mission based on day of year
+  const availableMissions = MISSIONS.filter(m => isAvailable(m.id) && !isDone(m.id));
+  if (availableMissions.length > 0) {
+    const dayIdx = Math.floor(Date.now() / 86400000) % availableMissions.length;
+    const daily = availableMissions[dayIdx];
+    const dailyTitle = typeof daily.title === 'function' ? daily.title() : daily.title;
+    html += `
+      <div class="daily-challenge-card" data-id="${daily.id}" id="daily-card">
+        <div class="daily-challenge__icon">🌟</div>
+        <div class="daily-challenge__text">
+          <div class="daily-challenge__title">Tages-Challenge</div>
+          <div class="daily-challenge__sub">${dailyTitle} · <strong>2× XP heute</strong></div>
+        </div>
+        <span class="daily-challenge__arrow">›</span>
+      </div>`;
+  }
+
   if (actionableDue.length > 0) {
     html += `<div class="review-banner">
       <div class="review-banner__title">🔔 Heute zur Wiederholung empfohlen</div>
@@ -80,6 +97,15 @@ export async function renderMissionList() {
   });
 
   pane.innerHTML = html;
+
+  document.getElementById('daily-card')?.addEventListener('click', () => {
+    const id = parseInt(document.getElementById('daily-card').dataset.id);
+    activeMissionId = id;
+    // Store daily mode so mission-view can apply 2x XP
+    sessionStorage.setItem('km4_daily', id);
+    if (onSelectMission) onSelectMission(id);
+    import('./mission-view.js').then(mod => mod.renderMission(id));
+  });
 
   document.getElementById('btn-tour')?.addEventListener('click', () => startTour());
 

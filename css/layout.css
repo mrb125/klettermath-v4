@@ -623,3 +623,11 @@
   border-color: var(--rope);
   color: #fff;
 }
+
+/* ── Landscape on small-height devices (iPad landscape) ── */
+@media (orientation: landscape) and (max-height: 600px) {
+  .park-body { flex-direction: row !important }
+  .canvas-pane { flex: 0 0 52% !important; border-right: 1px solid rgba(139,115,85,.15) !important; border-bottom: none !important }
+  .mission-pane { flex: 1 !important }
+  .wlc-content { padding: 16px 24px 24px }
+}

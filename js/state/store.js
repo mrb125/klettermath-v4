@@ -194,6 +194,13 @@ export function getReviewStatus(concept) {
   return { ...data, daysUntil, isDue: today >= nextDate.toISOString().slice(0, 10) };
 }
 
+export function resetMissionForReplay(id) {
+  // Clear per-step state so the mission can be re-played (XP/done status untouched)
+  const keys = Object.keys(state.missionState).filter(k => k.startsWith(`${id}_`));
+  keys.forEach(k => delete state.missionState[k]);
+  save();
+}
+
 function getWeekKey() {
   const d = new Date();
   const day = d.getDay();

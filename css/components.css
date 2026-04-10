@@ -295,3 +295,75 @@
 }
 .tour-ok  { color: #81c784; font-weight: 700; }
 .tour-err { color: #ff8a80; font-weight: 700; }
+
+/* ── Offline Banner ── */
+.offline-banner {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 9999;
+  background: rgba(255, 94, 91, 0.95);
+  color: #fff;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: .85rem;
+  font-weight: 700;
+  transform: translateY(0);
+  transition: transform .3s;
+}
+.offline-banner.hidden { display: none }
+
+/* ── Solution Box ── */
+.solution-box {
+  margin-top: 8px;
+  background: rgba(91,155,213,.1);
+  border: 1px solid rgba(91,155,213,.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: .82rem;
+}
+.solution-box summary {
+  cursor: pointer;
+  color: #6495ed;
+  font-weight: 700;
+  font-size: .82rem;
+}
+.solution-body {
+  margin-top: 8px;
+  color: var(--text);
+}
+
+/* ── Daily Challenge Card ── */
+.daily-challenge-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(232,160,48,.15), rgba(255,107,53,.15));
+  border: 1px solid rgba(232,160,48,.4);
+  border-radius: var(--r2);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.daily-challenge-card:hover { border-color: var(--gold); transform: translateY(-1px) }
+.daily-challenge__icon { font-size: 1.6rem; flex-shrink: 0 }
+.daily-challenge__text { flex: 1 }
+.daily-challenge__title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  color: var(--gold);
+}
+.daily-challenge__sub { font-size: .78rem; color: var(--text2) }
+.daily-challenge__arrow { font-size: 1.4rem; color: var(--gold); opacity: .7 }
+
+/* ── Replay Button ── */
+.replay-btn {
+  margin-top: 8px;
+  border-color: rgba(107,203,119,.3);
+  color: var(--ok);
+}
+.replay-btn:hover { border-color: var(--ok); background: rgba(107,203,119,.1) }
+
+/* ── Input live validation ── */
+.input-field.has-value { border-color: rgba(107,203,119,.5) }
