@@ -51,7 +51,40 @@
     <div class="wlc-bg-fallback" id="wlc-bg-fallback" style="display:none"></div>
     <div class="wlc-bg-overlay"></div>
     <div class="wlc-rope-line"></div>
-    <img src="assets/zipline-person.png" alt="" class="wlc-zipline-person" id="zipline-person" onerror="this.style.display='none'">
+    <!-- Inline SVG person on zipline — no external asset needed -->
+    <svg id="zipline-person" class="wlc-zipline-person" viewBox="0 0 80 110" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+      <!-- Pulley / grip -->
+      <rect x="32" y="0" width="16" height="8" rx="3" fill="#c8833a" opacity="0.95"/>
+      <rect x="38" y="-2" width="4" height="6" rx="2" fill="#e8a030"/>
+      <!-- Arms up holding rope -->
+      <line x1="40" y1="8" x2="22" y2="22" stroke="#d4956a" stroke-width="4" stroke-linecap="round"/>
+      <line x1="40" y1="8" x2="58" y2="22" stroke="#d4956a" stroke-width="4" stroke-linecap="round"/>
+      <!-- Body -->
+      <ellipse cx="40" cy="38" rx="10" ry="14" fill="#c47c4a"/>
+      <!-- Head -->
+      <circle cx="40" cy="20" r="11" fill="#e0a876"/>
+      <!-- Helmet -->
+      <ellipse cx="40" cy="13" rx="12" ry="7" fill="#c8833a"/>
+      <rect x="28" y="16" width="24" height="4" rx="2" fill="#b07030"/>
+      <!-- Face -->
+      <circle cx="36" cy="20" r="2" fill="#6b3a1a"/>
+      <circle cx="44" cy="20" r="2" fill="#6b3a1a"/>
+      <path d="M 35 26 Q 40 30 45 26" stroke="#6b3a1a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- Harness straps -->
+      <line x1="32" y1="30" x2="28" y2="52" stroke="#8b5e3c" stroke-width="3" stroke-linecap="round"/>
+      <line x1="48" y1="30" x2="52" y2="52" stroke="#8b5e3c" stroke-width="3" stroke-linecap="round"/>
+      <line x1="28" y1="52" x2="52" y2="52" stroke="#8b5e3c" stroke-width="3" stroke-linecap="round"/>
+      <!-- Legs -->
+      <line x1="35" y1="52" x2="28" y2="80" stroke="#5a6e3a" stroke-width="5" stroke-linecap="round"/>
+      <line x1="45" y1="52" x2="52" y2="80" stroke="#5a6e3a" stroke-width="5" stroke-linecap="round"/>
+      <!-- Feet / boots -->
+      <ellipse cx="26" cy="82" rx="6" ry="4" fill="#3a2a1a"/>
+      <ellipse cx="54" cy="82" rx="6" ry="4" fill="#3a2a1a"/>
+      <!-- Backpack -->
+      <rect x="50" y="28" width="10" height="16" rx="3" fill="#4a7a5a" opacity="0.9"/>
+      <!-- Glow under person -->
+      <ellipse cx="40" cy="92" rx="20" ry="4" fill="rgba(200,131,58,0.15)"/>
+    </svg>
   </div>
   <div class="wlc-content">
     <div class="wlc-badge">Q1 · Vektorrechnung · NRW</div>

@@ -19,10 +19,12 @@
   z-index: 0;
 }
 .wlc-bg-img {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  animation: kenBurns 22s ease-in-out infinite alternate;
-  transform-origin: center center;
+  object-position: center 20%;
+  animation: kenBurns 28s ease-in-out infinite alternate;
+  transform-origin: center 30%;
 }
 .wlc-bg-fallback {
   width: 100%; height: 100%;
@@ -33,31 +35,57 @@
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(10,8,6,.15) 0%,
-    rgba(10,8,6,.35) 40%,
-    rgba(26,22,20,.88) 75%,
-    rgba(26,22,20,.98) 100%
+    rgba(10,8,6,.05) 0%,
+    rgba(10,8,6,.15) 35%,
+    rgba(26,22,20,.82) 68%,
+    rgba(26,22,20,.97) 100%
   );
 }
 .wlc-rope-line {
   position: absolute;
-  top: 22%;
+  top: 28%;
   left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(200,131,58,.6) 20%, rgba(200,131,58,.6) 80%, transparent);
+  height: 3px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(200,131,58,.25) 8%,
+    rgba(200,131,58,.75) 20%,
+    rgba(232,160,48,.9) 50%,
+    rgba(200,131,58,.75) 80%,
+    rgba(200,131,58,.25) 92%,
+    transparent 100%
+  );
+  box-shadow: 0 1px 6px rgba(200,131,58,.4);
+  /* gentle sag: rope droops slightly in the middle */
+  clip-path: none;
+  transform-origin: center;
+}
+/* SVG rope sag drawn via pseudo */
+.wlc-rope-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  border-radius: 0 0 50% 50% / 0 0 6px 6px;
+  transform: scaleY(1.5) translateY(2px);
+  opacity: .4;
 }
 .wlc-zipline-person {
   position: absolute;
-  top: calc(22% - 48px);
-  left: -140px;
-  width: 90px;
-  mix-blend-mode: screen;
+  top: calc(28% - 88px);
+  left: -160px;
+  width: 130px;
+  height: auto;
   opacity: 0;
   pointer-events: none;
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,.8));
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,.85));
+  transform-origin: 50% 4px; /* pivot at the pulley top */
 }
+/* Looping slide + gentle swing */
 .wlc-zipline-person.active {
-  animation: zipline 1.6s cubic-bezier(.4,0,.6,1) forwards;
+  animation:
+    zipline 4s cubic-bezier(.25,0,.45,1) 0.6s infinite,
+    personSwing 0.9s ease-in-out 0.6s infinite;
 }
 .wlc-content {
   position: relative;
@@ -66,10 +94,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding: 32px 24px 52px;
+  padding: 32px 24px 48px;
   height: 100%;
   text-align: center;
-  animation: slideUpFade .7s ease both;
+  animation: slideUpFade .9s ease both;
+  /* Glass panel behind the text only */
+  background: none;
 }
 .wlc-badge {
   font-size: .72rem;

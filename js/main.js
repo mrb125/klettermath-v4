@@ -23,15 +23,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Welcome buttons — trigger zipline then navigate
-  function enterPark() {
+  // Auto-start zipline animation on welcome screen (loops continuously)
+  function startZiplineLoop() {
     const person = document.getElementById('zipline-person');
-    if (person && person.style.display !== 'none') {
-      person.classList.add('active');
-      setTimeout(() => { person.classList.remove('active'); navigate('park'); }, 1650);
-    } else {
-      navigate('park');
-    }
+    if (!person || person.style.display === 'none') return;
+    person.classList.add('active');
+  }
+  // Start loop shortly after page load
+  setTimeout(startZiplineLoop, 800);
+
+  // Welcome buttons — just navigate (animation is already looping)
+  function enterPark() {
+    navigate('park');
   }
   document.getElementById('btn-enter').addEventListener('click', enterPark);
   const btnContinue = document.getElementById('btn-continue');
