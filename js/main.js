@@ -371,7 +371,7 @@ export function updateTopBar() {
   const state = getState();
   if (!state) return;
   const done = state.progress.done.length;
-  const total = 12;
+  const total = 17;
   const pct = Math.round((done / total) * 100);
   const fill = document.getElementById('progress-fill');
   if (fill) fill.style.width = pct + '%';

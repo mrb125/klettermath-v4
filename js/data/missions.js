@@ -641,4 +641,309 @@ export const MISSIONS = [
     },
     why: 'Beim Bouldern wird die Spiegelung genutzt, um symmetrische Routenabschnitte zu planen. Die Spiegelung an einer Ebene beschreibt diese Symmetrie mathematisch.'
   }
+  ,{
+    id: 13, title: 'Zweites Seil — Brücke', concept: 'Verbindungsvektor & Betrag',
+    difficulty: 'basis', xp: 30, prerequisites: [2],
+    platforms: [1, 2],
+    story: () => `Vom ${P(1)} spannt sich ein weiteres Seil zur ${P(2)}. Berechne Verbindungsvektor, Länge und den Aufhängepunkt des Sicherheitsnetzes genau in der Mitte.`,
+    task: () => `Berechne \\(\\vec{${PLATS[1].lbl}${PLATS[2].lbl}}\\), seinen Betrag und den Mittelpunkt M.`,
+    tischaufgabe: {
+      setup: () => `<ol><li>Setze Plattform <strong>${PLATS[1].lbl}</strong> auf ${pCoord(1)} und <strong>${PLATS[2].lbl}</strong> auf ${pCoord(2)}</li><li>Verbinde beide mit einer Schnur</li><li>Markiere die Mitte der Schnur — das ist M</li></ol>`,
+      materials: ['Koordinatengitter', 'Schnur', 'Stift']
+    },
+    steps: [
+      {
+        prompt: () => `Berechne \\(\\vec{${PLATS[1].lbl}${PLATS[2].lbl}} = ${PLATS[2].lbl} - ${PLATS[1].lbl}\\):`,
+        type: 'vector3', answer: () => connArr(1, 2), tolerance: 0.1,
+        hints: [
+          () => `Zielkoordinaten minus Startkoordinaten: ${pCoordTeX(2)} − ${pCoordTeX(1)}`,
+          () => { const v = connArr(1,2); return `\\(\\begin{pmatrix}${PLATS[2].x}-${PLATS[1].x}\\\\${PLATS[2].y}-${PLATS[1].y}\\\\${PLATS[2].z}-${PLATS[1].z}\\end{pmatrix}\\)` },
+          () => { const v = connArr(1,2); return `$$\\vec{${PLATS[1].lbl}${PLATS[2].lbl}} = \\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
+        ],
+        diagnostics: [
+          { pattern: (ans) => { const rev = connArr(2,1); return Math.abs(ans[0]-rev[0])<0.1&&Math.abs(ans[1]-rev[1])<0.1&&Math.abs(ans[2]-rev[2])<0.1 }, msg: 'Richtung falsch: du hast B−A statt A−B gerechnet. Der Pfeil zeigt immer vom ersten zum zweiten Buchstaben.' }
+        ]
+      },
+      {
+        prompt: () => `Berechne \\(|\\vec{${PLATS[1].lbl}${PLATS[2].lbl}}|\\) (2 Dez.):`,
+        type: 'number', answer: () => connV(1, 2).len(), tolerance: 0.05,
+        hints: [
+          () => '\\(|\\vec{v}| = \\sqrt{x_1^2+x_2^2+x_3^2}\\)',
+          () => { const v = connArr(1,2); return `\\(\\sqrt{${v[0]}^2+${v[1]}^2+(${v[2]})^2}\\)` },
+          () => { const len = connV(1,2).len(); return `$$|\\vec{${PLATS[1].lbl}${PLATS[2].lbl}}| = ${len.toFixed(2)}$$` }
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => `Berechne den Mittelpunkt M (Aufhängepunkt des Sicherheitsnetzes):`,
+        type: 'vector3',
+        showPoint: true, pointLabel: 'M',
+        answer: () => [(pV(1).x+pV(2).x)/2, (pV(1).y+pV(2).y)/2, (pV(1).z+pV(2).z)/2],
+        tolerance: 0.1,
+        hints: [
+          () => '\\(M = \\frac{1}{2}(A + B)\\) — Durchschnitt der Koordinaten',
+          () => `\\(M = \\frac{1}{2}(${pCoordTeX(1)} + ${pCoordTeX(2)})\\)`,
+          () => { const m = [(pV(1).x+pV(2).x)/2,(pV(1).y+pV(2).y)/2,(pV(1).z+pV(2).z)/2]; return `$$M = \\begin{pmatrix}${m[0]}\\\\${m[1]}\\\\${m[2]}\\end{pmatrix}$$` }
+        ],
+        diagnostics: []
+      }
+    ],
+    insight: {
+      title: 'Verbindungsvektor & Mittelpunkt',
+      formula: '$$\\vec{AB} = B - A \\qquad M = \\frac{A+B}{2}$$',
+      body: 'Der Verbindungsvektor zeigt von A nach B. Der Mittelpunkt teilt die Strecke genau in zwei gleiche Hälften.'
+    },
+    why: 'Sicherheitsnetze zwischen zwei Plattformen werden am Mittelpunkt aufgehängt. Kletterpark-Ingenieure berechnen diesen Punkt mit genau dieser Formel — damit das Netz auf beiden Seiten gleich stark gespannt ist.'
+  },
+  {
+    id: 14, title: 'Zipline-Einheit', concept: 'Einheitsvektor',
+    difficulty: 'basis', xp: 35, prerequisites: [2],
+    platforms: [1, 7],
+    story: () => `Die schnellste Route im Park: vom ${P(1)} als Zipline direkt zur ${P(7)}. Für die Steuerung der Gondel braucht man den Einheitsvektor — er gibt die reine Richtung ohne Länge an.`,
+    task: () => `Berechne den Einheitsvektor \\(\\hat{e}_{${PLATS[1].lbl}${PLATS[7].lbl}}\\) der Zipline von ${PLATS[1].name} nach ${PLATS[7].name}.`,
+    tischaufgabe: {
+      setup: () => `<ol><li>Berechne \\(\\vec{${PLATS[1].lbl}${PLATS[7].lbl}}\\) und seinen Betrag</li><li>Teile jeden Eintrag durch den Betrag</li><li>Prüfe: Der Betrag des Ergebnisses muss genau 1 sein!</li></ol>`,
+      materials: ['Taschenrechner']
+    },
+    steps: [
+      {
+        prompt: () => `Berechne den Verbindungsvektor \\(\\vec{${PLATS[1].lbl}${PLATS[7].lbl}}\\):`,
+        type: 'vector3', answer: () => connArr(1, 7), tolerance: 0.1,
+        hints: [
+          () => `Zielkoordinaten ${pCoordTeX(7)} minus Startkoordinaten ${pCoordTeX(1)}`,
+          () => { const v = connArr(1,7); return `$$\\vec{${PLATS[1].lbl}${PLATS[7].lbl}} = \\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => `Berechne \\(|\\vec{${PLATS[1].lbl}${PLATS[7].lbl}}|\\) — die Länge der Zipline (exakter Wert):`,
+        type: 'number', answer: () => connV(1, 7).len(), tolerance: 0.05,
+        hints: [
+          () => { const v = connArr(1,7); return `\\(\\sqrt{${v[0]}^2+(${v[1]})^2+(${v[2]})^2}\\)` },
+          () => { const v = connArr(1,7); const s = v[0]*v[0]+v[1]*v[1]+v[2]*v[2]; return `\\(\\sqrt{${s}}\\) — schau: ist das eine bekannte Quadratzahl?` },
+          () => { const len = connV(1,7).len(); return `$$|\\vec{${PLATS[1].lbl}${PLATS[7].lbl}}| = ${len % 1 === 0 ? len : len.toFixed(2)}$$` }
+        ],
+        diagnostics: [
+          { pattern: (ans) => { const v = connArr(1,7); return Math.abs(ans - (Math.abs(v[0])+Math.abs(v[1])+Math.abs(v[2]))) < 0.1 }, msg: 'Das ist die Summe der Beträge, nicht der Betrag des Vektors! Benutze die Wurzel-Formel.' }
+        ]
+      },
+      {
+        prompt: () => `Berechne den Einheitsvektor \\(\\hat{e} = \\frac{\\vec{v}}{|\\vec{v}|}\\) (3 Dez.):`,
+        type: 'vector3',
+        answer: () => { const v = connV(1, 7); const l = v.len(); return [v.x/l, v.y/l, v.z/l] },
+        tolerance: 0.01,
+        hints: [
+          () => 'Teile jeden Eintrag des Vektors durch seinen Betrag.',
+          () => { const v = connArr(1,7); const l = connV(1,7).len(); return `Jede Komponente durch ${l % 1 === 0 ? l : l.toFixed(3)} teilen.` },
+          () => { const v = connV(1,7); const l = v.len(); return `$$\\hat{e} = \\begin{pmatrix}${(v.x/l).toFixed(3)}\\\\${(v.y/l).toFixed(3)}\\\\${(v.z/l).toFixed(3)}\\end{pmatrix}$$` }
+        ],
+        diagnostics: [
+          { pattern: (ans) => { const l = Math.sqrt(ans[0]*ans[0]+ans[1]*ans[1]+ans[2]*ans[2]); return Math.abs(l - connV(1,7).len()) < 0.2 }, msg: 'Du hast den ursprünglichen Vektor angegeben, nicht den Einheitsvektor. Teile durch den Betrag!' }
+        ]
+      }
+    ],
+    insight: {
+      title: 'Einheitsvektor',
+      formula: '$$\\hat{e} = \\frac{\\vec{v}}{|\\vec{v}|} \\qquad |\\hat{e}| = 1$$',
+      body: 'Der Einheitsvektor hat immer Betrag 1. Er gibt nur die Richtung an — ohne Information über die Länge.'
+    },
+    why: 'Seilbahn-Steuerungen benötigen den Einheitsvektor: Egal wie lang die Zipline ist — der Einheitsvektor gibt die Fahrtrichtung in normierter Form an. GPS-Systeme und Robotersteuerungen arbeiten ausschließlich mit Einheitsvektoren.'
+  },
+  {
+    id: 15, title: 'Baumstamm im Weg?', concept: 'Punktprobe & Parameterdarstellung',
+    difficulty: 'standard', xp: 50, prerequisites: [3, 13],
+    platforms: [1, 2],
+    story: () => `Der Ranger meldet: Zwei Bäume könnten die geplante Verlängerung des Seils ${PLATS[1].lbl}→${PLATS[2].lbl} blockieren. Position der Bäume: Baum₁(12|5|−1) und Baum₂(10|4|1). Prüfe, welcher auf dem Weg liegt!`,
+    task: () => `Bestimme die Gerade g durch ${P(1)} mit Richtung \\(\\vec{${PLATS[1].lbl}${PLATS[2].lbl}}\\) und prüfe beide Baum-Positionen mit der Punktprobe.`,
+    steps: [
+      {
+        prompt: () => `Welchen Parameter t liefert Baum₁(12|5|−1) bei der x₁-Gleichung der Geraden g (Aufpunkt ${PLATS[1].name}, Richtung ${PLATS[1].lbl}→${PLATS[2].lbl})?`,
+        type: 'number',
+        answer: () => { const v = connArr(1, 2); return (12 - PLATS[1].x) / v[0] },
+        tolerance: 0.05,
+        hints: [
+          () => `Geradengleichung: \\(\\vec{x} = ${pCoordTeX(1)} + t \\cdot \\vec{${PLATS[1].lbl}${PLATS[2].lbl}}\\)`,
+          () => { const v = connArr(1,2); return `x₁-Gleichung: \\(12 = ${PLATS[1].x} + t \\cdot ${v[0]}\\)` },
+          () => { const v = connArr(1,2); const t = (12-PLATS[1].x)/v[0]; return `$$t = \\frac{12 - ${PLATS[1].x}}{${v[0]}} = ${t}$$` }
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => `Liegt Baum₁(12|5|−1) auf der Geraden g? Prüfe alle drei Koordinaten mit t = 2.`,
+        type: 'mc', options: ['Ja — Baum₁ blockiert die Route!', 'Nein — Baum₁ liegt daneben'],
+        answer: () => {
+          const v = connArr(1, 2); const t = 2;
+          const x1ok = Math.abs(PLATS[1].x + t*v[0] - 12) < 0.1;
+          const x2ok = Math.abs(PLATS[1].y + t*v[1] - 5) < 0.1;
+          const x3ok = Math.abs(PLATS[1].z + t*v[2] - (-1)) < 0.1;
+          return (x1ok && x2ok && x3ok) ? 'Ja — Baum₁ blockiert die Route!' : 'Nein — Baum₁ liegt daneben';
+        },
+        tolerance: 0,
+        hints: [
+          () => { const v = connArr(1,2); return `Setze t = 2 ein: \\(\\vec{x} = ${pCoordTeX(1)} + 2 \\cdot \\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}\\)` },
+          () => { const v = connArr(1,2); return `Ergebnis: (${PLATS[1].x+2*v[0]}|${PLATS[1].y+2*v[1]}|${PLATS[1].z+2*v[2]}). Stimmt das mit Baum₁ überein?` },
+          () => `Vergleiche alle drei Komponenten: (12|5|−1) mit dem berechneten Punkt.`
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => `Welchen t-Wert liefert Baum₂(10|4|1) aus der x₁-Gleichung?`,
+        type: 'number',
+        answer: () => { const v = connArr(1, 2); return (10 - PLATS[1].x) / v[0] },
+        tolerance: 0.05,
+        hints: [
+          () => { const v = connArr(1,2); return `\\(10 = ${PLATS[1].x} + t \\cdot ${v[0]}\\)` },
+          () => { const v = connArr(1,2); const t = (10-PLATS[1].x)/v[0]; return `$$t = \\frac{10 - ${PLATS[1].x}}{${v[0]}} = ${t}$$` }
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => `Liegt Baum₂(10|4|1) auf der Geraden? (Prüfe x₂ und x₃ mit dem berechneten t)`,
+        type: 'mc', options: ['Ja — Baum₂ blockiert die Route!', 'Nein — Baum₂ liegt daneben'],
+        answer: () => {
+          const v = connArr(1, 2); const t = (10 - PLATS[1].x) / v[0];
+          const x2ok = Math.abs(PLATS[1].y + t*v[1] - 4) < 0.1;
+          const x3ok = Math.abs(PLATS[1].z + t*v[2] - 1) < 0.1;
+          return (x2ok && x3ok) ? 'Ja — Baum₂ blockiert die Route!' : 'Nein — Baum₂ liegt daneben';
+        },
+        tolerance: 0,
+        hints: [
+          () => { const v = connArr(1,2); const t = (10-PLATS[1].x)/v[0]; return `Setze t = ${t} ein: x₂ = ${PLATS[1].y}+${t}·${v[1]} = ${(PLATS[1].y+t*v[1]).toFixed(2)}, aber Baum₂ hat x₂ = 4.` },
+          () => `Wenn nicht alle drei t-Werte gleich sind, liegt der Punkt NICHT auf der Geraden.`
+        ],
+        diagnostics: []
+      }
+    ],
+    insight: {
+      title: 'Punktprobe auf einer Geraden',
+      formula: '$$P \\in g \\Leftrightarrow \\exists\\, t: P = A + t\\cdot\\vec{r}$$',
+      body: 'Ein Punkt liegt auf der Geraden, wenn ALLE drei Koordinatengleichungen denselben Wert t ergeben.'
+    },
+    why: 'Routenplaner prüfen mit der Punktprobe, ob Hindernisse (Bäume, Felsen, andere Seile) auf einer geplanten Geraden liegen. Das ist schneller als räumliches Vorstellungsvermögen — und sicherer.'
+  },
+  {
+    id: 16, title: 'Parallele Ziplines', concept: 'Parallele Geraden',
+    difficulty: 'standard', xp: 50, prerequisites: [5, 13],
+    platforms: [1, 2, 5, 6],
+    story: () => `Der Park plant einen Doppel-Parcours: Neben der bestehenden Route ${PLATS[1].lbl}→${PLATS[2].lbl} soll eine parallele Route durch ${P(6)} entstehen. Außerdem fragt sich der Ranger, ob ${PLATS[5].name}→${PLATS[6].name} bereits parallel zu ${PLATS[1].lbl}→${PLATS[2].lbl} verläuft.`,
+    task: () => `Prüfe Parallelität und stelle die neue Geradengleichung auf.`,
+    steps: [
+      {
+        prompt: () => `Berechne den Richtungsvektor \\(\\vec{${PLATS[1].lbl}${PLATS[2].lbl}}\\) (Route 1):`,
+        type: 'vector3', answer: () => connArr(1, 2), tolerance: 0.1,
+        hints: [
+          () => { const v = connArr(1,2); return `$$\\vec{${PLATS[1].lbl}${PLATS[2].lbl}} = \\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => `Berechne den Richtungsvektor \\(\\vec{${PLATS[5].lbl}${PLATS[6].lbl}}\\) (Route ${PLATS[5].name}→${PLATS[6].name}):`,
+        type: 'vector3', answer: () => connArr(5, 6), tolerance: 0.1,
+        hints: [
+          () => { const v = connArr(5,6); return `${PLATS[6].name} − ${PLATS[5].name} = ${pCoordTeX(6)} − ${pCoordTeX(5)}` },
+          () => { const v = connArr(5,6); return `$$\\vec{${PLATS[5].lbl}${PLATS[6].lbl}} = \\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => `Verlaufen die Routen ${PLATS[1].lbl}→${PLATS[2].lbl} und ${PLATS[5].lbl}→${PLATS[6].lbl} parallel? (Prüfe: ist ein Vektor ein Vielfaches des anderen?)`,
+        type: 'mc', options: ['Ja — die Routen sind parallel', 'Nein — die Routen sind nicht parallel'],
+        answer: () => {
+          const v1 = connArr(1, 2); const v2 = connArr(5, 6);
+          if (v1[0] === 0 || v2[0] === 0) return 'Nein — die Routen sind nicht parallel';
+          const lam = v2[0]/v1[0];
+          const par = Math.abs(v2[1]-lam*v1[1])<0.01 && Math.abs(v2[2]-lam*v1[2])<0.01;
+          return par ? 'Ja — die Routen sind parallel' : 'Nein — die Routen sind nicht parallel';
+        },
+        tolerance: 0,
+        hints: [
+          () => { const v1=connArr(1,2); const v2=connArr(5,6); return `Überprüfe: Gibt es ein λ mit \\(\\vec{${PLATS[5].lbl}${PLATS[6].lbl}} = \\lambda \\cdot \\vec{${PLATS[1].lbl}${PLATS[2].lbl}}\\)?` },
+          () => { const v1=connArr(1,2); const v2=connArr(5,6); const lam=v2[0]/v1[0]; return `Aus x₁: λ = ${v2[0]}/${v1[0]} = ${lam.toFixed(2)}. Ergibt das auch x₂ und x₃ richtig?` },
+          () => `Wenn nicht alle drei Gleichungen dasselbe λ liefern → NICHT parallel.`
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => `Stelle die neue Parallelroute h auf: gleicher Richtungsvektor wie ${PLATS[1].lbl}→${PLATS[2].lbl}, Aufpunkt ${PLATS[6].name} ${pCoord(6)}. Gib den Richtungsvektor von h an:`,
+        type: 'vector3', answer: () => connArr(1, 2), tolerance: 0.1,
+        hints: [
+          () => 'Parallele Geraden haben denselben (oder vielfachen) Richtungsvektor — nur der Aufpunkt ist verschieden.',
+          () => { const v = connArr(1,2); return `$$h: \\vec{x} = ${pCoordTeX(6)} + t \\cdot \\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
+        ],
+        diagnostics: [
+          { pattern: (ans) => Math.abs(ans[0])<0.1 && Math.abs(ans[1])<0.1 && Math.abs(ans[2])<0.1, msg: 'Der Nullvektor ist kein Richtungsvektor! Parallelrouten teilen den Richtungsvektor der Originalroute.' }
+        ]
+      }
+    ],
+    insight: {
+      title: 'Parallele Geraden',
+      formula: '$$g \\parallel h \\Leftrightarrow \\vec{r}_h = \\lambda \\cdot \\vec{r}_g \\quad (\\lambda \\neq 0)$$',
+      body: 'Zwei Geraden sind parallel, wenn ihre Richtungsvektoren Vielfache voneinander sind. Der Aufpunkt darf verschieden sein.'
+    },
+    why: 'Parallele Ziplines in Kletterparks müssen exakt berechnet werden — sonst kollidieren die Gondeln oder die Seile berühren sich. Ingenieure prüfen Parallelität genau mit diesem Verfahren.'
+  },
+  {
+    id: 17, title: 'Zipline-Neigung', concept: 'Winkel zur Ebene',
+    difficulty: 'standard', xp: 55, prerequisites: [6],
+    platforms: [0, 4],
+    story: () => `${P(0)} bis ${P(4)}: das ist die steilste Zipline im Park. Die Sicherheitsvorschrift schreibt vor, dass der Neigungswinkel zur Horizontalen zwischen 30° und 55° liegen muss. Liegt die Zipline im zulässigen Bereich?`,
+    task: () => `Berechne den Neigungswinkel der Zipline \\(${PLATS[0].lbl}${PLATS[4].lbl}\\) gegenüber der x₁x₂-Ebene (Horizontalen).`,
+    tischaufgabe: {
+      setup: () => `<ol><li>Berechne \\(\\vec{${PLATS[0].lbl}${PLATS[4].lbl}}\\) und seinen Betrag</li><li>Der Neigungswinkel α: \\(\\sin(α) = \\frac{|z\\text{-Komponente}|}{|\\vec{v}|}\\)</li><li>Ergebnis mit dem Winkelmesser am Modell vergleichen</li></ol>`,
+      materials: ['Taschenrechner', 'Koordinatengitter']
+    },
+    steps: [
+      {
+        prompt: () => `Berechne den Richtungsvektor \\(\\vec{${PLATS[0].lbl}${PLATS[4].lbl}}\\):`,
+        type: 'vector3', answer: () => connArr(0, 4), tolerance: 0.1,
+        hints: [
+          () => { const v=connArr(0,4); return `$$\\vec{${PLATS[0].lbl}${PLATS[4].lbl}} = \\begin{pmatrix}${v[0]}\\\\${v[1]}\\\\${v[2]}\\end{pmatrix}$$` }
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => `Berechne \\(|\\vec{${PLATS[0].lbl}${PLATS[4].lbl}}|\\) (2 Dez.):`,
+        type: 'number', answer: () => connV(0, 4).len(), tolerance: 0.1,
+        hints: [
+          () => { const v=connArr(0,4); return `\\(\\sqrt{${v[0]}^2+(${v[1]})^2+${v[2]}^2}\\)` },
+          () => { return `$$|\\vec{${PLATS[0].lbl}${PLATS[4].lbl}}| \\approx ${connV(0,4).len().toFixed(2)}$$` }
+        ],
+        diagnostics: []
+      },
+      {
+        prompt: () => `Der Neigungswinkel α zur x₁x₂-Ebene: \\(\\sin(α) = \\frac{|x_3|}{|\\vec{v}|}\\). Berechne α in Grad (2 Dez.):`,
+        type: 'number',
+        answer: () => { const v = connV(0, 4); return Math.asin(Math.abs(v.z) / v.len()) * 180 / Math.PI },
+        tolerance: 0.2,
+        hints: [
+          () => { const v=connArr(0,4); const len=connV(0,4).len(); return `\\(\\sin(α) = \\frac{${Math.abs(v[2])}}{${len.toFixed(2)}}\\)` },
+          () => { const alpha = Math.asin(Math.abs(connArr(0,4)[2])/connV(0,4).len())*180/Math.PI; return `$$α = \\arcsin\\!\\left(\\frac{${Math.abs(connArr(0,4)[2])}}{${connV(0,4).len().toFixed(2)}}\\right) \\approx ${alpha.toFixed(2)}°$$` }
+        ],
+        diagnostics: [
+          { pattern: (ans) => { const alpha = Math.acos(Math.abs(connArr(0,4)[2])/connV(0,4).len())*180/Math.PI; return Math.abs(ans-alpha)<0.5 }, msg: 'Du hast den Winkel zur Senkrechten berechnet (arccos), nicht zur Waagerechten (arcsin). Für den Neigungswinkel zur Horizontalen gilt: sin(α) = |z|/|v|.' }
+        ]
+      },
+      {
+        prompt: () => `Liegt der Neigungswinkel im zulässigen Bereich 30°–55°?`,
+        type: 'mc', options: ['Ja — Zipline ist sicherheitskonform', 'Nein — Neigung zu flach (< 30°)', 'Nein — Neigung zu steil (> 55°)'],
+        answer: () => {
+          const alpha = Math.asin(Math.abs(connArr(0,4)[2])/connV(0,4).len())*180/Math.PI;
+          if (alpha < 30) return 'Nein — Neigung zu flach (< 30°)';
+          if (alpha > 55) return 'Nein — Neigung zu steil (> 55°)';
+          return 'Ja — Zipline ist sicherheitskonform';
+        },
+        tolerance: 0,
+        hints: [
+          () => { const alpha = Math.asin(Math.abs(connArr(0,4)[2])/connV(0,4).len())*180/Math.PI; return `Berechneter Winkel: ca. ${alpha.toFixed(1)}°. Liegt das zwischen 30° und 55°?` }
+        ],
+        diagnostics: []
+      }
+    ],
+    insight: {
+      title: 'Winkel zur Ebene (Neigungswinkel)',
+      formula: '$$\\sin(\\alpha) = \\frac{|\\vec{v} \\cdot \\vec{n}|}{|\\vec{v}|\\cdot|\\vec{n}|} \\quad \\text{mit } \\vec{n}=(0|0|1)$$',
+      body: 'Der Neigungswinkel zur Horizontalebene ergibt sich aus der z-Komponente des Richtungsvektors und dem Betrag.'
+    },
+    why: 'NRW-Abitur 2023: Genau diese Formel kam im Abitur für eine Seilbahn-Aufgabe. Kletterpark-Genehmigungen in NRW erfordern einen Nachweis, dass Ziplines den Neigungswinkel-Vorschriften entsprechen.'
+  }
 ];
