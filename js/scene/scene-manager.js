@@ -12,7 +12,7 @@ let ropeMeshes = [];
 let animId = null;
 let liveArrow = null;
 let landmarkGroup = null;
-let ziplinePerson = null;
+// zipline person removed from 3D scene (lives on welcome/code screens only)
 
 // Math coordinates (x,y,z) → THREE.js (x, z, -y)
 export function mathToScene(x, y, z) {
@@ -116,13 +116,6 @@ export function initScene(canvas) {
   // Landmarks — always visible reference points
   initLandmarks();
 
-  // Zipline person — always visible ambient animation
-  initZiplinePerson();
-
-  // Precompute zipline direction for person tilt
-  const _zipDir = ZIP_TO.clone().sub(ZIP_FROM).normalize();
-  const _zipAngle = Math.atan2(_zipDir.z, _zipDir.x); // yaw along wire
-
   // Animate
   function animate() {
     animId = requestAnimationFrame(animate);
@@ -137,27 +130,6 @@ export function initScene(canvas) {
         m.userData.indicator.scale.setScalar(0.8 + Math.sin(pulse + m.userData.platId) * 0.2);
       }
     });
-
-    // Zipline person: ping-pong along S→G
-    if (ziplinePerson) {
-      // t in [0,1], ping-pong over ZIP_DURATION * 2 (one-way + return)
-      const cycle = (now % (ZIP_DURATION * 2)) / ZIP_DURATION; // 0..2
-      const tRaw = cycle <= 1 ? cycle : 2 - cycle;            // 0..1..0
-      // ease in-out: smoother at ends (simulate acceleration + deceleration)
-      const t = tRaw < 0.5
-        ? 2 * tRaw * tRaw
-        : 1 - 2 * (1 - tRaw) * (1 - tRaw);
-
-      const pos = ZIP_FROM.clone().lerp(ZIP_TO, t);
-      ziplinePerson.position.set(pos.x, pos.y - 0.95, pos.z);
-
-      // Swing: gentle pendulum on z-axis, stronger in middle of run
-      const swing = Math.sin(now * 0.0028) * 0.07 * Math.sin(Math.PI * t);
-      ziplinePerson.rotation.z = swing;
-
-      // Face direction of travel
-      ziplinePerson.rotation.y = cycle <= 1 ? _zipAngle : _zipAngle + Math.PI;
-    }
 
     renderer.render(scene, camera);
   }
@@ -337,107 +309,6 @@ export function clearLiveVector() {
   if (liveArrow && scene) { scene.remove(liveArrow); liveArrow = null; }
 }
 
-// ── Zipline Person ──
-// Rides from S(0|0|0) → A(4|1|3) on a permanent ambient wire, always visible
-const ZIP_FROM = mathToScene(0, 0, 0);   // S  → scene (0, 0, 0)
-const ZIP_TO   = mathToScene(4, 1, 3);   // A  → scene (4, 3, -1)
-const ZIP_DURATION = 7000; // ms one-way
-
-function buildZiplinePerson() {
-  const g = new THREE.Group();
-
-  const skin  = new THREE.MeshStandardMaterial({ color: 0xe0a876, roughness: 0.8 });
-  const helmt = new THREE.MeshStandardMaterial({ color: 0xc8833a, roughness: 0.4, metalness: 0.2 });
-  const shirt = new THREE.MeshStandardMaterial({ color: 0x4a7a5a, roughness: 0.7 });
-  const pants = new THREE.MeshStandardMaterial({ color: 0x3a4a2a, roughness: 0.8 });
-  const metal = new THREE.MeshStandardMaterial({ color: 0xd4a030, roughness: 0.3, metalness: 0.7 });
-  const rope  = new THREE.MeshStandardMaterial({ color: 0x8b6034, roughness: 0.9 });
-
-  // Umlenkrolle (oben)
-  const pulley = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.14, 10), metal);
-  pulley.rotation.z = Math.PI / 2;
-  pulley.position.set(0, 0.95, 0);
-  g.add(pulley);
-
-  // Griff-Stäbe (Hände halten Griff)
-  const gripMat = metal.clone();
-  for (const side of [-1, 1]) {
-    const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.22, 6), gripMat);
-    grip.position.set(side * 0.11, 0.84, 0);
-    g.add(grip);
-    // Armstück (Unterarm von Griff zum Körper)
-    const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.28, 4, 6), skin);
-    arm.position.set(side * 0.19, 0.65, 0);
-    arm.rotation.z = -side * 0.55;
-    g.add(arm);
-  }
-
-  // Kopf
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.17, 10, 10), skin);
-  head.position.set(0, 0.55, 0);
-  g.add(head);
-
-  // Helm (oben flach)
-  const helmBody = new THREE.Mesh(new THREE.SphereGeometry(0.19, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), helmt);
-  helmBody.position.set(0, 0.57, 0);
-  g.add(helmBody);
-  const helmBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.21, 0.05, 12), helmt);
-  helmBrim.position.set(0, 0.54, 0);
-  g.add(helmBrim);
-
-  // Körper (Weste)
-  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.13, 0.22, 4, 8), shirt);
-  body.position.set(0, 0.24, 0);
-  g.add(body);
-
-  // Hüft-Sicherheitsgurt (Ring)
-  const harness = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.025, 6, 12), metal);
-  harness.position.set(0, 0.10, 0);
-  harness.rotation.x = Math.PI / 2;
-  g.add(harness);
-
-  // Beine
-  for (const side of [-1, 1]) {
-    const upper = new THREE.Mesh(new THREE.CapsuleGeometry(0.055, 0.22, 4, 6), pants);
-    upper.position.set(side * 0.085, -0.12, 0);
-    upper.rotation.z = side * 0.12;
-    g.add(upper);
-    const lower = new THREE.Mesh(new THREE.CapsuleGeometry(0.045, 0.18, 4, 6), pants);
-    lower.position.set(side * 0.10, -0.38, 0.03);
-    lower.rotation.z = side * 0.08;
-    g.add(lower);
-    // Schuh
-    const boot = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.14), new THREE.MeshStandardMaterial({ color: 0x2a1a0a, roughness: 0.9 }));
-    boot.position.set(side * 0.11, -0.50, 0.04);
-    g.add(boot);
-  }
-
-  // Rucksack
-  const pack = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.20, 0.10), new THREE.MeshStandardMaterial({ color: 0x2a5a3a, roughness: 0.8 }));
-  pack.position.set(0, 0.28, -0.16);
-  g.add(pack);
-
-  // Verbindungsseil zur Rolle (kleines Seil-Stück)
-  const connRope = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.18, 5), rope);
-  connRope.position.set(0, 0.88, 0);
-  g.add(connRope);
-
-  return g;
-}
-
-function initZiplinePerson() {
-  // Permanent ambient wire (always visible, not part of mission ropes)
-  const pts = [ZIP_FROM.clone(), ZIP_TO.clone()];
-  const wireMat = new THREE.LineBasicMaterial({ color: 0xb08040, linewidth: 1, transparent: true, opacity: 0.55 });
-  const wireGeo = new THREE.BufferGeometry().setFromPoints(pts);
-  scene.add(new THREE.Line(wireGeo, wireMat));
-
-  ziplinePerson = buildZiplinePerson();
-  // pivot is at pulley top (y=0.95) — offset person so pulley sits ON the wire
-  ziplinePerson.position.copy(ZIP_FROM);
-  ziplinePerson.position.y -= 0.95; // hang below wire
-  scene.add(ziplinePerson);
-}
 
 function initLandmarks() {
   if (landmarkGroup) return;

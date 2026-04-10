@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initToast();
 
   // Register screens
-  registerScreen('code',    document.getElementById('s-code'));
+  registerScreen('code',    document.getElementById('s-code'), () => startZiplineLoop());
   registerScreen('welcome', document.getElementById('s-welcome'), () => startZiplineLoop());
   registerScreen('park',    document.getElementById('s-park'), onParkShow);
   registerScreen('badges',  document.getElementById('s-badges'), onBadgesShow);
@@ -23,11 +23,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Auto-start zipline animation on welcome screen (loops continuously)
+  // Auto-start zipline animation on welcome + code screens
   function startZiplineLoop() {
-    const person = document.getElementById('zipline-person');
-    if (!person) return;
-    person.classList.add('active');
+    document.getElementById('zipline-person')?.classList.add('active');
+    document.getElementById('zipline-person-code')?.classList.add('active');
   }
   // Also start on page load (covers direct welcome entry)
   setTimeout(startZiplineLoop, 800);

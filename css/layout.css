@@ -77,8 +77,8 @@
   height: auto;
   opacity: 0;
   pointer-events: none;
-  mix-blend-mode: screen;   /* black bg becomes transparent */
-  filter: drop-shadow(0 6px 18px rgba(0,0,0,.5));
+  /* No mix-blend-mode — image colors stay vivid on dark bg */
+  filter: drop-shadow(0 4px 14px rgba(0,0,0,.9)) brightness(1.05) saturate(1.2);
   transform-origin: 50% 10px; /* pivot at pulley */
 }
 /* Looping slide + gentle swing */

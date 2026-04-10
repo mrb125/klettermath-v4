@@ -36,12 +36,20 @@
 
 <!-- ════ Code Entry ════ -->
 <div id="s-code" class="screen">
-  <div class="wlc-title">KletterMath</div>
-  <div class="wlc-sub">Schüler-Code eingeben</div>
-  <div class="wlc-desc">Gib deinen 6-stelligen Code ein, den du von deiner Lehrkraft erhalten hast.</div>
-  <input id="code-input" class="code-input" type="text" maxlength="6" placeholder="A7KM3R" autocomplete="off" autocapitalize="characters" spellcheck="false">
-  <div id="code-error" class="code-error hidden"></div>
-  <button id="btn-code-submit" class="btn-start">WEITER</button>
+  <div class="wlc-bg">
+    <div class="wlc-bg-fallback" style="display:block"></div>
+    <div class="wlc-bg-overlay"></div>
+    <div class="wlc-rope-line"></div>
+    <img id="zipline-person-code" class="wlc-zipline-person" src="assets/zipline-person.png" alt="">
+  </div>
+  <div class="wlc-content" style="justify-content:center;gap:12px">
+    <div class="wlc-title" style="margin-bottom:4px">KletterMath</div>
+    <div class="wlc-sub">Schüler-Code eingeben</div>
+    <div class="wlc-desc">Gib deinen 6-stelligen Code ein, den du von deiner Lehrkraft erhalten hast.</div>
+    <input id="code-input" class="code-input" type="text" maxlength="6" placeholder="A7KM3R" autocomplete="off" autocapitalize="characters" spellcheck="false">
+    <div id="code-error" class="code-error hidden"></div>
+    <button id="btn-code-submit" class="btn-start">WEITER</button>
+  </div>
 </div>
 
 <!-- ════ Welcome ════ -->
