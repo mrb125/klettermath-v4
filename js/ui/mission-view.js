@@ -153,6 +153,8 @@ function renderMissionUI() {
   document.getElementById('btn-back')?.addEventListener('click', () => {
     clearHighlights();
     backToList();
+    // Direct call to showMapMode — belt-and-suspenders in case event chain fails
+    import('../main.js').then(m => m.showMapMode()).catch(() => {});
   });
 
   pane.querySelector('.tisch-stl-btn')?.addEventListener('click', () => {
@@ -580,13 +582,18 @@ function bindReflectionEvents() {
       note,
     });
     showToast('🪞 Reflexion gespeichert!', 'ok', 2000);
-    setTimeout(() => { clearHighlights(); backToList(); }, 400);
+    setTimeout(() => {
+      clearHighlights();
+      backToList();
+      import('../main.js').then(m => m.showMapMode()).catch(() => {});
+    }, 400);
   });
 
   // Skip
   document.getElementById('reflect-skip')?.addEventListener('click', () => {
     clearHighlights();
     backToList();
+    import('../main.js').then(m => m.showMapMode()).catch(() => {});
   });
 
   // Exam mode fallback: btn-next-mission
