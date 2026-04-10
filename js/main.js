@@ -249,9 +249,12 @@ async function onParkShow() {
     });
   });
 
-  // Render the interactive map and ensure tabs are visible
-  document.querySelector('.pane-tabs')?.style.setProperty('display', 'flex');
-  renderMapPane();
+  // Always reset SVG rendered-flag so re-entering park refreshes markers
+  const _svg = document.getElementById('map-pane-svg');
+  if (_svg) delete _svg.dataset.rendered;
+
+  // Show map mode (tabs + map, hide mission content)
+  showMapMode();
 
   // km-back-to-map: switch back to map after mission complete / back button
   if (!window._kmMapListenerAdded) {
