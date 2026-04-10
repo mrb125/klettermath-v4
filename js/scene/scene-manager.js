@@ -338,10 +338,10 @@ export function clearLiveVector() {
 }
 
 // ── Zipline Person ──
-// Rides from S(0|0|0) → G(-3|6|5) on a permanent ambient wire, always visible
-const ZIP_FROM = mathToScene(0, 0, 0);   // S
-const ZIP_TO   = mathToScene(-3, 6, 5);  // G
-const ZIP_DURATION = 9000; // ms one-way
+// Rides from S(0|0|0) → A(4|1|3) on a permanent ambient wire, always visible
+const ZIP_FROM = mathToScene(0, 0, 0);   // S  → scene (0, 0, 0)
+const ZIP_TO   = mathToScene(4, 1, 3);   // A  → scene (4, 3, -1)
+const ZIP_DURATION = 7000; // ms one-way
 
 function buildZiplinePerson() {
   const g = new THREE.Group();
