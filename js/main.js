@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Register screens
   registerScreen('code',    document.getElementById('s-code'));
-  registerScreen('welcome', document.getElementById('s-welcome'));
+  registerScreen('welcome', document.getElementById('s-welcome'), () => startZiplineLoop());
   registerScreen('park',    document.getElementById('s-park'), onParkShow);
   registerScreen('badges',  document.getElementById('s-badges'), onBadgesShow);
 
@@ -26,10 +26,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Auto-start zipline animation on welcome screen (loops continuously)
   function startZiplineLoop() {
     const person = document.getElementById('zipline-person');
-    if (!person || person.style.display === 'none') return;
+    if (!person) return;
     person.classList.add('active');
   }
-  // Start loop shortly after page load
+  // Also start on page load (covers direct welcome entry)
   setTimeout(startZiplineLoop, 800);
 
   // Welcome buttons — just navigate (animation is already looping)
