@@ -39,6 +39,32 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .menu-btn{background:none;border:1px solid var(--bg5);border-radius:5px;color:var(--text2);
           padding:5px 11px;cursor:pointer;font-size:16px;line-height:1;transition:all .15s}
 .menu-btn:hover{background:var(--bg4);color:var(--text)}
+.code-btn{background:none;border:1px solid var(--bg5);border-radius:5px;color:var(--text2);
+          padding:5px 11px;cursor:pointer;font-size:14px;line-height:1;transition:all .15s}
+.code-btn:hover{background:var(--bg4);color:var(--text)}
+.code-badge{background:rgba(232,160,48,.15);color:var(--gold);padding:2px 8px;border-radius:4px;font-size:11px;
+            font-family:'JetBrains Mono',monospace;font-weight:700}
+
+/* CODE MODAL */
+#code-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:none;align-items:center;
+            justify-content:center}
+#code-modal.open{display:flex}
+.code-box{background:var(--bg2);border:1px solid var(--bg3);border-radius:12px;padding:28px;
+          width:100%;max-width:380px;display:flex;flex-direction:column;gap:14px}
+.code-box h3{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--rope)}
+.code-box p{font-size:12px;color:var(--text2)}
+.code-box input{background:var(--bg);border:1px solid var(--bg5);border-radius:6px;padding:10px 12px;
+               color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;text-align:center;
+               letter-spacing:3px;text-transform:uppercase}
+.code-box input:focus{outline:none;border-color:var(--rope)}
+.code-status{font-size:11px;color:var(--text2);text-align:center;min-height:20px}
+.code-status.ok{color:var(--ok)}
+.code-status.err{color:var(--err)}
+.code-btns{display:flex;gap:8px;justify-content:center}
+.code-btns button{padding:7px 16px;border-radius:6px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;
+                  font-weight:700;font-size:12px;transition:opacity .15s}
+.code-btn-submit{background:var(--rope);color:var(--bg)}
+.code-btn-close{background:var(--bg4);color:var(--text)}
 
 /* DRAWER */
 #drawer{position:fixed;top:0;right:0;bottom:0;width:370px;z-index:20;display:flex;
@@ -281,6 +307,7 @@ input.num-input{width:90px!important}
   <button class="phase-btn locked" id="btn-tuev" onclick="tryTuev()">TÜV-Prüfung</button>
   <span class="score-badge" id="score-badge">0/10</span>
   <div id="hdr-sp"></div>
+  <button class="code-btn" id="code-btn-hdr" onclick="openCodeModal()" title="Schülercodes">🔑</button>
   <button class="menu-btn" onclick="openComp()" title="Kompendium">📖</button>
   <button class="menu-btn" onclick="toggleDrawer()">☰</button>
 </div>
@@ -291,6 +318,20 @@ input.num-input{width:90px!important}
     <button class="close-btn" onclick="toggleDrawer()">✕</button>
   </div>
   <div id="drw-body"></div>
+</div>
+
+<!-- CODE MODAL -->
+<div id="code-modal">
+  <div class="code-box">
+    <h3>Schülercodes</h3>
+    <p>Gib deinen 6-stelligen Code ein, um deinen Fortschritt zu synchen:</p>
+    <input type="text" id="code-input" maxlength="6" placeholder="z.B. ABC123" onkeydown="if(event.key==='Enter')submitCode()">
+    <div class="code-status" id="code-status"></div>
+    <div class="code-btns">
+      <button class="code-btn-submit" onclick="submitCode()">✓ Anmelden</button>
+      <button class="code-btn-close" onclick="closeCodeModal()">✕ Schließen</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -593,9 +634,93 @@ const STATE = {
     return MISSIONS.some(m=>m.unlocks&&m.unlocks.includes(id)&&this.isDone(m.id));
   },
   isTuevUnlocked(){ return this.isDone(7) || this.cfg.tuevForced; },
-  complete(id){ if(!this.isDone(id)) this.d.done.push(id); this.save(); },
+  complete(id){ if(!this.isDone(id)) this.d.done.push(id); this.save(); syncProgress(); },
   reset(){ this.d={done:[]}; this.save(); }
 };
+
+/* ══════════════════════════════════════════════════════
+   SCHÜLERCODES & SYNC
+   ══════════════════════════════════════════════════════ */
+const SYNC_API = 'https://mrbl.4lima.de/klettermath-dashboard/api';
+
+function getStudentCode() { return localStorage.getItem('km5_code') || null; }
+function setStudentCode(code) { localStorage.setItem('km5_code', code); updateCodeBadge(); }
+
+function updateCodeBadge(){
+  const code=getStudentCode(), btn=document.getElementById('code-btn-hdr');
+  if(!btn)return;
+  if(code){
+    btn.textContent='🔑 '+code;
+    btn.classList.add('code-badge');
+  }else{
+    btn.textContent='🔑';
+    btn.classList.remove('code-badge');
+  }
+}
+
+function openCodeModal(){
+  const m=document.getElementById('code-modal');
+  if(m)m.classList.add('open');
+  const inp=document.getElementById('code-input');
+  if(inp){
+    inp.value=getStudentCode()||'';
+    inp.focus();
+  }
+}
+
+function closeCodeModal(){
+  const m=document.getElementById('code-modal');
+  if(m)m.classList.remove('open');
+}
+
+async function submitCode(){
+  const code=document.getElementById('code-input').value.trim().toUpperCase();
+  const status=document.getElementById('code-status');
+  if(code.length!==6){
+    status.innerHTML='<span style="color:var(--err)">Bitte 6-stelligen Code eingeben</span>';
+    return;
+  }
+  status.textContent='Validiere…';
+  try{
+    const res=await fetch(SYNC_API+'/validate.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({code})
+    });
+    const data=await res.json();
+    if(data.valid){
+      setStudentCode(code);
+      status.innerHTML='<span style="color:var(--ok)">✓ Angemeldet! Klasse: '+data.class+'</span>';
+      setTimeout(closeCodeModal,1500);
+      syncProgress();
+    }else{
+      status.innerHTML='<span style="color:var(--err)">✗ Code ungültig</span>';
+    }
+  }catch(e){
+    status.innerHTML='<span style="color:var(--err)">Fehler beim Verbinden</span>';
+  }
+}
+
+async function syncProgress(){
+  const code=getStudentCode();
+  if(!code)return;
+  const missions=STATE.d.done||[];
+  const xp=missions.length*30;
+  try{
+    await fetch(SYNC_API+'/sync.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        code,
+        missions,
+        xp,
+        streak:0,
+        mastery:{},
+        errors:{}
+      })
+    });
+  }catch(e){}
+}
 
 function ropeKey(r){ return `${r.from}→${r.to}`; }
 function ropeVecByKey(key){
@@ -2684,6 +2809,15 @@ function init(){
   applyMissionHighlight({platforms:[0,1,2,3,4,5,6,7],showRopes:false});
   renderDrawer();
   if(!drawerOpen) toggleDrawer();
+
+  // Code initialization
+  updateCodeBadge();
+  const params=new URLSearchParams(window.location.search);
+  const urlCode=params.get('code');
+  if(urlCode && urlCode.length===6){
+    setStudentCode(urlCode.toUpperCase());
+    syncProgress();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);
