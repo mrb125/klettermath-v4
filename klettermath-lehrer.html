@@ -33,7 +33,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);
 .pw-err.show{display:block}
 
 /* MAIN PANEL */
-#main{display:none;max-width:600px;margin:0 auto;padding:24px 16px 60px}
+#main{display:none;max-width:640px;margin:0 auto;padding:24px 16px 60px}
 #main.show{display:block}
 
 /* HEADER */
@@ -50,31 +50,34 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);
   color:var(--text2);margin-bottom:4px}
 .section-desc{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:14px}
 
-/* MISSION ROWS */
-.m-row{display:flex;align-items:center;gap:10px;padding:8px 0;
+/* BIG TOGGLE ROW */
+.big-toggle-row{display:flex;align-items:center;gap:12px;padding:10px 0}
+.big-toggle-info{flex:1;min-width:0}
+.big-toggle-title{font-size:14px;font-weight:700}
+.big-toggle-sub{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:2px}
+
+/* RULE ROWS */
+.rule-row{display:flex;align-items:center;gap:10px;padding:7px 0;
   border-bottom:1px solid var(--bg3)}
-.m-row:last-of-type{border-bottom:none}
-.m-num{width:26px;height:26px;border-radius:50%;background:var(--bg4);
-  color:var(--text2);font-family:'Bebas Neue',sans-serif;font-size:14px;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.m-num.teacher{background:var(--blue);color:var(--bg)}
-.m-num.done{background:var(--ok);color:var(--bg)}
-.m-info{flex:1;min-width:0}
-.m-title{font-size:13px;font-weight:700}
-.m-concept{font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace}
-.m-badge{font-size:9px;font-family:'JetBrains Mono',monospace;
-  padding:2px 7px;border-radius:8px;flex-shrink:0;white-space:nowrap}
-.m-badge.free{background:rgba(91,163,217,.18);color:var(--blue)}
-.m-badge.done-b{background:rgba(107,203,119,.18);color:var(--ok)}
-.m-badge.locked-b{background:var(--bg4);color:var(--text2)}
-.m-badge.normal{background:rgba(200,131,58,.15);color:var(--rope)}
+.rule-row:last-of-type{border-bottom:none}
+.rule-id{width:34px;height:34px;border-radius:6px;background:var(--bg4);
+  color:var(--text2);font-family:'Bebas Neue',sans-serif;font-size:13px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  letter-spacing:1px;transition:background .2s,color .2s}
+.rule-id.active{background:var(--rope);color:var(--bg)}
+.rule-info{flex:1;min-width:0}
+.rule-title{font-size:13px;font-weight:700}
+.rule-cat{font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:1px}
+.rule-para{font-size:10px;color:var(--gold);font-family:'JetBrains Mono',monospace;margin-top:1px}
 
 /* TOGGLE */
 .toggle-wrap{position:relative;width:42px;height:24px;flex-shrink:0}
 .toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
 .toggle-track{position:absolute;inset:0;background:var(--bg4);border-radius:12px;
   cursor:pointer;transition:background .2s}
-.toggle-wrap input:checked+.toggle-track{background:var(--blue)}
+.toggle-wrap input:checked+.toggle-track{background:var(--rope)}
+.toggle-wrap.blue input:checked+.toggle-track{background:var(--blue)}
+.toggle-wrap.ok input:checked+.toggle-track{background:var(--ok)}
 .toggle-track:before{content:'';position:absolute;width:18px;height:18px;
   background:white;border-radius:50%;top:3px;left:3px;transition:transform .2s}
 .toggle-wrap input:checked+.toggle-track:before{transform:translateX(18px)}
@@ -87,12 +90,22 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);
 .btn:hover{opacity:.85}
 .btn-p{background:var(--rope);color:var(--bg)}
 .btn-s{background:var(--bg4);color:var(--text);border:1px solid var(--bg5)}
+.btn-blue{background:var(--blue);color:var(--bg)}
 .btn-danger{background:var(--err);color:white}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* LINK BOX */
+.link-box{background:var(--bg);border:1px solid var(--bg5);border-radius:6px;
+  padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--text2);word-break:break-all;margin-bottom:10px;line-height:1.5}
 
 /* DANGER */
 .section.danger{border-color:rgba(255,94,91,.3)}
 .section.danger .section-title{color:var(--err)}
+
+/* EXAM MODE active state */
+.section.exam-active{border-color:rgba(176,127,255,.4)}
+.section.exam-active .section-title{color:var(--purple)}
 
 /* STATUS BAR */
 #status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);
@@ -107,6 +120,11 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);
   font-size:11px;font-family:'Nunito',sans-serif;padding:4px 8px;
   border-radius:4px;border:1px solid var(--bg4)}
 .logout-btn:hover{color:var(--text);background:var(--bg4)}
+
+/* RULE CATEGORY HEADER */
+.cat-hdr{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text2);padding:8px 0 4px;border-top:1px solid var(--bg4);margin-top:4px}
+.cat-hdr:first-child{border-top:none;padding-top:0;margin-top:0}
 </style>
 </head>
 <body>
@@ -130,43 +148,77 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);
   <div class="hdr">
     <div>
       <h1>Lehrerbereich</h1>
-      <div class="hdr-sub" id="hdr-sub">KletterMath v5 · Missionen verwalten</div>
+      <div class="hdr-sub" id="hdr-sub">KletterMath v5 · TÜV &amp; Prüfungsmodus</div>
     </div>
     <button class="logout-btn" onclick="doLogout()">Abmelden</button>
   </div>
 
-  <!-- Missionen -->
-  <div class="section">
-    <div class="section-title">Missionen freigeben</div>
+  <!-- Prüfungsmodus -->
+  <div class="section" id="sec-exam">
+    <div class="section-title">Prüfungsmodus</div>
     <div class="section-desc">
-      Aktiviere einzelne Missionen direkt — unabhängig davon, ob Schüler
-      die Vorgänger-Missionen bereits abgeschlossen haben.
-      Die Freigabe gilt für diesen Browser.
+      Im Prüfungsmodus sind alle <strong>Tipp-Schaltflächen</strong> in den Missionen
+      ausgeblendet. Aktiviere diesen Modus vor einer Klassenarbeit oder einem Test —
+      Schüler sehen dann nur Eingabefelder, keine Hinweise.
     </div>
-    <div id="missions-list"></div>
-    <div class="btn-row">
-      <button class="btn btn-s" onclick="setAll(true)">✓ Alle freigeben</button>
-      <button class="btn btn-s" onclick="setAll(false)">✕ Alle sperren</button>
+    <div class="big-toggle-row">
+      <div style="font-size:24px">📋</div>
+      <div class="big-toggle-info">
+        <div class="big-toggle-title">Prüfungsmodus aktivieren</div>
+        <div class="big-toggle-sub" id="exam-status">Tipps sind sichtbar</div>
+      </div>
+      <label class="toggle-wrap purple" id="exam-toggle-wrap">
+        <input type="checkbox" id="exam-toggle" onchange="toggleExam(this.checked)">
+        <div class="toggle-track" style=""></div>
+      </label>
     </div>
   </div>
 
-  <!-- TÜV -->
+  <!-- TÜV-Prüfung Freigabe -->
   <div class="section">
-    <div class="section-title">TÜV-Prüfung</div>
+    <div class="section-title">TÜV-Prüfung freischalten</div>
     <div class="section-desc">
-      Standardmäßig nach Mission 7 freigeschaltet. Hier kann die
-      TÜV-Prüfung unabhängig vom Missionsfortschritt aktiviert werden.
+      Standardmäßig wird die TÜV-Prüfung nach Abschluss von Mission 7 freigeschaltet.
+      Hier kann der Zugang unabhängig vom Missionsfortschritt erzwungen werden.
     </div>
-    <div class="m-row" style="border:none">
-      <span style="font-size:20px">🔧</span>
-      <div class="m-info">
-        <div class="m-title">TÜV-Prüfung</div>
-        <div class="m-concept">Freie Parkplanung + Regelprüfung</div>
+    <div class="big-toggle-row">
+      <div style="font-size:24px">🔧</div>
+      <div class="big-toggle-info">
+        <div class="big-toggle-title">TÜV-Zugang freigeben</div>
+        <div class="big-toggle-sub" id="tuev-status">Nur nach Mission 7</div>
       </div>
-      <label class="toggle-wrap">
+      <label class="toggle-wrap ok" id="tuev-toggle-wrap">
         <input type="checkbox" id="tuev-toggle" onchange="toggleTuev(this.checked)">
         <div class="toggle-track"></div>
       </label>
+    </div>
+  </div>
+
+  <!-- TÜV-Regeln -->
+  <div class="section">
+    <div class="section-title">TÜV-Regeln aktivieren</div>
+    <div class="section-desc">
+      Bestimme, welche Regeln in der TÜV-Prüfung erscheinen können.
+      Deaktivierte Regeln werden nie gezogen. Mindestens eine Regel muss aktiv bleiben.
+    </div>
+    <div id="rules-list"></div>
+    <div class="btn-row">
+      <button class="btn btn-s" onclick="setAllRules(true)">✓ Alle aktivieren</button>
+      <button class="btn btn-s" onclick="setAllRules(false)">✕ Alle deaktivieren</button>
+    </div>
+  </div>
+
+  <!-- Link teilen -->
+  <div class="section">
+    <div class="section-title">Schüler-App teilen</div>
+    <div class="section-desc">
+      Link zur Schüler-App in die Zwischenablage kopieren.
+      Die aktuelle Konfiguration (TÜV, Regeln, Prüfungsmodus) wird über
+      den Browser-Speicher übertragen — Schüler müssen denselben Browser und Rechner nutzen.
+    </div>
+    <div class="link-box" id="app-link-box"></div>
+    <div class="btn-row">
+      <button class="btn btn-blue" onclick="copyLink()">📋 Link kopieren</button>
     </div>
   </div>
 
@@ -194,39 +246,43 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);
 /* ══════════════════════════════════════════════════════
    KONFIGURATION — hier anpassen
    ══════════════════════════════════════════════════════ */
-const LEHRER_PW   = 'Lehrer2025';   // ← Passwort ändern
-const SCHUELER_KEY = 'km5';         // localStorage-Key der Schüler-App
-const LEHRER_KEY   = 'km5-lehrer';  // localStorage-Key für Lehrer-Freigaben
+const LEHRER_PW    = 'Lehrer2025';   // ← Passwort ändern
+const SCHUELER_KEY = 'km5';
+const LEHRER_KEY   = 'km5-lehrer';
 
 /* ══════════════════════════════════════════════════════
-   MISSION-DATEN (muss mit klettermath-v5.html übereinstimmen)
+   ALLE VERFÜGBAREN TÜV-REGELN
+   (muss mit klettermath-v5.html übereinstimmen)
    ══════════════════════════════════════════════════════ */
-const MISSIONS = [
-  {id:1, title:'Erste Schritte',        concept:'Ortsvektor'},
-  {id:2, title:'Das erste Seil',        concept:'Verbindungsvektor · Betrag'},
-  {id:3, title:'Die Seilbahn',          concept:'Parameterdarstellung'},
-  {id:4, title:'Liegt er auf dem Weg?', concept:'Punkt auf Geraden'},
-  {id:5, title:'Zwei Seile',            concept:'Lagebeziehung zweier Geraden'},
-  {id:6, title:'Der Aufprallwinkel',    concept:'Skalarprodukt · Winkel'},
-  {id:7, title:'Abstand zur Stütze',    concept:'Lotfußpunkt · Abstand Punkt→Gerade'},
-  {id:8, title:'Die Kletterwand',       concept:'Ebene · Normalenform'},
-  {id:9, title:'Wie weit zur Wand?',    concept:'Abstand Punkt → Ebene'},
-  {id:10,title:'Seilgondel trifft Wand',concept:'Schnitt Gerade · Ebene'},
+const ALL_RULES = [
+  { id:'A1', cat:'Parameterdarstellung', title:'Seilgerade aufstellen',  para:'§2 — Stütz- und Richtungsvektor' },
+  { id:'B1', cat:'Parameterdarstellung', title:'Hindernischeck',         para:'§6 — Baum auf Seilpfad?' },
+  { id:'C1', cat:'Betrag',              title:'Seillänge berechnen',     para:'§3 — Länge 4–20 m' },
+  { id:'C3', cat:'Betrag',              title:'Fahrtrichtungsvektor',    para:'§9 — Einheitsvektor' },
+  { id:'D1', cat:'Winkel',              title:'Neigungswinkel',          para:'§5 — Neigung 20°–60°' },
+  { id:'E1', cat:'Parallelität',        title:'Parallelität zweier Seile', para:'§8 — Kein Gegenverkehr' },
+  { id:'F1', cat:'Abstand',             title:'Sicherheitsabstand',      para:'§7 — Lotfußpunkt, mind. 3 m' },
+  { id:'G1', cat:'Lagebeziehung',       title:'Lagebeziehung zweier Seile', para:'§8b — Sicherheitsbrücke' },
 ];
+
+const DEFAULT_ACTIVE = ALL_RULES.map(r=>r.id);
 
 /* ══════════════════════════════════════════════════════
    STATE
    ══════════════════════════════════════════════════════ */
 function loadCfg(){
-  try{ const s=localStorage.getItem(LEHRER_KEY); if(s) return JSON.parse(s); }catch(e){}
-  return {unlocked:[],tuevForced:false};
+  try{
+    const s=localStorage.getItem(LEHRER_KEY);
+    if(s){
+      const c=JSON.parse(s);
+      if(!c.activeRules || c.activeRules.length===0) c.activeRules=[...DEFAULT_ACTIVE];
+      return c;
+    }
+  }catch(e){}
+  return {tuevForced:false, examMode:false, activeRules:[...DEFAULT_ACTIVE]};
 }
 function saveCfg(cfg){
   try{ localStorage.setItem(LEHRER_KEY,JSON.stringify(cfg)); }catch(e){}
-}
-function loadSchueler(){
-  try{ const s=localStorage.getItem(SCHUELER_KEY); if(s) return JSON.parse(s); }catch(e){}
-  return {done:[]};
 }
 
 /* ══════════════════════════════════════════════════════
@@ -255,96 +311,147 @@ function doLogout(){
 }
 
 /* ══════════════════════════════════════════════════════
-   PANEL
+   PANEL RENDERN
    ══════════════════════════════════════════════════════ */
 function renderPanel(){
-  const cfg      = loadCfg();
-  const schueler = loadSchueler();
-  const done     = schueler.done || [];
+  const cfg = loadCfg();
 
-  // TÜV toggle
-  document.getElementById('tuev-toggle').checked = cfg.tuevForced || done.includes(7);
-  document.getElementById('tuev-toggle').disabled = done.includes(7); // schon verdient
+  // Prüfungsmodus
+  document.getElementById('exam-toggle').checked = cfg.examMode;
+  document.getElementById('exam-status').textContent = cfg.examMode
+    ? 'Tipps ausgeblendet (Prüfungsmodus aktiv)'
+    : 'Tipps sind sichtbar';
+  document.getElementById('sec-exam').classList.toggle('exam-active', cfg.examMode);
+  // purple toggle color
+  const examTrack = document.querySelector('#sec-exam .toggle-track');
+  if(examTrack) examTrack.style.background = cfg.examMode ? 'var(--purple)' : '';
 
-  // Missions
-  const list = document.getElementById('missions-list');
+  // TÜV-Freigabe
+  document.getElementById('tuev-toggle').checked = cfg.tuevForced;
+  document.getElementById('tuev-status').textContent = cfg.tuevForced
+    ? 'TÜV für alle freigegeben'
+    : 'Nur nach Mission 7';
+
+  // Regeln
+  renderRules(cfg);
+
+  // App-Link
+  const appUrl = location.href.replace('klettermath-lehrer.html','klettermath-v5.html');
+  document.getElementById('app-link-box').textContent = appUrl;
+}
+
+function renderRules(cfg){
+  const list = document.getElementById('rules-list');
   list.innerHTML = '';
-  MISSIONS.forEach(m => {
-    const isTeacher = cfg.unlocked.includes(m.id);
-    const isDone    = done.includes(m.id);
-    // Normale Freischaltung durch Vorgänger
-    const isNormal  = m.id === 1 || MISSIONS.some(
-      prev => prev.id < m.id && done.includes(prev.id)
-    );
 
-    let badgeClass, badgeText;
-    if(isDone)         { badgeClass='done-b';  badgeText='✓ abgeschlossen'; }
-    else if(isTeacher) { badgeClass='free';    badgeText='🔑 Lehrer-Freigabe'; }
-    else if(isNormal)  { badgeClass='normal';  badgeText='verfügbar'; }
-    else               { badgeClass='locked-b';badgeText='gesperrt'; }
-
-    const row = document.createElement('div');
-    row.className = 'm-row';
-    row.innerHTML = `
-      <div class="m-num ${isDone?'done':(isTeacher?'teacher':'')}">${m.id}</div>
-      <div class="m-info">
-        <div class="m-title">${m.title}</div>
-        <div class="m-concept">${m.concept}</div>
-      </div>
-      <span class="m-badge ${badgeClass}">${badgeText}</span>
-      <label class="toggle-wrap">
-        <input type="checkbox"
-          ${(isTeacher||isDone||isNormal)?'checked':''}
-          ${isDone?'disabled':''}
-          onchange="toggleMission(${m.id},this.checked)">
-        <div class="toggle-track"></div>
-      </label>`;
-    list.appendChild(row);
+  // Gruppiere nach Kategorie
+  const cats = [];
+  const seen = {};
+  ALL_RULES.forEach(r => {
+    if(!seen[r.cat]){ seen[r.cat]=true; cats.push(r.cat); }
   });
 
-  // Header-Info
-  const doneCount = done.length;
-  document.getElementById('hdr-sub').textContent =
-    `KletterMath v5 · ${doneCount}/10 Missionen abgeschlossen`;
+  cats.forEach(cat => {
+    const hdr = document.createElement('div');
+    hdr.className = 'cat-hdr';
+    hdr.textContent = cat;
+    list.appendChild(hdr);
+
+    ALL_RULES.filter(r=>r.cat===cat).forEach(rule => {
+      const isActive = cfg.activeRules.includes(rule.id);
+
+      const row = document.createElement('div');
+      row.className = 'rule-row';
+      row.innerHTML = `
+        <div class="rule-id ${isActive?'active':''}" id="rid-${rule.id}">${rule.id}</div>
+        <div class="rule-info">
+          <div class="rule-title">${rule.title}</div>
+          <div class="rule-cat">${rule.cat}</div>
+          <div class="rule-para">${rule.para}</div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" ${isActive?'checked':''}
+            onchange="toggleRule('${rule.id}',this.checked)">
+          <div class="toggle-track"></div>
+        </label>`;
+      list.appendChild(row);
+    });
+  });
 }
 
 /* ══════════════════════════════════════════════════════
    AKTIONEN
    ══════════════════════════════════════════════════════ */
-function toggleMission(id, on){
+function toggleExam(on){
   const cfg = loadCfg();
-  if(on){ if(!cfg.unlocked.includes(id)) cfg.unlocked.push(id); }
-  else  { cfg.unlocked = cfg.unlocked.filter(x=>x!==id); }
+  cfg.examMode = on;
   saveCfg(cfg);
-  renderPanel();
-  showStatus(on ? `Mission ${id} freigegeben` : `Mission ${id} gesperrt`);
-}
-
-function setAll(on){
-  const schueler = loadSchueler();
-  const done = schueler.done || [];
-  const cfg = loadCfg();
-  if(on){
-    MISSIONS.forEach(m => { if(!done.includes(m.id) && !cfg.unlocked.includes(m.id)) cfg.unlocked.push(m.id); });
-  } else {
-    cfg.unlocked = [];
-  }
-  saveCfg(cfg);
-  renderPanel();
-  showStatus(on ? 'Alle Missionen freigegeben' : 'Alle Lehrer-Freigaben entfernt');
+  document.getElementById('exam-status').textContent = on
+    ? 'Tipps ausgeblendet (Prüfungsmodus aktiv)'
+    : 'Tipps sind sichtbar';
+  document.getElementById('sec-exam').classList.toggle('exam-active', on);
+  const examTrack = document.querySelector('#sec-exam .toggle-track');
+  if(examTrack) examTrack.style.background = on ? 'var(--purple)' : '';
+  showStatus(on ? 'Prüfungsmodus aktiviert — Tipps ausgeblendet' : 'Prüfungsmodus deaktiviert');
 }
 
 function toggleTuev(on){
   const cfg = loadCfg();
   cfg.tuevForced = on;
   saveCfg(cfg);
-  showStatus(on ? 'TÜV-Prüfung aktiviert' : 'TÜV-Prüfung deaktiviert');
+  document.getElementById('tuev-status').textContent = on
+    ? 'TÜV für alle freigegeben'
+    : 'Nur nach Mission 7';
+  showStatus(on ? 'TÜV-Prüfung freigegeben' : 'TÜV-Freigabe aufgehoben');
+}
+
+function toggleRule(id, on){
+  const cfg = loadCfg();
+  if(on){
+    if(!cfg.activeRules.includes(id)) cfg.activeRules.push(id);
+  } else {
+    // Mindestens eine Regel muss aktiv bleiben
+    if(cfg.activeRules.length <= 1){
+      showStatus('Mindestens eine Regel muss aktiv sein!');
+      // Checkbox zurücksetzen
+      setTimeout(()=>renderRules(cfg),50);
+      return;
+    }
+    cfg.activeRules = cfg.activeRules.filter(x=>x!==id);
+  }
+  saveCfg(cfg);
+  // Regel-Badge aktualisieren
+  const badge = document.getElementById('rid-'+id);
+  if(badge) badge.classList.toggle('active', on);
+  showStatus(on ? `Regel ${id} aktiviert` : `Regel ${id} deaktiviert`);
+}
+
+function setAllRules(on){
+  const cfg = loadCfg();
+  cfg.activeRules = on ? [...DEFAULT_ACTIVE] : [DEFAULT_ACTIVE[0]]; // mindestens 1
+  saveCfg(cfg);
+  renderRules(cfg);
+  showStatus(on ? 'Alle Regeln aktiviert' : `Nur ${DEFAULT_ACTIVE[0]} aktiv (Minimum)`);
+}
+
+function copyLink(){
+  const appUrl = location.href.replace('klettermath-lehrer.html','klettermath-v5.html');
+  navigator.clipboard.writeText(appUrl).then(()=>{
+    showStatus('Link kopiert!');
+  }).catch(()=>{
+    // Fallback: select text in link box
+    const box = document.getElementById('app-link-box');
+    const range = document.createRange();
+    range.selectNodeContents(box);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    showStatus('Link markiert — Strg+C zum Kopieren');
+  });
 }
 
 function doReset(){
   if(!confirm('Gesamten Schüler-Fortschritt wirklich löschen?\nDieser Schritt kann nicht rückgängig gemacht werden.')) return;
   try{ localStorage.removeItem(SCHUELER_KEY); }catch(e){}
-  renderPanel();
   showStatus('Fortschritt zurückgesetzt');
 }
 
@@ -352,13 +459,12 @@ function showStatus(msg){
   const el = document.getElementById('status-msg');
   el.textContent = msg;
   el.classList.remove('hide');
-  setTimeout(()=>el.classList.add('hide'),2500);
+  setTimeout(()=>el.classList.add('hide'),2800);
 }
 
 /* ══════════════════════════════════════════════════════
    INIT
    ══════════════════════════════════════════════════════ */
-// Auto-Login wenn Session noch aktiv
 if(sessionStorage.getItem('km5-auth')==='1'){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('main').classList.add('show');
