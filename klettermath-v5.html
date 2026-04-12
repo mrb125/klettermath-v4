@@ -303,9 +303,9 @@ input.num-input{width:90px!important}
 
 <div id="hdr">
   <h1 style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--rope)">KletterMath <span style="font-size:12px;opacity:.5;letter-spacing:1px">v5</span></h1>
-  <button class="phase-btn active" id="btn-missions" onclick="setPhase('missions')">Missionen</button>
-  <button class="phase-btn locked" id="btn-tuev" onclick="tryTuev()">TÜV-Prüfung</button>
-  <span class="score-badge" id="score-badge">0/10</span>
+  <button class="phase-btn active" id="btn-missions" onclick="setPhase('missions')" style="display:none">Missionen</button>
+  <button class="phase-btn active" id="btn-tuev" onclick="tryTuev()">TÜV-Prüfung</button>
+  <span class="score-badge" id="score-badge">Stufe 1</span>
   <div id="hdr-sp"></div>
   <button class="code-btn" id="code-btn-hdr" onclick="openCodeModal()" title="Schülercodes">🔑</button>
   <button class="menu-btn" onclick="openComp()" title="Kompendium">📖</button>
@@ -504,6 +504,60 @@ const PARK_CONFIG = {
 const RULES = ['A1', 'C1', 'C3', 'D1', 'E1', 'B1', 'F1', 'G1']; // Fallback — alle verfügbaren Regeln
 function getActiveRules(){ return (STATE.cfg.activeRules || RULES).filter(id=>RDEFS[id]); }
 
+/* ══════════════════════════════════════════════════════
+   STUFEN-SYSTEM
+   Jede Stufe = vordefinierter Park + aktive Regeln.
+   Lehrer wählt Stufe flexibel pro Gruppe/Stunde.
+   ══════════════════════════════════════════════════════ */
+const STUFEN = [
+  {
+    id: 1,
+    name: "Erkundung",
+    desc: "3 Plattformen, 2 Seile – finde die Verstöße!",
+    plats: {
+      S: { x:0, y:0, z:8 },
+      A: { x:10, y:0, z:3 },
+      B: { x:5, y:8, z:12 }
+    },
+    ropes: [
+      { from:'S', to:'A' },
+      { from:'S', to:'B' }
+    ],
+    rules: ['C1','D1'],
+    editable: false
+  },
+  {
+    id: 2,
+    name: "Kreuzungen",
+    desc: "4. Plattform – Lagebeziehungen und Parallelität",
+    plats: {
+      S: { x:0, y:0, z:8 },
+      A: { x:10, y:0, z:3 },
+      B: { x:5, y:8, z:12 },
+      G: { x:8, y:6, z:6 }
+    },
+    ropes: [
+      { from:'S', to:'A' },
+      { from:'S', to:'B' },
+      { from:'A', to:'G' },
+      { from:'B', to:'G' }
+    ],
+    rules: ['C1','D1','E1','G1'],
+    editable: false
+  },
+  {
+    id: 3,
+    name: "Freies Bauen",
+    desc: "Eigenen Park bauen und TÜV-prüfen lassen",
+    plats: {
+      S: { x:0, y:0, z:4 }
+    },
+    ropes: [],
+    rules: ['A1','C1','C3','D1','E1','B1','F1','G1'],
+    editable: true
+  }
+];
+
 /* ── Plattform-Varianten (pro Buchstabe wählbar) ──────────
    Verfügbare Varianten:
      0 = Start-Bogen       (S)
@@ -633,7 +687,7 @@ const STATE = {
     if(this.isTeacherUnlocked(id)) return true;
     return MISSIONS.some(m=>m.unlocks&&m.unlocks.includes(id)&&this.isDone(m.id));
   },
-  isTuevUnlocked(){ return this.isDone(7) || this.cfg.tuevForced; },
+  isTuevUnlocked(){ return true; },
   complete(id){ if(!this.isDone(id)) this.d.done.push(id); this.save(); syncProgress(); },
   reset(){ this.d={done:[]}; this.save(); }
 };
@@ -1420,14 +1474,44 @@ function renderDrawer(){
     title.textContent = 'Missionen';
     body.appendChild(APP.mView==='runner' ? buildMissionRunner() : buildMissionList());
   } else {
+    // Stufen-Auswahl immer oben anzeigen
+    const stufe=STUFEN.find(s=>s.id===APP.currentStufe);
     if(APP.tuevPhase==='build'){
-      title.textContent = 'Park aufbauen';
+      title.textContent = stufe ? `Stufe ${stufe.id}: ${stufe.name}` : 'Park aufbauen';
+      body.appendChild(buildStufeSelector());
       body.appendChild(buildDrawerPark());
     } else {
-      title.textContent = 'TÜV-Prüfung';
+      title.textContent = stufe ? `TÜV – ${stufe.name}` : 'TÜV-Prüfung';
+      body.appendChild(buildStufeSelector());
       body.appendChild(buildDrawerTuev());
     }
   }
+}
+
+function buildStufeSelector(){
+  const sec=document.createElement('div');
+  sec.className='sec';
+  sec.innerHTML='<div class="sec-title">📋 Stufe wählen</div>';
+  const bar=document.createElement('div');
+  bar.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px';
+  STUFEN.forEach(s=>{
+    const active=APP.currentStufe===s.id;
+    const chip=document.createElement('button');
+    chip.style.cssText=`padding:6px 12px;border-radius:6px;border:2px solid ${active?'var(--rope)':'var(--bg5)'};background:${active?'var(--rope)':'var(--bg4)'};color:${active?'var(--bg)':'var(--text)'};cursor:pointer;font-size:12px;font-weight:600;font-family:inherit`;
+    chip.textContent=`${s.id}. ${s.name}`;
+    chip.title=s.desc;
+    chip.onclick=()=>loadStufe(s.id);
+    bar.appendChild(chip);
+  });
+  sec.appendChild(bar);
+  const stufe=STUFEN.find(s=>s.id===APP.currentStufe);
+  if(stufe){
+    const desc=document.createElement('div');
+    desc.style.cssText='font-size:11px;color:var(--text2);margin-top:4px';
+    desc.textContent=stufe.desc;
+    sec.appendChild(desc);
+  }
+  return sec;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -1435,6 +1519,79 @@ function renderDrawer(){
    ══════════════════════════════════════════════════════ */
 function buildDrawerPark(){
   const frag = document.createDocumentFragment();
+
+  // ── Bau-Sperre bei festen Parks ──
+  if(!APP.canEdit){
+    const info=document.createElement('div');
+    info.className='sec';
+    info.innerHTML=`<div style="background:var(--bg4);padding:12px;border-radius:6px;border-left:3px solid var(--rope)">
+      <div style="font-weight:600;color:var(--rope);margin-bottom:4px">🔒 Vorgegebener Park</div>
+      <div style="font-size:12px;color:var(--text2)">Dieser Park ist fest vorgegeben. Untersuche die Plattformen und Seile, berechne die Vektoren und prüfe die TÜV-Regeln!</div>
+    </div>`;
+    frag.appendChild(info);
+    // Plattform-Liste (nur Anzeige)
+    const platSec=document.createElement('div');
+    platSec.className='sec';
+    platSec.innerHTML='<div class="sec-title">Plattformen</div>';
+    for(const [id,pt] of Object.entries(APP.plats)){
+      const item=document.createElement('div');
+      item.className='list-item fixed';
+      item.innerHTML=`<span><b>${id}</b>(${pt.x}|${pt.y}|${pt.z})</span>`;
+      platSec.appendChild(item);
+    }
+    frag.appendChild(platSec);
+    // Seil-Liste mit Richtungs-Labels
+    if(APP.ropes.length>0){
+      const ropeSec=document.createElement('div');
+      ropeSec.className='sec';
+      ropeSec.innerHTML='<div class="sec-title">Verbindungen</div>';
+      APP.ropes.forEach(r=>{
+        const a=APP.plats[r.from], b=APP.plats[r.to]; if(!a||!b) return;
+        const dz=b.z-a.z;
+        const typ=dz>0.3?'🌉 Brücke ↑':dz<-0.3?'🚡 Zipline ↓':'➖ Seil →';
+        const item=document.createElement('div');
+        item.className='list-item fixed';
+        item.innerHTML=`<span>${r.from} → ${r.to}</span><span style="font-size:11px;color:${dz>0.3?'var(--ok)':dz<-0.3?'var(--accent)':'var(--text2)'}">${typ}</span>`;
+        ropeSec.appendChild(item);
+      });
+      frag.appendChild(ropeSec);
+    }
+    // Richtungsvektoren-Tabelle
+    if(APP.ropes.length>0){
+      const vecSec=document.createElement('div');
+      vecSec.className='sec';
+      let rows=APP.ropes.map(r=>{
+        const a=APP.plats[r.from],b=APP.plats[r.to]; if(!a||!b) return '';
+        const d=V.sub([b.x,b.y,b.z],[a.x,a.y,a.z]);
+        const len=V.len(d);
+        const dz=b.z-a.z;
+        const typ=dz>0.3?'🌉':dz<-0.3?'🚡':'➖';
+        return `<tr>
+          <td>${typ} ${r.from}${r.to}</td>
+          <td>${V.str([a.x,a.y,a.z])}</td>
+          <td>${V.str([b.x,b.y,b.z])}</td>
+          <td>${V.str(d)}</td>
+          <td>${n2(len)} m</td>
+        </tr>`;
+      }).join('');
+      vecSec.innerHTML=`<div class="sec-title">📐 Richtungsvektoren</div>
+        <table class="rope-table">
+          <tr><th></th><th>Von</th><th>Zu</th><th>d⃗</th><th>|d⃗|</th></tr>
+          ${rows}
+        </table>
+        <div class="hint" style="margin-top:5px">🌉 = Brücke (nach oben) · 🚡 = Zipline (nach unten)</div>`;
+      frag.appendChild(vecSec);
+    }
+    // TÜV-Button
+    const hr=document.createElement('hr'); hr.className='div'; frag.appendChild(hr);
+    const startBtn=document.createElement('button');
+    startBtn.className='btn btn-ok';
+    startBtn.style.cssText='width:100%;padding:10px;font-size:13px';
+    startBtn.textContent='🔧 TÜV-Prüfung starten →';
+    startBtn.onclick=startTuev;
+    frag.appendChild(startBtn);
+    return frag;
+  }
 
   // ── Plattform-Typen Palette ──
   const platTypeSec = document.createElement('div');
@@ -1818,11 +1975,42 @@ function updateProgBadge(){
     b.textContent=`${d}/10 Missionen`;
     b.className='score-badge show'+(d===10?' win':'');
   } else {
+    const stufe=STUFEN.find(s=>s.id===APP.currentStufe);
     const pass=Object.values(APP.results).filter(Boolean).length;
     const total=APP.order.length;
-    b.textContent=`${pass}/${total||8} Regeln`;
+    const sName=stufe?stufe.name:'TÜV';
+    b.textContent=`Stufe ${APP.currentStufe||1}: ${sName}`;
     b.className='score-badge show'+(pass===total&&total>0?' win':'');
   }
+}
+
+/* ══════════════════════════════════════════════════════
+   STUFEN-STEUERUNG
+   ══════════════════════════════════════════════════════ */
+function loadStufe(id){
+  const stufe=STUFEN.find(s=>s.id===id);
+  if(!stufe) return;
+  // Park laden
+  APP.plats={};
+  APP.ropes=[];
+  for(const [lbl,p] of Object.entries(stufe.plats)){
+    APP.plats[lbl]={x:p.x, y:p.y, z:p.z, fixed:!stufe.editable};
+  }
+  APP.ropes=stufe.ropes.map(r=>({...r}));
+  // Regeln setzen
+  STATE.cfg.activeRules=stufe.rules;
+  APP.currentStufe=id;
+  APP.canEdit=stufe.editable!==false;
+  // Reset Ergebnisse
+  APP.results={};
+  APP.ruleRopes={};
+  APP.ruleScen={};
+  APP.order=[];
+  // Phase: immer erst Übersicht (build), dann kann Schüler zur Prüfung wechseln
+  APP.tuevPhase='build';
+  rebuild3();
+  updateProgBadge();
+  renderDrawer();
 }
 
 /* ══════════════════════════════════════════════════════
@@ -2803,11 +2991,10 @@ function init(){
     document.getElementById('btn-tuev').classList.remove('locked');
   }
   updateProgBadge();
-  // Start in missions phase, show list
-  APP.phase='missions'; APP.mView='list';
-  rebuild3();
-  applyMissionHighlight({platforms:[0,1,2,3,4,5,6,7],showRopes:false});
-  renderDrawer();
+  // Start im TÜV-Modus, Stufe 1 laden
+  APP.phase='tuev';
+  APP.canEdit=false;
+  loadStufe(1);
   if(!drawerOpen) toggleDrawer();
 
   // Code initialization

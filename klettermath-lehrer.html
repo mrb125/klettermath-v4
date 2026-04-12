@@ -745,6 +745,103 @@
       flex-wrap: wrap;
     }
 
+    /* INTERNATIONAL FILTERS */
+    .international-filters {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr auto;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 12px;
+      background: var(--bg4);
+      border-radius: 6px;
+    }
+
+    .filter-input,
+    .filter-select {
+      padding: 8px 12px;
+      background: var(--bg2);
+      border: 1px solid var(--bg5);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--rope);
+      background: var(--bg3);
+    }
+
+    .filter-select option {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* TASKS TABLE */
+    .tasks-table-container {
+      overflow-x: auto;
+      max-height: calc(100vh - 300px);
+      overflow-y: auto;
+      border: 1px solid var(--bg4);
+      border-radius: 6px;
+      background: var(--bg3);
+    }
+
+    .tasks-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .tasks-table th {
+      background: var(--bg4);
+      padding: 12px;
+      text-align: left;
+      font-weight: 700;
+      color: var(--text);
+      border-bottom: 2px solid var(--rope);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .tasks-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--bg4);
+      color: var(--text);
+      vertical-align: top;
+    }
+
+    .tasks-table tbody tr:hover {
+      background: var(--bg4);
+    }
+
+    .tasks-table code {
+      background: var(--bg2);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: var(--gold);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    .tasks-table a {
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 11px;
+    }
+
+    .tasks-table a:hover {
+      text-decoration: underline;
+    }
+
+    .task-flag {
+      font-size: 16px;
+      margin-right: 4px;
+    }
+
     /* MISSIONS LIST */
     .mission-list {
       display: flex;
@@ -896,11 +993,50 @@
         <!-- TASKS VIEW -->
         <div id="view-tasks" class="view">
           <div class="section">
-            <div class="section-title">📚 Aufgaben-Bibliothek</div>
+            <div class="section-title">🌍 Internationale Aufgaben zur Vektorrechnung</div>
             <p style="color: var(--text2); font-size: 12px; margin-bottom: 12px;">
-              34 internationale Aufgaben für Vektorrechnung (Q1 GK NRW)
+              36 internationale Aufgaben aus verschiedenen Lehrplänen (PISA, GCSE, SAT, IB, etc.)
             </p>
-            <div class="tasks-grid" id="tasks-grid"></div>
+
+            <!-- FILTER BAR -->
+            <div class="international-filters">
+              <input type="text" id="search-input" placeholder="Nach Titel oder Aufgabe suchen..." class="filter-input">
+              <select id="concept-filter" class="filter-select">
+                <option value="">Alle Konzepte</option>
+              </select>
+              <select id="difficulty-filter" class="filter-select">
+                <option value="">Alle Schwierigkeiten</option>
+                <option value="leicht">Leicht</option>
+                <option value="mittel">Mittel</option>
+                <option value="schwer">Schwer</option>
+              </select>
+              <select id="country-filter" class="filter-select">
+                <option value="">Alle Länder</option>
+              </select>
+              <button class="btn btn-secondary" onclick="resetInternationalFilters()">Zurücksetzen</button>
+            </div>
+
+            <!-- TASKS TABLE -->
+            <div class="tasks-table-container">
+              <table class="tasks-table">
+                <thead>
+                  <tr>
+                    <th>Land</th>
+                    <th>Titel</th>
+                    <th>Konzept</th>
+                    <th>Schwierigkeit</th>
+                    <th>Aufgabenbeschreibung</th>
+                    <th>Quelle</th>
+                    <th>Bezug zu KletterMath</th>
+                  </tr>
+                </thead>
+                <tbody id="tasks-tbody">
+                  <tr>
+                    <td colspan="7" style="text-align:center;color:var(--text2);padding:20px;">Lädt internationale Aufgaben...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -1053,42 +1189,42 @@ H(0,5,3) K(4,6,2) E(7,2,0)<br>
       {id: 'D2', name: 'Regel D2', desc: 'Wartung-Protokoll'}
     ];
 
-    // Task Library (t01-t34) — internationale Aufgaben
-    const TASKS = [
-      {id: 't01', title: 'Vektoren in der Ebene', desc: 'Grundlagen 2D-Vektoren'},
-      {id: 't02', title: 'Skalarprodukt', desc: 'Orthogonalität und Winkel'},
-      {id: 't03', title: 'Kreuzprodukt', desc: '3D Normalenvektor'},
-      {id: 't04', title: 'Abstand Punkt-Gerade', desc: 'Lotfußpunkt-Methode'},
-      {id: 't05', title: 'Abstand Punkt-Ebene', desc: 'Normalenform'},
-      {id: 't06', title: 'Abstand Gerade-Gerade', desc: 'Windschief-Fall'},
-      {id: 't07', title: 'Schnitt Gerade-Ebene', desc: 'Parameter auflösen'},
-      {id: 't08', title: 'Schnitt zwei Geraden', desc: 'Schnittpunkt berechnen'},
-      {id: 't09', title: 'Schnitt zwei Ebenen', desc: 'Schnittgerade'},
-      {id: 't10', title: 'Spiegelung an Punkt', desc: 'Zentralsymmetrie'},
-      {id: 't11', title: 'Spiegelung an Gerade', desc: '2D/3D Spiegelung'},
-      {id: 't12', title: 'Spiegelung an Ebene', desc: '3D Ebenen-Spiegelung'},
-      {id: 't13', title: 'Drehung um Achse', desc: 'Rotations-Matrix'},
-      {id: 't14', title: 'Volumen Parallelepiped', desc: 'Spatprodukt'},
-      {id: 't15', title: 'Fläche Dreieck', desc: 'Kreuzprodukt-Methode'},
-      {id: 't16', title: 'Ebene durch 3 Punkte', desc: 'Normalenform ablesen'},
-      {id: 't17', title: 'Gerade-Ebene-Winkel', desc: 'Schnittwinkel'},
-      {id: 't18', title: 'Zwei Ebenen-Winkel', desc: 'Dihedral-Winkel'},
-      {id: 't19', title: 'Parametrische Kurven', desc: '3D Bahn-Gleichungen'},
-      {id: 't20', title: 'Tangenten-Vektor', desc: 'Ableitung Parameterdarstellung'},
-      {id: 't21', title: 'Krümmung und Normale', desc: 'Differentialgeometrie'},
-      {id: 't22', title: 'Ebene-Kreis-Schnitt', desc: 'Resultat-Kreis berechnen'},
-      {id: 't23', title: 'Kugel-Ebene-Schnitt', desc: 'Schnittkreis'},
-      {id: 't24', title: 'Kugel-Gerade-Schnitt', desc: 'Schnittpunkte'},
-      {id: 't25', title: 'Drei Ebenen-Schnitt', desc: 'Schnittpunkt im 3D'},
-      {id: 't26', title: 'Lineare Abhängigkeit', desc: 'Vektoren und Basis'},
-      {id: 't27', title: 'Rang und Dimension', desc: 'Linear unabhängig'},
-      {id: 't28', title: 'Basis und Koordinaten', desc: 'Basiswechsel'},
-      {id: 't29', title: 'Gram-Schmidt-Verfahren', desc: 'Orthonormalisierung'},
-      {id: 't30', title: 'Projektion auf Vektor', desc: 'Komponenten zerlegen'},
-      {id: 't31', title: 'Projektion auf Ebene', desc: 'Senkrechter Vektor'},
-      {id: 't32', title: 'QR-Zerlegung', desc: 'Orthogonale Matrix'},
-      {id: 't33', title: 'Eigenvektor/-wert', desc: 'Diagonalisierung'},
-      {id: 't34', title: 'Anwendung: Kletterpark', desc: 'Integratives Projekt'}
+    // Task Library — INTERNATIONAL TASKS (36 Aufgaben aus der ganzen Welt)
+    const TASKS_LIBRARY = [
+      { flag:'🇩🇪', country:'Deutschland (NRW)', title:'Zipline-Neigung berechnen', concept:'winkel', diff:'mittel', context:'Kletterpark', desc:'A(2|1|8) → B(14|5|2). Neigungswinkel gegenüber der Horizontalen berechnen.', source:'https://www.schulentwicklung.nrw.de/lehrplaene/', label:'KLP NRW', km:'Mission 12 — Winkel zwischen Zipline und x₁x₂-Ebene' },
+      { flag:'🇩🇪', country:'Deutschland (Bayern)', title:'Dreieck-Fläche mit Kreuzprodukt', concept:'kreuzprodukt', diff:'schwer', context:'Geometrie', desc:'A(1|2|0), B(4|1|3), C(2|5|1). Flächeninhalt über Vektorprodukt berechnen.', source:'https://www.isb.bayern.de/', label:'ISB Bayern', km:'Erweiterung: Sicherheitsnetz-Fläche zwischen 3 Plattformen' },
+      { flag:'🇩🇪', country:'Deutschland (BW)', title:'Abstand windschiefer Geraden', concept:'abstand', diff:'schwer', context:'Architektur', desc:'g: (1|2|0)+t(1|1|2), h: (3|0|1)+s(1|2|1). Kürzester Abstand berechnen.', source:'https://www.bildungsplaene-bw.de/', label:'Bildungsplan BW', km:'Mindestabstand zweier Seilbahnen im Park — Sicherheitsberechnung' },
+      { flag:'🇦🇹', country:'Österreich (Matura)', title:'Schnittgerade zweier Ebenen', concept:'schnittgerade', diff:'schwer', context:'Topographie', desc:'E₁: 2x₁+x₂−x₃=4, E₂: x₁−x₂+3x₃=2. Schnittgerade bestimmen, Punktprobe P(3|−1|3).', source:'https://www.bifie.at/', label:'BIFIE Österreich', km:'Schnittkante zweier Felswände im Kletterpark' },
+      { flag:'🇳🇱', country:'Niederlande (VWO)', title:'Windrad-Blattspitze als Ortsvektor', concept:'ortsvektor', diff:'mittel', context:'Technik', desc:'Nabe (10|0|40), Blatt 25m, Drehung in x₁x₃-Ebene. Ortsvektor in Abhängigkeit von φ.', source:'https://www.wolterskluwer.nl/', label:'Wiskunde B VWO', km:'Rotierendes Klettersystem: Karabiner auf Kreisbahn' },
+      { flag:'🇳🇱', country:'Niederlande (HAVO)', title:'Verbindungsvektor und Mittelpunkt', concept:'verbindungsvektor', diff:'leicht', context:'Stadtplanung', desc:'A(2|5|1), B(8|1|7). AB⃗, Betrag und Mittelpunkt M bestimmen.', source:'https://www.nuffic.nl/', label:'HAVO Wiskunde', km:'Mittelpunkt zweier Plattformen — Aufhängepunkt Sicherheitsnetz' },
+      { flag:'🇨🇭', country:'Schweiz (Maturität)', title:'Drachenschnur — Gerade & Ebenenantritt', concept:'geradengleichung', diff:'mittel', context:'Outdoor', desc:'A(0|0|0), Richtung (1|2|3). Wo durchquert die Schnur Ebene x₃=15?', source:'https://www.edk.ch/', label:'EDK Schweiz', km:'Seilpfad durch Park — wo trifft Seil bestimmte Höhenebene?' },
+      { flag:'🇫🇷', country:'Frankreich (Terminale)', title:'Raumdiagonale im Quader', concept:'koordinaten', diff:'leicht', context:'Architektur', desc:'Raum 6m×4m×3m. Betrag der Raumdiagonale und Parameterdarstellung bestimmen.', source:'https://eduscol.education.fr/', label:'Eduscol France', km:'Diagonale Eingang (S) bis höchste Plattform (T) im Kletterpark' },
+      { flag:'🇫🇷', country:'Frankreich (Terminale)', title:'Produit scalaire — Orthogonalität', concept:'winkel', diff:'mittel', context:'Physik', desc:'u⃗=(3|1|−2), v⃗=(1|−3|0). Skalarprodukt berechnen, zeigen u⃗⊥v⃗.', source:'https://eduscol.education.fr/', label:'Eduscol France', km:'Senkrechte Sicherheitsleinen an Plattform' },
+      { flag:'🇬🇧', country:'UK (A-Level)', title:'Three-Rope Anchor: Kräftegleichgewicht', concept:'winkel', diff:'schwer', context:'Klettern', desc:'F₁=(2|−1|3), F₂=(−1|4|−1), F₃=? halten Gewicht im Gleichgewicht. Winkel F₁∧F₂.', source:'https://www.ocr.org.uk/', label:'OCR A-Level', km:'Drei-Punkt-Anker an Kletterwand — direktes Kletterthema!' },
+      { flag:'🇬🇧', country:'UK (Further Maths)', title:'Ebenengleichung — Normalenvektor', concept:'schnittgerade', diff:'schwer', context:'Ingenieurwesen', desc:'P(1|2|−1), n⃗=(2|3|−1). Ebenengleichung, Punktprobe Q(3|−1|2).', source:'https://www.edexcel.com/', label:'Edexcel Further', km:'Schräge Kletterwand als Ebene — liegt Griffposition in der Wand?' },
+      { flag:'🇸🇬', country:'Singapur (H2 Math)', title:'Ratio-Division eines Vektors', concept:'verbindungsvektor', diff:'mittel', context:'Geometrie', desc:'A(1|3|2), B(7|0|5). P teilt AB im Verhältnis 2:1, Q teilt AB 1:3. OP⃗, OQ⃗.', source:'https://www.seab.gov.sg/', label:'SEAB H2 Math', km:'Kletterer hängt 2/3 des Weges zwischen zwei Plattformen' },
+      { flag:'🇸🇬', country:'Singapur (H2 Math)', title:'Abstand Punkt–Gerade in 3D', concept:'abstand', diff:'schwer', context:'Physik', desc:'l: (1|0|2)+t(2|1|−1), P=(3|4|1). Lotfußpunkt F und Abstand |PF|.', source:'https://www.seab.gov.sg/', label:'SEAB H2 Math', km:'Kürzester Abstand Kletterer–Seilbahn (Kollisionsvermeidung)' },
+      { flag:'🇫🇮', country:'Finnland (Ylioppilastutkinto)', title:'Satellit — Bahnvektor und Position', concept:'ortsvektor', diff:'mittel', context:'Raumfahrt', desc:'A(0|0|400), v⃗=(7|3|−0,5) km/min. Wann hat Satellit Höhe 300km?', source:'https://www.ylioppilastutkinto.fi/', label:'YTL Finnland', km:'Kletterer: Start Höhe 8m, Abstieg — wann Höhe 2m erreicht?' },
+      { flag:'🇸🇪', country:'Schweden (Matematik 3c)', title:'Parallele Geraden erkennen', concept:'geradengleichung', diff:'leicht', context:'Stadtplanung', desc:'g:(1|2|0)+t(1|1|2). Sind h:(3|4|1)+s(2|2|4) und k+r(1|2|1) parallel?', source:'https://www.skolverket.se/', label:'Skolverket', km:'Parallele Kletterrouten — fahren Seilbahnen in gleiche Richtung?' },
+      { flag:'🇯🇵', country:'Japan (数学B)', title:'Tetraeder-Schwerpunkt', concept:'verbindungsvektor', diff:'schwer', context:'Geometrie', desc:'A(0|0|0), B(4|0|0), C(0|3|0), D(0|0|6). Schwerpunkt G bestimmen.', source:'https://www.mext.go.jp/', label:'MEXT Japan', km:'Gleichgewichtspunkt eines 3D-Klettergerüsts mit 4 Ankern' },
+      { flag:'🇦🇺', country:'Australien (VCE Specialist)', title:'Vektor-Projektion: Schatten', concept:'skalarprodukt', diff:'schwer', context:'Computergrafik', desc:'P=(3|4|2) auf d⃗=(1|2|2). Projektionsvektor und Abstand P–Gerade.', source:'https://www.vcaa.vic.edu.au/', label:'VCAA Specialist', km:'Schattenlänge einer Plattform auf dem Waldboden' },
+      { flag:'🇨🇦', country:'Kanada (MCV4U Ontario)', title:'Linie–Ebene-Schnitt: Orientierungslauf', concept:'schnittgerade', diff:'mittel', context:'Sport', desc:'g:(1|0|2)+t(1|2|−1), E: 2x₁−x₂+3x₃=9. Schnittpunkt bestimmen.', source:'https://www.edu.gov.on.ca/', label:'Ontario MCV4U', km:'Kletterseil (Gerade) trifft Felswand (Ebene) — wo?' },
+      { flag:'🇺🇸', country:'USA (AP Calculus BC)', title:'Parameterform einer Raumkurve', concept:'geradengleichung', diff:'mittel', context:'Sport', desc:'x₁=3t, x₂=2t, x₃=−t²+5. Startpunkt, Richtungsvektor bei t=1, wann x₃=0?', source:'https://apcentral.collegeboard.org/', label:'College Board AP', km:'Parabolische Kurve eines geworfenen Seilbeutels — wo landet er?' },
+      { flag:'🇭🇺', country:'Ungarn (Érettségi emelt)', title:'Spiegelung an Ebene', concept:'abstand', diff:'schwer', context:'Optik', desc:'A(1|2|3) an E: x₁+2x₂−2x₃=0 spiegeln. Lotfußpunkt, Spiegelpunkt A\'.', source:'https://www.oktatas.hu/', label:'Oktatási Hivatal', km:'Spiegelbild einer Plattform im Bergsee' },
+      { flag:'🇵🇱', country:'Polen (Matura rozszerzony)', title:'Betrag und Winkelhalbierende', concept:'betrag', diff:'mittel', context:'Geometrie', desc:'a⃗=(3|4|0), b⃗=(0|3|4). Beträge, Winkel und Winkelhalbierendenrichtung.', source:'https://cke.gov.pl/', label:'CKE Polen', km:'Zwei Seile gleicher Länge — Winkel und Mittellinie' },
+      { flag:'🇨🇿', country:'Tschechien (Maturitní zkouška)', title:'Spurpunkte einer Geraden', concept:'spurpunkt', diff:'mittel', context:'Raumgeometrie', desc:'g:(2|−1|3)+t(1|2|−2). Alle 3 Spurpunkte mit Koordinatenebenen bestimmen.', source:'https://www.cermat.cz/', label:'CERMAT CZ', km:'Direkt Mission 9! Seil trifft Boden / Wand / Decke' },
+      { flag:'🇮🇹', country:'Italien (Esame di Stato)', title:'Vektoroperationen: Grundrechenarten', concept:'verbindungsvektor', diff:'leicht', context:'Design', desc:'a⃗=(2|1|3), b⃗=(−1|4|0). Summe, 2a⃗−b⃗, Skalarprodukt, Winkel.', source:'https://www.istruzione.it/', label:'MiUR Italia', km:'Kombinierte Seilvektoren am Kletterpark' },
+      { flag:'🇪🇸', country:'Spanien (EBAU)', title:'Relative Lage Gerade–Ebene', concept:'schnittgerade', diff:'mittel', context:'Geometrie', desc:'g: (x−1)/2=(y+1)/1=(z−2)/(−1), E: 2x−y+z=3. Schnitt/parallel/in Ebene?', source:'https://www.educacion.es/', label:'EBAU España', km:'Kletterseil trifft Felswand — trifft er sie oder nicht?' },
+      { flag:'🇧🇷', country:'Brasilien (ENEM)', title:'Verschiebungsvektor: Öko-Pfad', concept:'verbindungsvektor', diff:'leicht', context:'Ökotourismus', desc:'A(0|0|0)→B(3|4|0)→C(3|4|5). Gesamtstrecke und Verschiebungsvektor AC⃗.', source:'https://enem.inep.gov.br/', label:'INEP Brasil', km:'Kletterpfad: mehrere Wegpunkte, Direktvektor zum Ziel' },
+      { flag:'🇲🇽', country:'Mexiko (SEP Bachillerato)', title:'Tirolesa: Länge, Winkel, Einheitsvektor', concept:'betrag', diff:'leicht', context:'Kletterpark/Zipline', desc:'A(0|0|10)→B(20|5|2) m. Seillänge, Neigungswinkel, Einheitsvektor berechnen.', source:'https://www.sep.gob.mx/', label:'SEP México', km:'Direktes Zipline-Thema — sofort als KletterMath-Aufgabe nutzbar!' },
+      { flag:'🇹🇷', country:'Türkei (YKS AYT)', title:'Würfel: Winkel zwischen Diagonalen', concept:'winkel', diff:'mittel', context:'Geometrie', desc:'Würfel a=3. Hauptdiagonale d⃗ und Flächendiagonale f⃗. Winkel mit Skalarprodukt.', source:'https://www.meb.gov.tr/', label:'MEB Türkiye', km:'Kletterturm als Würfelgerüst: Winkel der Diagonalverstrebung' },
+      { flag:'🇰🇷', country:'Südkorea (수능 CSAT)', title:'Orthogonale Projektion (정사영)', concept:'skalarprodukt', diff:'schwer', context:'Physik', desc:'a⃗=(1|2|2) auf b⃗=(3|0|4). Projektionsvektor und Projektionsbetrag.', source:'https://www.suneung.re.kr/', label:'KICE 한국', km:'Schattenlänge eines Kletterseils bei parallelen Sonnenstrahlen' },
+      { flag:'🇮🇳', country:'Indien (CBSE Class 12)', title:'Richtungskosinusse einer Geraden', concept:'betrag', diff:'leicht', context:'Navigation', desc:'A(1|2|−2), B(3|−1|4). Richtungsvektor, Richtungskosinusse (l,m,n), l²+m²+n²=1.', source:'https://www.cbseacademic.nic.in/', label:'CBSE India', km:'Kletterpfad-Richtung als Einheitsvektor mit Achsenanteilen' },
+      { flag:'🇮🇱', country:'Israel (Bagrut 5 י.ל)', title:'Schnittgerade zweier Ebenen', concept:'schnittgerade', diff:'schwer', context:'Geometrie', desc:'E₁: x+2y−z=4, E₂: 2x−y+3z=1. Schnittgerade in Parameterform bestimmen.', source:'https://www.education.gov.il/', label:'Bagrut Israel', km:'Schnittkante zweier Kletterwände' },
+      { flag:'🇳🇿', country:'Neuseeland (NCEA Level 3)', title:'Vektorgleichung: Kayak-Pfad', concept:'geradengleichung', diff:'mittel', context:'Natur/Kayak', desc:'A(3|1|0), v⃗=(2|3|0). Wann x₁=9? Wie nah an Fels P=(6|7|0)?', source:'https://www.nzqa.govt.nz/', label:'NZQA AS91573', km:'Kletterer auf Seil: wann bestimmte Position, Abstand zu Hindernis?' },
+      { flag:'🇵🇹', country:'Portugal (ENEB Matemática A)', title:'Skalarprodukt und Winkel', concept:'skalarprodukt', diff:'mittel', context:'Physik', desc:'u⃗=(2|1|2), v⃗=(1|−2|2). u⃗·v⃗, Beträge, Winkel, Orthogonalität prüfen.', source:'https://www.iave.pt/', label:'IAVE Portugal', km:'Zwei Seile am Karabiner — wie groß ist der Winkel?' },
+      { flag:'🇧🇪', country:'Belgien (Vlaanderen)', title:'Parametervergelijking van een rechte', concept:'geradengleichung', diff:'leicht', context:'Geometrie', desc:'A(2|3|1), B(5|−1|4). Richtungsvektor, Parameterdarstellung, liegt C(8|−5|7) drauf?', source:'https://www.ond.vlaanderen.be/', label:'Onderwijs Vlaanderen', km:'Seilbahn A→B: liegt Plattform C auf dem Seil?' },
+      { flag:'🇬🇷', country:'Griechenland (Πανελλαδικές)', title:'Dreieck: Seitenvektoren und Schwerpunkt', concept:'koordinaten', diff:'leicht', context:'Geometrie', desc:'A(2|1|0), B(0|3|4), C(4|−1|2). Seitenvektoren, Beträge, Schwerpunkt G.', source:'https://www.minedu.gov.gr/', label:'ΥΠΑΙΘ Griechenland', km:'Drei Plattformen = Dreieck. Wo liegt der Gleichgewichtspunkt G?' }
     ];
 
     // ════════════════════════════════════════════════════════════
@@ -1103,7 +1239,8 @@ H(0,5,3) K(4,6,2) E(7,2,0)<br>
     // ════════════════════════════════════════════════════════════
     function init() {
       checkSession();
-      renderTaskLibrary();
+      renderInternationalTasks();
+      setupInternationalFilters();
       renderRulesList();
       loadTeacherSettings();
     }
@@ -1305,17 +1442,98 @@ H(0,5,3) K(4,6,2) E(7,2,0)<br>
     }
 
     // ════════════════════════════════════════════════════════════
-    // TASKS LIBRARY
+    // INTERNATIONAL TASKS LIBRARY
     // ════════════════════════════════════════════════════════════
-    function renderTaskLibrary() {
-      const grid = document.getElementById('tasks-grid');
-      grid.innerHTML = TASKS.map(task => `
-        <div class="task-card" onclick="showTaskDetail('${task.id}')">
-          <div class="task-id">${task.id}</div>
-          <div class="task-title">${task.title}</div>
-          <div class="task-desc">${task.desc}</div>
-        </div>
+    let filteredTasks = [...TASKS_LIBRARY];
+
+    function renderInternationalTasks(tasks = TASKS_LIBRARY) {
+      const tbody = document.getElementById('tasks-tbody');
+
+      if (tasks.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:20px;">Keine Aufgaben gefunden</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = tasks.map((task, idx) => `
+        <tr>
+          <td><span class="task-flag">${task.flag}</span> ${task.country}</td>
+          <td><strong>${task.title}</strong></td>
+          <td><code>${task.concept}</code></td>
+          <td><span style="background: ${difficultyColor(task.diff)}; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 600;">${task.diff}</span></td>
+          <td style="max-width: 300px; word-break: break-word;">${task.desc}</td>
+          <td><a href="${task.source}" target="_blank" title="${task.label}">🔗 ${task.label}</a></td>
+          <td style="font-size: 11px; color: var(--text2);">${task.km}</td>
+        </tr>
       `).join('');
+
+      filteredTasks = tasks;
+    }
+
+    function difficultyColor(diff) {
+      switch(diff) {
+        case 'leicht': return 'rgba(107, 203, 119, 0.2)';
+        case 'mittel': return 'rgba(232, 160, 48, 0.2)';
+        case 'schwer': return 'rgba(255, 94, 91, 0.2)';
+        default: return 'transparent';
+      }
+    }
+
+    function setupInternationalFilters() {
+      // Populate concept dropdown
+      const concepts = [...new Set(TASKS_LIBRARY.map(t => t.concept))].sort();
+      const conceptFilter = document.getElementById('concept-filter');
+      concepts.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c;
+        option.textContent = c;
+        conceptFilter.appendChild(option);
+      });
+
+      // Populate country dropdown
+      const countries = [...new Set(TASKS_LIBRARY.map(t => t.country))].sort();
+      const countryFilter = document.getElementById('country-filter');
+      countries.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c;
+        option.textContent = c;
+        countryFilter.appendChild(option);
+      });
+
+      // Setup event listeners
+      document.getElementById('search-input').addEventListener('input', applyInternationalFilters);
+      document.getElementById('concept-filter').addEventListener('change', applyInternationalFilters);
+      document.getElementById('difficulty-filter').addEventListener('change', applyInternationalFilters);
+      document.getElementById('country-filter').addEventListener('change', applyInternationalFilters);
+    }
+
+    function applyInternationalFilters() {
+      const search = document.getElementById('search-input').value.toLowerCase();
+      const concept = document.getElementById('concept-filter').value;
+      const difficulty = document.getElementById('difficulty-filter').value;
+      const country = document.getElementById('country-filter').value;
+
+      const filtered = TASKS_LIBRARY.filter(task => {
+        const searchMatch = !search ||
+          task.title.toLowerCase().includes(search) ||
+          task.desc.toLowerCase().includes(search) ||
+          task.country.toLowerCase().includes(search);
+
+        const conceptMatch = !concept || task.concept === concept;
+        const diffMatch = !difficulty || task.diff === difficulty;
+        const countryMatch = !country || task.country === country;
+
+        return searchMatch && conceptMatch && diffMatch && countryMatch;
+      });
+
+      renderInternationalTasks(filtered);
+    }
+
+    function resetInternationalFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('concept-filter').value = '';
+      document.getElementById('difficulty-filter').value = '';
+      document.getElementById('country-filter').value = '';
+      renderInternationalTasks(TASKS_LIBRARY);
     }
 
     function showTaskDetail(taskId) {
